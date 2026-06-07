@@ -1,0 +1,30 @@
+# 洞窟共鳴劍 - 鐵劍，Scarf 造物，地牢內依職業自適應
+display_name: "&d&l洞窟共鳴劍"
+material: IRON_SWORD
+
+stats:
+  damage: 170
+
+# 職業加成（插件實作時讀取）
+class_bonus:
+  berserk:   { damage: 10, strength: 75, speed: 10 }
+  healer:   { mending: 10, tether_heal: "獲得生命偷取/虹吸/吸血治療的&e33%&7" }
+  mage:     { intelligence: 100, damage: 10, mana_restore: "近戰攻擊恢復&e25%&7額外魔力" }
+  tank:     { defense: 100, vitality: 5, true_defense: 5 }
+  archer:   { effect: "近戰攻擊使敵人&e5秒&7內受你箭矢傷害&c+10%&7" }
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - ""
+  - "&6能力：&e洞窟共鳴 &7（依職業自適應）"
+  - "&7Scarf 所鑄之劍，在地牢內會依使用者職業共鳴。"
+  - ""
+  - "&c狂戰 &7→ &c+{berserk_damage} 傷害 &7、&c+{berserk_strength} 力量 &7、&f+{berserk_speed} 速度"
+  - "&a治療 &7→ &a+{healer_mending} 治療 &7，牽引 &e10格 &7內玩家，{healer_tether_heal}"
+  - "&b法師 &7→ &b+{mage_intelligence} 智力 &7、&c+{mage_damage} 傷害 &7，{mage_mana_restore}"
+  - "&9坦克 &7→ &a+{tank_defense} 防禦 &7、&e+{tank_vitality} 活力 &7、&e+{tank_true_defense} 真實防禦"
+  - "&e弓手 &7→ {archer_effect}"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF武&#C4C4FF器&#CFC7FF]"

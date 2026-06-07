@@ -1,0 +1,36 @@
+# 旋風棒 - 右鍵噴射錐形冰霜，造成傷害並冰凍 5 秒，冰凍中受傷 +10%
+display_name: "&6&l旋風棒"
+material: BREEZE_ROD
+
+# 對應 lore 佔位符 {damage}、{intelligence}，由 WeaponManager 替換
+stats:
+  damage: 65
+  intelligence: 152
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7智力: &a+{intelligence}"
+  - ""
+  - "&6能力：&6{skill_name} &e右鍵施放"
+  - "&7在身前釋放錐形冰霜，對怪物造成 &c{base_ability_damage} &7傷害並冰凍 &e5秒&7。"
+  - "&7冰凍中的怪物受到傷害 &c+10%&7。"
+  - "&7法力消耗: &b{mana_cost}"
+  - "&7冷卻: &f5秒"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF武&#C4C4FF器&#CFC7FF]"
+
+skill:
+  type: freeze
+  name: "冰霜噴射"
+  mana_cost: 50
+  cooldown_seconds: 5.0
+  base_ability_damage: 17000
+  ability_scaling: 0.1
+  freeze_duration_ticks: 100
+  frozen_damage_increase_percent: 10
+  cast_particle: SNOWFLAKE
+  frozen_particle: SNOWFLAKE
+  frozen_particle_count: 12
+

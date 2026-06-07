@@ -1,0 +1,35 @@
+name: underground_state
+version: '1.0'
+main: maple.underground_state.UndergroundState
+api-version: '1.21.11'
+load: POSTWORLD
+softdepend: [CMI, CMILib, LuckPerms]
+commands:
+  chestdump:
+    description: Toggle chest content dump logging
+    usage: /chestdump
+  info-new:
+    description: Open the info UI
+    usage: /info-new
+  backpackbag:
+    description: Give a small backpack bag item
+    usage: /backpackbag <1-5> [player] [amount]
+    permission: underground_state.admin
+  dungeon_panel:
+    description: Open dungeon panel GUI
+    usage: /dungeon_panel
+  playerstats:
+    description: View or edit base player stats
+    usage: /playerstats get [player] | /playerstats set <player> <stat> <value> ...
+    permission: underground_state.admin
+  underground_state:
+    description: Manage player skill state
+    usage: /underground_state player state <skill|player> ...
+    permission: underground_state.admin
+permissions:
+  underground_state.admin:
+    default: op
+  underground_state.backpack.*:
+    default: op
+  underground_state.backpack.1:
+    default: false

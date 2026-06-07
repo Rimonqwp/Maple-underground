@@ -1,0 +1,89 @@
+# 傳說套裝 第7套 - 末影（洞窟傳說）。強化末影之刃
+set_id: blood_strong_set
+display_name_prefix: "末影"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8末&#FFDFC0影&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8末&#FFDFC0影&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8末&#FFDFC0影&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8末&#FFDFC0影&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#8B4513"
+unbreakable: true
+
+ability:
+  name: "末影"
+  description: "強化末影之刃：+75 傷害；瞬傳距離 +2 格、持續 +3 秒、施放時 +5 力量。"
+
+set_bonus:
+  name: "末影"
+  aote_damage: 75
+  teleport_blocks_bonus: 2
+  duration_bonus_seconds: 3
+  strength_on_cast: 5
+
+stats:
+  helmet:   { health: 70,  defense: 100, strength: 25 }
+  chest:    { health: 123, defense: 175, strength: 35 }
+  leggings: { health: 98,  defense: 140, strength: 28 }
+  boots:    { health: 59,  defense: 85,  strength: 12 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+70"
+    - "&7防禦: &a+100"
+    - "&7力量: &c+25"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：末影 &f({set_progress})"
+    - "&7強化末影之刃：&c+{aote_damage} 傷害&7；瞬傳 &f+{teleport_blocks_bonus}格 &7、持續 &f+{duration_bonus_seconds}秒 &7、施放時 &c+{strength_on_cast} 力量&7。"
+    - "&7需手持末影之刃並穿齊本套裝才享有加成。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+123"
+    - "&7防禦: &a+175"
+    - "&7力量: &c+35"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：末影 &f({set_progress})"
+    - "&7強化末影之刃：&c+{aote_damage} 傷害&7；瞬傳 &f+{teleport_blocks_bonus}格 &7、持續 &f+{duration_bonus_seconds}秒 &7、施放時 &c+{strength_on_cast} 力量&7。"
+    - "&7需手持末影之刃並穿齊本套裝才享有加成。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+98"
+    - "&7防禦: &a+140"
+    - "&7力量: &c+28"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：末影 &f({set_progress})"
+    - "&7強化末影之刃：&c+{aote_damage} 傷害&7；瞬傳 &f+{teleport_blocks_bonus}格 &7、持續 &f+{duration_bonus_seconds}秒 &7、施放時 &c+{strength_on_cast} 力量&7。"
+    - "&7需手持末影之刃並穿齊本套裝才享有加成。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+59"
+    - "&7防禦: &a+85"
+    - "&7力量: &c+12"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：末影 &f({set_progress})"
+    - "&7強化末影之刃：&c+{aote_damage} 傷害&7；瞬傳 &f+{teleport_blocks_bonus}格 &7、持續 &f+{duration_bonus_seconds}秒 &7、施放時 &c+{strength_on_cast} 力量&7。"
+    - "&7需手持末影之刃並穿齊本套裝才享有加成。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

@@ -1,0 +1,211 @@
+monsters:
+  MINIBOSS:
+    displayName: "Miniboss"
+    entity: "ZOMBIE"
+    level: 1
+    skills:
+      corrosionMark:
+        chance: 0.22
+        cooldownSeconds: 9
+        durationSeconds: 4
+      bloodRush:
+        chance: 0.25
+        cooldownSeconds: 8
+        durationSeconds: 2
+        healRatio: 0.08
+    variants:
+      - id: "default"
+        name: "默认"
+        hp: 800
+        damage: 22
+        defense: 16
+        skin: ""
+
+  ZOMBIE_TANK:
+    displayName: "坦克僵尸"
+    entity: "ZOMBIE"
+    level: 1
+    variants:
+      - id: "a"
+        name: "A"
+        hp: 260
+        damage: 12
+        defense: 18
+      - id: "b"
+        name: "B"
+        hp: 290
+        damage: 11
+        defense: 21
+
+  ZOMBIE_WARRIOR:
+    displayName: "战士僵尸"
+    entity: "ZOMBIE"
+    level: 1
+    variants:
+      - id: "a"
+        name: "A"
+        hp: 170
+        damage: 16
+        defense: 9
+      - id: "b"
+        name: "B"
+        hp: 185
+        damage: 15
+        defense: 10
+
+  SKELETON:
+    displayName: "小白"
+    entity: "SKELETON"
+    level: 1
+    hp: 130
+    damage: 12
+    defense: 7
+
+  WITCH:
+    displayName: "女巫"
+    entity: "WITCH"
+    level: 1
+    hp: 125
+    damage: 11
+    defense: 7
+
+  ENDERMAN:
+    displayName: "末影人"
+    entity: "ENDERMAN"
+    level: 1
+    hp: 180
+    damage: 16
+    defense: 11
+
+# Exit 房專用：固定 18 個頭顱 = 9 種怪物各 2 隻，依 tag 讀取血量/攻擊/防禦
+exit_room_monsters:
+  - tag: "EXIT_MOB_1"
+    entity: "ZOMBIE"
+    displayName: "出口守衛·一"
+    hp: 240
+    damage: 15
+    defense: 9
+  - tag: "EXIT_MOB_2"
+    entity: "ZOMBIE"
+    displayName: "出口守衛·二"
+    hp: 260
+    damage: 16
+    defense: 10
+  - tag: "EXIT_MOB_3"
+    entity: "SKELETON"
+    displayName: "出口弓手·一"
+    hp: 130
+    damage: 20
+    defense: 8
+  - tag: "EXIT_MOB_4"
+    entity: "SKELETON"
+    displayName: "出口弓手·二"
+    hp: 145
+    damage: 21
+    defense: 8
+  - tag: "EXIT_MOB_5"
+    entity: "ZOMBIE"
+    displayName: "出口重甲·一"
+    hp: 320
+    damage: 12
+    defense: 20
+  - tag: "EXIT_MOB_6"
+    entity: "ZOMBIE"
+    displayName: "出口重甲·二"
+    hp: 340
+    damage: 13
+    defense: 22
+  - tag: "EXIT_MOB_7"
+    entity: "WITCH"
+    displayName: "出口巫術·一"
+    hp: 120
+    damage: 18
+    defense: 7
+  - tag: "EXIT_MOB_8"
+    entity: "WITCH"
+    displayName: "出口巫術·二"
+    hp: 130
+    damage: 19
+    defense: 7
+  - tag: "EXIT_MOB_9"
+    entity: "ENDERMAN"
+    displayName: "出口末影·一"
+    hp: 230
+    damage: 24
+    defense: 12
+
+# last_boss_room 專用：F1 雙 BOSS，玩家模型（需填 skinUuid 取得皮膚），可調血量/攻擊/防禦
+# 第一個會逃避玩家，第二個會主動攻擊
+last_boss_f1:
+  - tag: "F1_last_boss_1"
+    entity: "ZOMBIE"
+    displayName: "終關守護·一"
+    hp: 3600
+    damage: 28
+    defense: 22
+    speed: 0.32
+    knockbackResistance: 0.7
+    entityInteractionRange: 4.5
+    fearParalysis:
+      chance: 0.33
+      cooldownSeconds: 11
+      durationSeconds: 5
+      damagePerSecond: 1.0
+    groundSlam:
+      chance: 0.16
+      cooldownSeconds: 16
+      windupSeconds: 1.8
+      radius: 4.5
+      damage: 14
+    summonAdds:
+      chance: 0.20
+      cooldownSeconds: 16
+      count: 2
+      hp: 170
+      damage: 9
+      defense: 8
+      types: [ "ZOMBIE", "SKELETON", "SPIDER", "ENDERMAN", "WITHER_SKELETON", "SILVERFISH" ]
+      perType:
+        ZOMBIE: { hp: 180, damage: 9, defense: 9 }
+        SKELETON: { hp: 150, damage: 11, defense: 7 }
+        SPIDER: { hp: 145, damage: 10, defense: 6 }
+        ENDERMAN: { hp: 210, damage: 12, defense: 8 }
+        WITHER_SKELETON: { hp: 195, damage: 13, defense: 10 }
+        SILVERFISH: { hp: 95, damage: 7, defense: 4 }
+    skinUuid: ""
+  - tag: "F1_last_boss_2"
+    entity: "ZOMBIE"
+    displayName: "終關守護·二"
+    hp: 4500
+    damage: 34
+    defense: 26
+    speed: 0.35
+    knockbackResistance: 0.8
+    entityInteractionRange: 5.0
+    fearParalysis:
+      chance: 0.40
+      cooldownSeconds: 9
+      durationSeconds: 5
+      damagePerSecond: 1.0
+    groundSlam:
+      chance: 0.22
+      cooldownSeconds: 13
+      windupSeconds: 1.4
+      radius: 5.2
+      damage: 18
+    summonAdds:
+      chance: 0.26
+      cooldownSeconds: 14
+      count: 3
+      hp: 210
+      damage: 11
+      defense: 9
+      types: [ "ZOMBIE", "SKELETON", "SPIDER", "ENDERMAN", "WITHER_SKELETON", "SILVERFISH"]
+      perType:
+        ZOMBIE: { hp: 230, damage: 11, defense: 10 }
+        SKELETON: { hp: 190, damage: 13, defense: 8 }
+        SPIDER: { hp: 185, damage: 12, defense: 8 }
+        ENDERMAN: { hp: 250, damage: 14, defense: 10 }
+        WITHER_SKELETON: { hp: 240, damage: 15, defense: 11 }
+        SILVERFISH: { hp: 130, damage: 8, defense: 6 }
+    skinUuid: ""

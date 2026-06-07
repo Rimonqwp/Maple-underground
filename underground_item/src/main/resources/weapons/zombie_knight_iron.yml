@@ -1,0 +1,28 @@
+# 殭屍騎士劍 - 鐵劍，F3 怪物 2% 掉落。與篩網編織套裝有套裝加成
+display_name: "&6&l殭屍騎士劍"
+material: IRON_SWORD
+
+stats:
+  damage: 91
+  strength: 24
+
+set_bonus:
+  set_id: sieve_set
+  bonus_name: "殭屍騎士"
+  bonus_description: "與 篩網編織套裝 同時裝備時獲得 +30 力量"
+  strength: 30
+
+drop:
+  floor: F3
+  chance: 0.02
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - ""
+  - "&6完整套裝獎勵：&6{set_bonus_name}"
+  - "&7與 &6{set_bonus_name} &7同時裝備時獲得 &c+{set_bonus_strength} &7力量"
+  - ""
+  - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF武&#FFC3E8器&#FFBEF0]"

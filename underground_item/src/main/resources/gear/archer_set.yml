@@ -1,0 +1,99 @@
+# 骨弓套裝 - 擊殺地牢骷髏 10% 掉落。每件裝備使箭矢傷害 +5%（4 件 = 20%）。
+# F1 基礎屬性依圖 Floor I (Bonzo)：防禦/生命/暴擊傷害；F2=F1×1.1，F3=F2×1.1
+
+set_id: archer_set
+display_name_prefix: "白骨箭手套裝"
+
+# 終極附魔風格漸層：深紫粉 → 淺粉（與 [終極附魔] 同色系）
+pieces:
+  helmet: "&l&#B493FF白&#C196FF骨&#CF99FF箭&#DC9CFF手&#EA9FFF頭&#F7A2FF盔"
+  chest: "&l&#B493FF白&#C196FF骨&#CF99FF箭&#DC9CFF手&#EA9FFF胸&#F7A2FF甲"
+  leggings: "&l&#B493FF白&#C196FF骨&#CF99FF箭&#DC9CFF手&#EA9FFF護&#F7A2FF腿"
+  boots: "&l&#B493FF白&#C196FF骨&#CF99FF箭&#DC9CFF手&#EA9FFF戰&#F7A2FF靴"
+
+leather_color_hex: "#c4a35a"
+
+unbreakable: true
+
+# 每件裝備使箭矢傷害 +5%
+arrow_damage_percent_per_piece: 5
+
+drop:
+  chance: 0.10
+  entity_type: SKELETON
+
+# 各樓層數值硬編碼（F1 依圖，F2=F1×1.1，F3=F2×1.1 取整）
+floors:
+  F1:
+    helmet:   { defense: 33,  health: 14,  crit_damage: 15 }
+    chest:    { defense: 38,  health: 33,  crit_damage: 15 }
+    leggings: { defense: 44,  health: 22,  crit_damage: 15 }
+    boots:    { defense: 20,  health: 23,  crit_damage: 15 }
+  F2:
+    helmet:   { defense: 36,  health: 15,  crit_damage: 17 }
+    chest:    { defense: 42,  health: 36,  crit_damage: 17 }
+    leggings: { defense: 48,  health: 24,  crit_damage: 17 }
+    boots:    { defense: 22,  health: 25,  crit_damage: 17 }
+  F3:
+    helmet:   { defense: 40,  health: 17,  crit_damage: 19 }
+    chest:    { defense: 46,  health: 40,  crit_damage: 19 }
+    leggings: { defense: 53,  health: 26,  crit_damage: 19 }
+    boots:    { defense: 24,  health: 28,  crit_damage: 19 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+5%"
+    - "&7穿齊 4 件時，箭矢傷害共 &c+20%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+5%"
+    - "&7穿齊 4 件時，箭矢傷害共 &c+20%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+5%"
+    - "&7穿齊 4 件時，箭矢傷害共 &c+20%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+5%"
+    - "&7穿齊 4 件時，箭矢傷害共 &c+20%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 

@@ -1,0 +1,26 @@
+# 癒合之冠 - 地牢內 +100 治療量，稀有
+
+texture_id: "15d0f0c368e54d20e3c5e550a04a469d0161b1fecf26c8e518318c09e1134f6b"
+
+display_name: "&l&#7FAFFF癒&#8AB2FF合&#96B6FF之&#A1B9FF冠&#ADBDFF"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - ""
+  - "&7深入洞窟時，治療效果大幅提升。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&6能力：&e洞窟療癒"
+  - "&7在地底洞窟內獲得 &a+100 治療量&7。"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+
+stats:
+  health: 80
+
+ability:
+  name: "洞窟療癒"
+  mending_in_dungeon: 100

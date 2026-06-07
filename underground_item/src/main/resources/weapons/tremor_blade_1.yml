@@ -1,0 +1,27 @@
+# 餘波斬 - 木劍，稀有。擊中時 3 格內怪物受到部分傷害。
+display_name: "&a&l餘波斬"
+material: WOODEN_SWORD
+
+stats:
+  damage: 105
+  strength: 20
+  crit_damage: 20
+  cleave_radius: 3
+
+ability:
+  name: "範圍劈斬"
+  description: "當擊中目標時，3格範圍內的怪物也會受到部分傷害。"
+
+rarity: "稀有"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - "&7暴擊傷害: &9+{crit_damage}"
+  - ""
+  - "&6能力：&6{skill_name}"
+  - "&7揮擊時震盪之力向外擴散，&e{cleave_radius}格 &7內的敵人都會受到餘波傷害。"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF武&#C4C4FF器&#CFC7FF]"

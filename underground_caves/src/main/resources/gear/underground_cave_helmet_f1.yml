@@ -1,0 +1,12 @@
+# 地下洞穴頭盔 F1
+
+texture_id: ""
+display_name: "&6&l地下洞穴頭盔 F1"
+
+lore:
+  - "&7洞窟 F1 專用頭盔"
+
+stats:
+  strength: 5
+  health: 20
+  defense: 10

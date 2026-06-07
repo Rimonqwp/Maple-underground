@@ -1,0 +1,90 @@
+# 傳說套裝 第4套 - 雷鳴（洞窟傳說）。有時對附近怪物降雷
+set_id: blood_unstable_set
+display_name_prefix: "雷鳴"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8雷&#FFDFC0鳴&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8雷&#FFDFC0鳴&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8雷&#FFDFC0鳴&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8雷&#FFDFC0鳴&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#FFD700"
+unbreakable: true
+
+ability:
+  name: "雷鳴"
+  description: "有時對附近怪物降下雷擊。不穩定！"
+
+stats:
+  helmet:   { health: 70,  defense: 100, crit_chance: 5, crit_damage: 15, intelligence: 6 }
+  chest:    { health: 123, defense: 175, crit_chance: 5, crit_damage: 15, intelligence: 7 }
+  leggings: { health: 98,  defense: 140, crit_chance: 5, crit_damage: 15, intelligence: 6 }
+  boots:    { health: 59,  defense: 85,  crit_chance: 5, crit_damage: 15, intelligence: 6 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+70"
+    - "&7防禦: &a+100"
+    - "&7暴擊機率: &e+5"
+    - "&7暴擊傷害: &c+15"
+    - "&7智力: &b+6"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：雷鳴 &f({set_progress})"
+    - "&7有時對附近怪物降下雷擊。&c不穩定！"
+    - "&7觸發機率隨戰鬥時長浮動，高風險高回報。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+123"
+    - "&7防禦: &a+175"
+    - "&7暴擊機率: &e+5"
+    - "&7暴擊傷害: &c+15"
+    - "&7智力: &b+7"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：雷鳴 &f({set_progress})"
+    - "&7有時對附近怪物降下雷擊。&c不穩定！"
+    - "&7觸發機率隨戰鬥時長浮動，高風險高回報。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+98"
+    - "&7防禦: &a+140"
+    - "&7暴擊機率: &e+5"
+    - "&7暴擊傷害: &c+15"
+    - "&7智力: &b+6"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：雷鳴 &f({set_progress})"
+    - "&7有時對附近怪物降下雷擊。&c不穩定！"
+    - "&7觸發機率隨戰鬥時長浮動，高風險高回報。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+59"
+    - "&7防禦: &a+85"
+    - "&7暴擊機率: &e+5"
+    - "&7暴擊傷害: &c+15"
+    - "&7智力: &b+6"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：雷鳴 &f({set_progress})"
+    - "&7有時對附近怪物降下雷擊。&c不穩定！"
+    - "&7觸發機率隨戰鬥時長浮動，高風險高回報。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

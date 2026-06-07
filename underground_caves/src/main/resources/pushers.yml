@@ -1,0 +1,272 @@
+version: 1
+templates:
+  base_room_1x1_05:
+    pushers:
+      p1769839008906:
+        region:
+          min:
+            x: 4
+            y: -21
+            z: 14
+          max:
+            x: 7
+            y: -15
+            z: 14
+        start:
+          x: 5
+          y: -21
+          z: 14
+        end:
+          x: 6
+          y: -21
+          z: 3
+  base_room_l_02:
+    pushers:
+      p1769842361361:
+        region:
+          min:
+            x: 29
+            y: -19
+            z: 34
+          max:
+            x: 33
+            y: -15
+            z: 34
+        start:
+          x: 31
+          y: -19
+          z: 34
+        end:
+          x: 31
+          y: -19
+          z: 42
+  trap_room_01:
+    pushers:
+      p1769632277024:
+        region:
+          min:
+            x: 18
+            y: 9
+            z: 22
+          max:
+            x: 20
+            y: 16
+            z: 22
+        start:
+          x: 19
+          y: 9
+          z: 22
+        end:
+          x: 19
+          y: 9
+          z: 10
+      p1769632337959:
+        region:
+          min:
+            x: 13
+            y: 6
+            z: 8
+          max:
+            x: 14
+            y: 6
+            z: 8
+        start:
+          x: 14
+          y: 6
+          z: 8
+        end:
+          x: 14
+          y: 6
+          z: 7
+        link:
+          key: fd67699b-1654-4e2b-bfc1-15d095944ee5
+          phase: 0
+      p1769632370966:
+        region:
+          min:
+            x: 13
+            y: 6
+            z: 1
+          max:
+            x: 14
+            y: 6
+            z: 1
+        start:
+          x: 14
+          y: 6
+          z: 1
+        end:
+          x: 14
+          y: 6
+          z: 3
+        link:
+          key: fd67699b-1654-4e2b-bfc1-15d095944ee5
+          phase: 1
+      p1769632422912:
+        region:
+          min:
+            x: 13
+            y: 9
+            z: 22
+          max:
+            x: 15
+            y: 16
+            z: 22
+        start:
+          x: 14
+          y: 9
+          z: 22
+        end:
+          x: 14
+          y: 9
+          z: 10
+      p1769632460202:
+        region:
+          min:
+            x: 8
+            y: 9
+            z: 22
+          max:
+            x: 10
+            y: 16
+            z: 22
+        start:
+          x: 9
+          y: 9
+          z: 22
+        end:
+          x: 9
+          y: 9
+          z: 10
+      p1769783645235:
+        region:
+          min:
+            x: 7
+            y: -19
+            z: 18
+          max:
+            x: 7
+            y: -14
+            z: 21
+        start:
+          x: 7
+          y: -19
+          z: 20
+        end:
+          x: 22
+          y: -19
+          z: 20
+      p1769783671830:
+        region:
+          min:
+            x: 0
+            y: -5
+            z: 4
+          max:
+            x: 0
+            y: 0
+            z: 7
+        start:
+          x: 0
+          y: -5
+          z: -2
+        end:
+          x: 18
+          y: -5
+          z: -3
+      p1769783713436:
+        region:
+          min:
+            x: 19
+            y: -4
+            z: 10
+          max:
+            x: 21
+            y: 0
+            z: 10
+        start:
+          x: 20
+          y: -4
+          z: 10
+        end:
+          x: 20
+          y: -5
+          z: -3
+  base_room_1x2_02:
+    pushers:
+      p1770138375475:
+        region:
+          min:
+            x: 8
+            y: -57
+            z: 20
+          max:
+            x: 8
+            y: -54
+            z: 26
+        start:
+          x: 8
+          y: -57
+          z: 23
+        end:
+          x: 24
+          y: -57
+          z: 23
+  base_room_1x4_01:
+    pushers:
+      p1770130597180:
+        region:
+          min:
+            x: 29
+            y: -68
+            z: 40
+          max:
+            x: 29
+            y: -64
+            z: 42
+        start:
+          x: 29
+          y: -68
+          z: 41
+        end:
+          x: 20
+          y: -68
+          z: 41
+  trap_room_02:
+    pushers:
+      p1769796813043:
+        region:
+          min:
+            x: 11
+            y: 21
+            z: 29
+          max:
+            x: 15
+            y: 24
+            z: 29
+        start:
+          x: 13
+          y: 21
+          z: 29
+        end:
+          x: 13
+          y: 21
+          z: 15
+      p1769797250163:
+        region:
+          min:
+            x: 11
+            y: 21
+            z: 2
+          max:
+            x: 15
+            y: 24
+            z: 2
+        start:
+          x: 13
+          y: 21
+          z: 2
+        end:
+          x: 13
+          y: 21
+          z: 13

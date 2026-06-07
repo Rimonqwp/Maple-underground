@@ -1,0 +1,86 @@
+# 傳說套裝 第3套 - 睿智（洞窟傳說）。所有能力消耗 2/3 魔力
+set_id: blood_wise_set
+display_name_prefix: "睿智"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8睿&#FFDFC0智&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8睿&#FFDFC0智&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8睿&#FFDFC0智&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8睿&#FFDFC0智&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#4B0082"
+unbreakable: true
+
+ability:
+  name: "睿智"
+  description: "裝備時，所有能力消耗 2/3 魔力。"
+
+set_bonus:
+  name: "睿智"
+  mana_cost_ratio: "2/3"
+
+stats:
+  helmet:   { health: 70,  defense: 100, intelligence: 70 }
+  chest:    { health: 123, defense: 175, intelligence: 123 }
+  leggings: { health: 98,  defense: 140, intelligence: 98 }
+  boots:    { health: 59,  defense: 85,  intelligence: 59 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+70"
+    - "&7防禦: &a+100"
+    - "&7智力: &b+70"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：睿智 &f({set_progress})"
+    - "&7裝備時，所有能力消耗 &b{mana_cost_ratio} &7魔力。"
+    - "&7法師與治療職可更頻繁施放技能。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+123"
+    - "&7防禦: &a+175"
+    - "&7智力: &b+123"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：睿智 &f({set_progress})"
+    - "&7裝備時，所有能力消耗 &b{mana_cost_ratio} &7魔力。"
+    - "&7法師與治療職可更頻繁施放技能。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+98"
+    - "&7防禦: &a+140"
+    - "&7智力: &b+98"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：睿智 &f({set_progress})"
+    - "&7裝備時，所有能力消耗 &b{mana_cost_ratio} &7魔力。"
+    - "&7法師與治療職可更頻繁施放技能。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+59"
+    - "&7防禦: &a+85"
+    - "&7智力: &b+59"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：睿智 &f({set_progress})"
+    - "&7裝備時，所有能力消耗 &b{mana_cost_ratio} &7魔力。"
+    - "&7法師與治療職可更頻繁施放技能。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

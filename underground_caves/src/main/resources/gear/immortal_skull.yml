@@ -1,0 +1,40 @@
+# 永恆的面具 - 抵擋一次致死攻擊後血量回满，並獲得 3 秒傷害免疫與 +20 力量，冷卻 360 秒
+# 僅能透過指令取得，不會從任何怪物掉落
+
+# 頭顱材質（Minecraft 材質 URL 的 hash 部分）
+texture_id: "43931ab4b7f99ab96246ae704335f461810738cf5129932412dffc35ef920c4e"
+
+display_name: "&l&#79A4FF永&#7CB7FF恆&#7FCBFF的&#81DEFF面&#84F1FF具"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7智力: &a+{intelligence}"
+  - ""
+  - "&7傳說中能抵禦死亡的頭顱，"
+  - "&7觸發免死時血量將直接回满。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&7抵擋一次怪物或 BOSS 的致死攻擊後觸發："
+  - "&7  &c血量回满 &7｜&7 持續 &e{effect_duration_seconds} 秒 &7內 &7傷害免疫 &7｜&c +{strength_bonus} 力量 &7(玩家屬性)"
+  - "&7觸發後短時間內不會受到傷害，並提升近戰傷害。"
+  - "&f冷卻時間：{cooldown_seconds} 秒"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF面&#82E6FF具&#84F1FF]"
+
+# 裝備時提供的屬性
+stats:
+  health: 125
+  defense: 100
+  intelligence: 150
+
+# 觸發免死後的增益（strength_bonus 會加在玩家 Strength 屬性上，持續 duration_seconds 秒）
+effect:
+  strength_bonus: 20
+  duration_seconds: 3
+
+# 冷卻（秒）
+cooldown_seconds: 360

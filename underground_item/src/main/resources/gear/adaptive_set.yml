@@ -1,0 +1,118 @@
+# F3 自適應套裝（可改顯示名為「自適應裝備」）
+# 稀有度: 史詩 | 總屬性: 60 力 / 515 血 / 245 防 / 60 智，平分四件
+# 依所選地牢職業額外獲得加成（見 lore 與下方 class_bonus，需插件實作）
+
+set_id: adaptive_set
+display_name_prefix: "自適應裝備"
+
+pieces:
+  helmet: "&l&#C09BFF自&#C79EF8適&#CFA2F1應&#D6A5EA頭&#DDA9E3盔"
+  chest: "&l&#C09BFF自&#C79EF8適&#CFA2F1應&#D6A5EA胸&#DDA9E3甲"
+  leggings: "&l&#C09BFF自&#C79EF8適&#CFA2F1應&#D6A5EA護&#DDA9E3腿"
+  boots: "&l&#C09BFF自&#C79EF8適&#CFA2F1應&#D6A5EA戰&#DDA9E3靴"
+
+leather_color_hex: "#9b7bc0"
+
+unbreakable: true
+
+# 職業加成（供插件讀取實作）
+class_bonus:
+  berserk:   { strength: 20 }
+  healer:    { mending: 5, health: 40 }
+  mage:      { intelligence: 50 }
+  tank:      { defense: 30, damage_reduction_per_piece_percent: 5, same_monster_seconds: 10 }
+  archer:    { crit_chance: 5, crit_damage: 15 }
+
+# 僅 F3 樓層 | 屬性分配：胸甲 > 護腿 > 頭盔 > 靴子
+floors:
+  F3:
+    helmet:   { strength: 14, health: 117, defense: 56, intelligence: 14 }
+    chest:    { strength: 19, health: 164, defense: 78, intelligence: 19 }
+    leggings: { strength: 16, health: 140, defense: 67, intelligence: 16 }
+    boots:    { strength: 11, health: 94,  defense: 44, intelligence: 11 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7會隨你選擇的 &e地牢職業 &7而改變效能："
+    - "&c狂戰 &7→ &c+20 力量"
+    - "&a治療 &7→ &a+5 &7治療量 並 &a+40 &7生命"
+    - "&b法師 &7→ &b+50 &7智力"
+    - "&9坦克 &7→ &a+30 防禦 &7，且同一怪物在 &e10 秒 &7內多次命中時，每件減傷 &e5%&7"
+    - "&e弓手 &7→ &e+5 &7暴擊機率與 &e+15 &7暴擊傷害"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：洞鳴 &f({set_progress})"
+    - "&7每提升 &e5 &7級地底洞窟等級，這件裝備的所有基礎屬性 &a+2%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7會隨你選擇的 &e地牢職業 &7而改變效能："
+    - "&c狂戰 &7→ &c+20 力量"
+    - "&a治療 &7→ &a+5 &7治療量 並 &a+40 &7生命"
+    - "&b法師 &7→ &b+50 &7智力"
+    - "&9坦克 &7→ &a+30 防禦 &7，且同一怪物在 &e10 秒 &7內多次命中時，每件減傷 &e5%&7"
+    - "&e弓手 &7→ &e+5 &7暴擊機率與 &e+15 &7暴擊傷害"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：洞鳴 &f({set_progress})"
+    - "&7每提升 &e5 &7級地底洞窟等級，這件裝備的所有基礎屬性 &a+2%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7會隨你選擇的 &e地牢職業 &7而改變效能："
+    - "&c狂戰 &7→ &c+20 力量"
+    - "&a治療 &7→ &a+5 &7治療量 並 &a+40 &7生命"
+    - "&b法師 &7→ &b+50 &7智力"
+    - "&9坦克 &7→ &a+30 防禦 &7，且同一怪物在 &e10 秒 &7內多次命中時，每件減傷 &e5%&7"
+    - "&e弓手 &7→ &e+5 &7暴擊機率與 &e+15 &7暴擊傷害"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：洞鳴 &f({set_progress})"
+    - "&7每提升 &e5 &7級地底洞窟等級，這件裝備的所有基礎屬性 &a+2%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7會隨你選擇的 &e地牢職業 &7而改變效能："
+    - "&c狂戰 &7→ &c+20 力量"
+    - "&a治療 &7→ &a+5 &7治療量 並 &a+40 &7生命"
+    - "&b法師 &7→ &b+50 &7智力"
+    - "&9坦克 &7→ &a+30 防禦 &7，且同一怪物在 &e10 秒 &7內多次命中時，每件減傷 &e5%&7"
+    - "&e弓手 &7→ &e+5 &7暴擊機率與 &e+15 &7暴擊傷害"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：洞鳴 &f({set_progress})"
+    - "&7每提升 &e5 &7級地底洞窟等級，這件裝備的所有基礎屬性 &a+2%"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"

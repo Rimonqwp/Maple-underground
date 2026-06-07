@@ -1,0 +1,24 @@
+# 翠玉之刃 - 綠色染料物品，傷害隨錢包金幣增加（上限 20 億），公式同 Hypixel: 基礎 + 2.5 × (金幣)^0.25
+display_name: "&a&l翠玉之刃"
+material: LIME_DYE
+
+# 對應 lore 佔位符 {base_damage}、{coin_cap}、{curse_name}
+stats:
+  base_damage: 130
+  coin_cap: "20 億"
+  curse_name: "貪婪"
+
+curse:
+  name: "貪婪"
+  description: "攻擊時施加貪婪詛咒，取消任何減免死亡時金幣損失的效果。"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{base_damage} "
+  - ""
+  - "&f「&7昔日礦脈深處掘出的翠玉，&f」"
+  - "&7被鑄成此刃。據說持有者若貪念愈重、囊中愈滿，"
+  - "&7劍身便會共鳴愈強，鋒芒愈利——&c直至觸及詛咒。&7"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"

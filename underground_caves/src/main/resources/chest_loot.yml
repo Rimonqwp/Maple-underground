@@ -1,0 +1,150 @@
+chests:
+  bronze:
+    display_name: Treasure Chest (bronze)
+    base_price: 0
+    F1:
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 2-3
+          '22':
+            item: cave_echo_leyline
+            amount: 3-4
+        pool:
+          '24':
+          - { "item": "death_pennies", "amount": "1", "chance": 14.8921 }
+          - { "item": "feather_wing", "amount": "1", "chance": 29.7844 }
+          - { "item": "fortune_coins", "amount": "1", "chance": 14.8921 }
+          - { "item": "infinite_quiver", "amount": "1", "chance": 29.7844 }
+          - { "item": "no_pain_no_gain", "amount": "1", "chance": 10.6470 }
+  silver:
+    display_name: Treasure Chest (silver)
+    base_price: 25000
+    F1:
+      base_price: 25000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 4-5
+          '21':
+            item: cave_echo_leyline
+            amount: 4-5
+        pool:
+          '24':
+          - { "item": "armor_shred", "amount": "1", "chance": 7.5949 }
+          - { "item": "bounty_hunter", "amount": "1", "chance": 11.2499 }
+          - { "item": "deadwood_revival", "amount": "1", "chance": 2.8062 }
+          - { "item": "death_pennies", "amount": "1", "chance": 11.2499 }
+          - { "item": "feather_wing", "amount": "1", "chance": 22.4999 }
+          - { "item": "fortune_coins", "amount": "1", "chance": 11.2499 }
+          - { "item": "infinite_quiver", "amount": "1", "chance": 22.4999 }
+          - { "item": "mercenary", "amount": "1", "chance": 2.8062 }
+          - { "item": "no_pain_no_gain", "amount": "1", "chance": 8.0432 }
+
+  gold:
+    display_name: Treasure Chest (gold)
+    base_price: 50000
+    F1:
+      base_price: 50000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_stalactite
+            amount: 3-5
+          '22':
+            item: cave_echo_firefly
+            amount: 4-6
+        pool:
+          '24':
+          - { "item": "armor_shred", "amount": "1", "chance": 7.3876 }
+          - { "item": "bounty_hunter", "amount": "1", "chance": 10.9428 }
+          - { "item": "deadwood_revival", "amount": "1", "chance": 2.7296 }
+          - { "item": "death_pennies", "amount": "1", "chance": 10.9428 }
+          - { "item": "feather_wing", "amount": "1", "chance": 21.8858 }
+          - { "item": "fortune_coins", "amount": "1", "chance": 10.9428 }
+          - { "item": "infinite_quiver", "amount": "1", "chance": 21.8858 }
+          - { "item": "mercenary", "amount": "1", "chance": 2.7296 }
+          - { "item": "no_pain_no_gain", "amount": "1", "chance": 7.8235 }
+          - { "item": "immortal_skull", "amount": "1", "chance": 2.7297, "extra_price": 1000000 }
+
+
+  platinum:
+    display_name: Treasure Chest (platinum)
+    base_price: 100000
+    F1:
+      base_price: 100000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 4-6
+          '21':
+            item: cave_echo_leyline
+            amount: 5-7
+        pool:
+          '23': &PLATINUM_F1_POOL_23_24
+          - { "item": "armor_shred", "amount": "1", "chance": 20.9615 }
+          - { "item": "bounty_hunter", "amount": "1", "chance": 13.3391 }
+          - { "item": "deadwood_revival", "amount": "1", "chance": 13.3391 }
+          - { "item": "death_pennies", "amount": "1", "chance": 9.5280 }
+          - { "item": "feather_wing", "amount": "1", "chance": 7.6224 }
+          - { "item": "fortune_coins", "amount": "1", "chance": 10.4808 }
+          - { "item": "infinite_quiver", "amount": "1", "chance": 7.6224 }
+          - { "item": "mercenary", "amount": "1", "chance": 6.6696 }
+          - { "item": "no_pain_no_gain", "amount": "1", "chance": 5.7167 }
+          - { "item": "showtime_hook", "amount": "1", "chance": 2.3602, "extra_price": 2100000 }
+          - { "item": "immortal_skull", "amount": "1", "chance": 2.3602, "extra_price": 1000000 }
+          '24': *PLATINUM_F1_POOL_23_24
+  red:
+    display_name: Treasure Chest (red)
+    base_price: 250000
+    F1:
+      base_price: 250000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 5-6
+          '21':
+            item: cave_echo_leyline
+            amount: 12-15
+        pool:
+          '22': &RED_F1_POOL_22_24
+            - { "item": "armor_shred", "amount": "1", "chance": 6.3879 }
+            - { "item": "bounty_hunter", "amount": "1", "chance": 9.4620 }
+            - { "item": "deadwood_revival", "amount": "1", "chance": 2.3602 }
+            - { "item": "death_pennies", "amount": "1", "chance": 9.4620 }
+            - { "item": "feather_wing", "amount": "1", "chance": 18.9241 }
+            - { "item": "fortune_coins", "amount": "1", "chance": 9.4620 }
+            - { "item": "infinite_quiver", "amount": "1", "chance": 18.9241 }
+            - { "item": "mercenary", "amount": "1", "chance": 2.3602 }
+            - { "item": "no_pain_no_gain", "amount": "1", "chance": 6.7648}
+
+            - { "item": "quality_upgrade", "amount": "1", "chance": 1.7310, "extra_price": 5000000 }
+            - { "item": "immortal_skull", "amount": "1", "chance": 2.3602, "extra_price": 1000000 }
+            - { "item": "showtime_hook", "amount": "1", "chance": 2.3602, "extra_price": 2000000 }
+            - { "item": "cavern_explorer_set", "amount": "1", "chance": 2.3602, "extra_price": 1500000 }
+            - { "item": "blood_wise_set", "amount": "1", "chance": 2.3602, "extra_price": 2000000 }
+            - { "item": "ability_damage_helmet_1", "amount": "1", "chance": 2.3602, "extra_price": 1500000 }
+            - { "item": "mending_helmet_1", "amount": "1", "chance": 2.3607, "extra_price": 2000000 }
+          '23': *RED_F1_POOL_22_24
+          '24': *RED_F1_POOL_22_24
+  orange:
+    display_name: Treasure Chest (orange)
+    base_price: 3500
+    F1:
+      slots:
+        A:
+          price: 5500
+          item: DIAMOND 3
+        B:
+          price: 5500
+          item: GOLD_INGOT 8
+        C:
+          price: 5500
+          item: EMERALD 5
+        D:
+          price: 6500
+          item: NETHERITE_INGOT 1

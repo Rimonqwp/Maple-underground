@@ -1,0 +1,84 @@
+# 傳說套裝 第1套 - 祝福（洞窟傳說）。6 格內玩家自然生命恢復 3 倍
+set_id: blood_holy_set
+display_name_prefix: "祝福"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8祝&#FFDFC0福&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8祝&#FFDFC0福&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8祝&#FFDFC0福&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8祝&#FFDFC0福&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#C41E3A"
+unbreakable: true
+
+ability:
+  name: "祝福"
+  description: "你與 6 格內所有玩家的自然生命恢復提升 3 倍。"
+
+set_bonus:
+  name: "祝福"
+  radius_blocks: 6
+  regen_multiplier: 3
+
+# 總 545 血 / 500 防，分配：胸 > 腿 > 頭 > 靴
+stats:
+  helmet:   { health: 109, defense: 100 }
+  chest:    { health: 191, defense: 175 }
+  leggings: { health: 153, defense: 140 }
+  boots:    { health: 92,  defense: 85 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+109"
+    - "&7防禦: &a+100"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：祝福 &f({set_progress})"
+    - "&7你與 &e{radius_blocks}格 &7內所有玩家的自然生命恢復提升 &a{regen_multiplier}倍&7。"
+    - "&7範圍內隊友共享聖血祝福，脫戰後回血更快。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+191"
+    - "&7防禦: &a+175"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：祝福 &f({set_progress})"
+    - "&7你與 &e{radius_blocks}格 &7內所有玩家的自然生命恢復提升 &a{regen_multiplier}倍&7。"
+    - "&7範圍內隊友共享聖血祝福，脫戰後回血更快。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+153"
+    - "&7防禦: &a+140"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：祝福 &f({set_progress})"
+    - "&7你與 &e{radius_blocks}格 &7內所有玩家的自然生命恢復提升 &a{regen_multiplier}倍&7。"
+    - "&7範圍內隊友共享聖血祝福，脫戰後回血更快。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+92"
+    - "&7防禦: &a+85"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：祝福 &f({set_progress})"
+    - "&7你與 &e{radius_blocks}格 &7內所有玩家的自然生命恢復提升 &a{regen_multiplier}倍&7。"
+    - "&7範圍內隊友共享聖血祝福，脫戰後回血更快。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

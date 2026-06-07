@@ -1,0 +1,100 @@
+# F2 深窟探險者套裝 - 地牢二層通用裝備，無職業加成，數值低於 F3 自適應套裝
+# 總屬性約為 F3 自適應的 70%：42 力 / 360 血 / 170 防 / 42 智
+
+set_id: cavern_explorer_set
+display_name_prefix: "深窟探險者"
+
+pieces:
+  helmet: "&l&#7FAFFF深&#8AB2FF窟&#96B6FF探&#A1B9FF險&#ADBDFF者&#B8C0FF頭&#C4C4FF盔"
+  chest: "&l&#7FAFFF深&#8AB2FF窟&#96B6FF探&#A1B9FF險&#ADBDFF者&#B8C0FF胸&#C4C4FF甲"
+  leggings: "&l&#7FAFFF深&#8AB2FF窟&#96B6FF探&#A1B9FF險&#ADBDFF者&#B8C0FF護&#C4C4FF腿"
+  boots: "&l&#7FAFFF深&#8AB2FF窟&#96B6FF探&#A1B9FF險&#ADBDFF者&#B8C0FF戰&#C4C4FF靴"
+
+leather_color_hex: "#5a6b8a"
+
+unbreakable: true
+
+# 套裝效果：穿齊四件時生效（由插件按需實作）
+set_bonus:
+  name: "深窟路線記錄"
+  description_main: "在地底洞窟中行走時更易尋路與閃避攻擊。"
+  walk_speed_bonus: 5           # 建議解讀為 +5 行走速度（比 F3 自適應弱）
+  damage_reduction_percent: 5   # 受到怪物傷害 -5%
+
+# 僅 F2 樓層 | 屬性分配：胸甲 > 護腿 > 頭盔 > 靴子
+floors:
+  F2:
+    helmet:   { strength: 10, health: 82,  defense: 39, intelligence: 10 }
+    chest:    { strength: 13, health: 115, defense: 54, intelligence: 13 }
+    leggings: { strength: 11, health: 98,  defense: 46, intelligence: 11 }
+    boots:    { strength: 8,  health: 65,  defense: 31, intelligence: 8 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7深入二層洞窟的探險者常備裝備，"
+    - "&7在黑暗與怪物之間取得平衡。"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：深窟路線記錄 &f({set_progress})" 
+    - "&7穿齊 &e4 &7件時，在地底洞窟中獲得 &a+{walk_speed_bonus} 速度 &7與 &a{damage_reduction_percent}% &7傷害減免"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7深入二層洞窟的探險者常備裝備，"
+    - "&7在黑暗與怪物之間取得平衡。"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：深窟路線記錄 &f({set_progress})" 
+    - "&7穿齊 &e4 &7件時，在地底洞窟中獲得 &a+{walk_speed_bonus} 速度 &7與 &a{damage_reduction_percent}% &7傷害減免"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7深入二層洞窟的探險者常備裝備，"
+    - "&7在黑暗與怪物之間取得平衡。"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：深窟路線記錄 &f({set_progress})" 
+    - "&7穿齊 &e4 &7件時，在地底洞窟中獲得 &a+{walk_speed_bonus} 速度 &7與 &a{damage_reduction_percent}% &7傷害減免"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7力量: &c+{strength}"
+    - "&7智力: &b+{intelligence}"
+    - ""
+    - "&7深入二層洞窟的探險者常備裝備，"
+    - "&7在黑暗與怪物之間取得平衡。"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：深窟路線記錄 &f({set_progress})" 
+    - "&7穿齊 &e4 &7件時，在地底洞窟中獲得 &a+{walk_speed_bonus} 速度 &7與 &a{damage_reduction_percent}% &7傷害減免"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"

@@ -1,0 +1,118 @@
+# 冥界套裝 - Floor II (Scarf) 風格；擊殺地牢骷髏 2.5% 掉落。
+# 每件箭矢傷害 +5%；套裝獎勵「Skeleton Master」：箭矢傷害 +25%（穿齊 4 件共 45%）。
+# 胸甲額外：弓不消耗箭矢。
+
+set_id: skeleton_master_set
+display_name_prefix: "冥界套裝"
+
+pieces:
+  helmet: "&l&#B493FF冥&#CA98FF界&#E19DFF頭&#F7A2FF盔"
+  chest: "&l&#B493FF冥&#CA98FF界&#E19DFF胸&#F7A2FF甲"
+  leggings: "&l&#B493FF冥&#CA98FF界&#E19DFF護&#F7A2FF腿"
+  boots: "&l&#B493FF冥&#CA98FF界&#E19DFF戰&#F7A2FF靴"
+
+leather_color_hex: "#6B5B4F"
+
+unbreakable: true
+
+arrow_damage_percent_per_piece: 5
+set_bonus_arrow_damage_percent: 25
+# 胸甲專屬：弓不消耗箭矢（由 BowNoConsumeArrowListener 處理）
+chestplate_bow_no_consume_arrow: true
+
+drop:
+  chance: 0.025
+  entity_type: SKELETON
+
+# F2 依圖（Floor II Scarf）；F1=F2/1.1，F3=F2×1.1 取整
+floors:
+  F1:
+    helmet:   { defense: 25,  health: 15,  crit_damage: 21,  crit_chance: 2 }
+    chest:    { defense: 41,  health: 26,  crit_damage: 21,  crit_chance: 2 }
+    leggings: { defense: 38,  health: 24,  crit_damage: 21,  crit_chance: 2 }
+    boots:    { defense: 23,  health: 14,  crit_damage: 21,  crit_chance: 2 }
+  F2:
+    helmet:   { defense: 28,  health: 17,  crit_damage: 23,  crit_chance: 2 }
+    chest:    { defense: 45,  health: 29,  crit_damage: 23,  crit_chance: 2 }
+    leggings: { defense: 42,  health: 26,  crit_damage: 23,  crit_chance: 2 }
+    boots:    { defense: 25,  health: 15,  crit_damage: 23,  crit_chance: 2 }
+  F3:
+    helmet:   { defense: 31,  health: 19,  crit_damage: 25,  crit_chance: 2 }
+    chest:    { defense: 50,  health: 32,  crit_damage: 25,  crit_chance: 2 }
+    leggings: { defense: 46,  health: 29,  crit_damage: 25,  crit_chance: 2 }
+    boots:    { defense: 28,  health: 17,  crit_damage: 25,  crit_chance: 2 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：冥界 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c{arrow_damage_percent_per_piece}%"
+    - "&e&l&o胸甲專屬：&7弓不消耗箭矢"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：冥界 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：冥界 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：冥界 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]"

@@ -1,0 +1,36 @@
+# 絕境逢生頭盔 - 瀕死時觸發 3 秒 50 速度與傷害免疫，冷卻 30 秒
+
+texture_id: "807fc9bee8d3344e840e4031a37249a4c3c87fc80cf16432cc5c2153d1f9c53d"
+
+display_name: "&l&#C09BFF絕&#C79EF8境&#CFA2F1逢&#D6A5EA生&#DDA9E3頭&#E4ACDC盔&#ECB0D5"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7智力: &a+{intelligence}"
+  - "&7速度: &f+{speed}"
+
+  - ""
+  - "&7瀕死時激發潛能，短暫脫離險境。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&6能力：&e絕境逢生"
+  - "&7代替死亡觸發：獲得 &f+{speed_bonus} 速度 &7與傷害免疫 &e{duration_seconds} 秒&7。"
+  - "&f冷卻：&7{cooldown_seconds} 秒"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+
+stats:
+  health: 100
+  defense: 50
+  speed: 15
+  intelligence: 20
+
+effect:
+  speed_bonus: 50
+  duration_seconds: 3
+
+cooldown_seconds: 30

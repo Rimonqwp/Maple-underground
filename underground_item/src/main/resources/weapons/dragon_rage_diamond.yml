@@ -1,0 +1,29 @@
+# 龍怒鑽石劍 - 鑽石劍，右鍵前方範圍 12,000 傷害 + 擊退
+display_name: "&6&l龍怒鑽石劍"
+material: DIAMOND_SWORD
+
+stats:
+  damage: 225
+  strength: 100
+
+ability:
+  name: "龍怒"
+  type: right_click
+  description: "前方所有怪物受到 12,000 傷害，命中者大幅擊退。"
+  mana_cost: 100
+  cooldown_seconds: 2
+  base_ability_damage: 12000
+  ability_scaling: 0.1
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &a+{strength}"
+  - ""
+  - "&6能力：&6{skill_name} &e右鍵施放"
+  - "&7前方所有怪物受到 &c{base_ability_damage} &7傷害，命中者大幅擊退。"
+  - "&7法力消耗: &b{mana_cost}"
+  - "&7冷卻: &f{cooldown_seconds}秒"
+  - ""
+  - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF武&#FFC3E8器&#FFBEF0]"

@@ -1,0 +1,27 @@
+# 地鳴之鋒 - 木劍，史詩。擊中時 4 格內怪物受到部分傷害。
+display_name: "&d&l地鳴之鋒"
+material: WOODEN_SWORD
+
+stats:
+  damage: 175
+  strength: 100
+  crit_damage: 100
+  cleave_radius: 4
+
+ability:
+  name: "範圍劈斬"
+  description: "當擊中目標時，4格範圍內的怪物也會受到部分傷害。"
+
+rarity: "史詩"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - "&7暴擊傷害: &9+{crit_damage}"
+  - ""
+  - "&6能力：&6{skill_name}"
+  - "&7揮擊時震盪之力向外擴散，&e{cleave_radius}格 &7內的敵人都會受到餘波傷害。"
+  - ""
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC武&#ECB0D5器&#F3B3CE]"

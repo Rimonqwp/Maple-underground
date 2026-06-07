@@ -1,0 +1,29 @@
+# 地底礦洞 F2 鑽石頭盔 - 15 Strength / 70 Health / 30 Defense（存活率 2 倍計劃）
+# 僅能透過指令取得：/gear give diamond_villager_helmet [玩家]
+
+texture_id: "dc9ab0934efd04ecc01acdebab0fa435636e98e542faa376901a6e798c072ca2"
+
+display_name: "&l&#FFEDEE钻&#FFE5E8石&#FFDCE3村&#FFD4DD民&#FFCBD8頭&#FFC3D2盔"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7力量: &c+{strength}"
+  - ""
+  - "&f「&7如果村民也懂得談條件——&f」"
+  - "&7牠們大概會要求先拿到這頂頭盔，再下去 F2 挖礦。"
+  - "&7實驗記錄顯示：戴上後的生還率幾乎翻倍，"
+  - "&7甚至開始出現『自願下礦』的申請表。"
+  - ""
+  - "&e成功實施的研究項目："
+  - "&e『地底礦洞 F2 存活率提升 2 倍計劃』"
+  - ""
+  - "&o&#C1C1C1幽&#B4B4B4靈&#A7A7A7靈&#9B9B9B魂&#8E8E8E綁&#818181定"
+  - "&#FFEDEE[&#FFE7EA钻&#FFE1E6石&#FFDBE2洞&#FFD5DE窟&#FFCFDA頭&#FFC9D6盔&#FFC3D2]"
+
+stats:
+  strength: 15
+  health: 70
+  defense: 30

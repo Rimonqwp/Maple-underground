@@ -1,0 +1,106 @@
+chests:
+  bronze:
+    display_name: Treasure Chest (bronze)
+    base_price: 0
+    F2:
+      base_price: 0
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 1-1
+          '22':
+            item: cave_echo_leyline
+            amount: 1-1
+        pool:
+          '24':
+          - { "item": "fortune_coins", "amount": "1", "chance": 100.0000 }
+
+  silver:
+    display_name: Treasure Chest (silver)
+    base_price: 25000
+    F2:
+      base_price: 25000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 1-1
+          '21':
+            item: cave_echo_leyline
+            amount: 1-1
+        pool:
+          '24':
+          - { "item": "fortune_coins", "amount": "1", "chance": 100.0000 }
+
+  gold:
+    display_name: Treasure Chest (gold)
+    base_price: 50000
+    F2:
+      base_price: 50000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_stalactite
+            amount: 1-1
+          '22':
+            item: cave_echo_firefly
+            amount: 1-1
+        pool:
+          '24':
+          - { "item": "fortune_coins", "amount": "1", "chance": 100.0000 }
+
+  platinum:
+    display_name: Treasure Chest (platinum)
+    base_price: 100000
+    F2:
+      base_price: 100000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 1-1
+          '21':
+            item: cave_echo_leyline
+            amount: 1-1
+        pool:
+          '23': &PLATINUM_F2_POOL_23_24
+          - { "item": "fortune_coins", "amount": "1", "chance": 100.0000 }
+          '24': *PLATINUM_F2_POOL_23_24
+
+  red:
+    display_name: Treasure Chest (red)
+    base_price: 250000
+    F2:
+      base_price: 250000
+      gui:
+        fixed:
+          '20':
+            item: cave_echo_motherrock
+            amount: 1-1
+          '21':
+            item: cave_echo_leyline
+            amount: 1-1
+        pool:
+          '22': &RED_F2_POOL_22_24
+          - { "item": "fortune_coins", "amount": "1", "chance": 100.0000 }
+          '23': *RED_F2_POOL_22_24
+          '24': *RED_F2_POOL_22_24
+
+  orange:
+    display_name: Treasure Chest (orange)
+    base_price: 3500
+    F2:
+      slots:
+        A:
+          price: 5500
+          item: DIAMOND 3
+        B:
+          price: 5500
+          item: GOLD_INGOT 8
+        C:
+          price: 5500
+          item: EMERALD 5
+        D:
+          price: 6500
+          item: NETHERITE_INGOT 1

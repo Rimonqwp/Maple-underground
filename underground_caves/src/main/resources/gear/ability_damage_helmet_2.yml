@@ -1,0 +1,18 @@
+# 法術精通頭盔 - 35% 能力傷害，200 智力
+
+texture_id: "79f95be39102b50f5ecc57a161618608b0e47f27be7afd747451fd09505cc935"
+
+display_name: "&l&#C09BFF法&#C79EF8術&#CFA2F1精&#D6A5EA通&#DDA9E3頭&#E4ACDC盔&#ECB0D5"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7能力傷害: &b+{ability_damage_percent}%"
+  - "&7智力: &b+{intelligence}"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+
+stats:
+  ability_damage_percent: 35
+  intelligence: 200

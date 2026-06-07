@@ -1,0 +1,29 @@
+# 地底礦洞 F1 鑽石頭盔 - 10 Strength / 50 Health / 20 Defense（存活率 2 倍計劃）
+# 僅能透過指令取得：/gear give diamond_panda_helmet [玩家]
+
+texture_id: "4b9c817e444ed3db17acea990f1783017bd4ec8f023f231916578de5bfc5a77d"
+
+display_name: "&l&#FFEDEE钻&#FFE5E8石&#FFDCE3熊&#FFD4DD貓&#FFCBD8頭&#FFC3D2盔"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7力量: &c+{strength}"
+  - ""
+  - "&f「&7第一個笑著走出地底礦洞的人，&f」"
+  - "&7據說頭上戴的，就是這頂鑽石熊貓頭盔。"
+  - "&7研究員把他列為 F1 區域的異常樣本，"
+  - "&7在報告旁邊只寫了一句：&a『活著回來了。』"
+  - ""
+  - "&e成功實施的研究項目："
+  - "&e『地底礦洞 F1 存活率提升 2 倍計劃』"
+  - ""
+  - "&o&#C1C1C1幽&#B4B4B4靈&#A7A7A7靈&#9B9B9B魂&#8E8E8E綁&#818181定"
+  - "&#FFEDEE[&#FFE7EA钻&#FFE1E6石&#FFDBE2洞&#FFD5DE窟&#FFCFDA頭&#FFC9D6盔&#FFC3D2]"
+
+stats:
+  strength: 10
+  health: 50
+  defense: 20

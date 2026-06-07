@@ -1,0 +1,27 @@
+# 守護療癒之冠 - 220 血，地牢內 +100 治療量與活力，史詩
+
+texture_id: "456a209803e1e8eb941177e2cc8a01bcea884d94dc77c38e22f5cd1a862f89ca"
+
+display_name: "&l&#C09BFF守&#C79EF8護&#CFA2F1療&#D6A5EA癒&#DDA9E3之&#E4ACDC冠&#ECB0D5"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - ""
+  - "&7在洞窟中兼顧生存與恢復。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&6能力：&e洞窟守護療癒"
+  - "&7在地底洞窟內獲得 &a+100 治療量 &7與 &a+100 活力&7。"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+
+stats:
+  health: 220
+
+ability:
+  name: "洞窟守護療癒"
+  mending_in_dungeon: 100
+  vitality_in_dungeon: 100

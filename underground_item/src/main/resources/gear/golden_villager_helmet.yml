@@ -1,0 +1,30 @@
+# 地下洞穴頭盔 F2 - 10 Strength / 30 Health / 15 Defense
+# 僅能透過指令取得：/gear give golden_villager_helmet [玩家]
+
+texture_id: "75d562e7534c004a77f67ad3fc34d50c35d2307913ad1b9c48e0a089c36c0881"
+
+display_name: "&l&#FFEDEE黄&#FFE5E8金&#FFDCE3村&#FFD4DD民&#FFCBD8頭&#FFC3D2盔"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7力量: &c+{strength}"  
+  - ""
+  - "&7透過無數次在地下洞穴 F2 的殺戮與犧牲，"
+  - "&7這頂頭盔被記錄在冒險者公會的統計報告之中。"
+  - "&7據說曾有一位教授為了研究這片墓穴，"
+  - "&7在第二層反覆殉職，才換來寶貴的實戰數據。"
+  - ""
+  - "&e目前撥款中的研究項目："
+  - "&e『地底礦洞 F2 存活率提升 2 倍計劃』"
+  - ""
+  - "&o&#C1C1C1幽&#B4B4B4靈&#A7A7A7靈&#9B9B9B魂&#8E8E8E綁&#818181定"
+  - "&#FFEDEE[&#FFE7EA永&#FFE1E6恆&#FFDBE2洞&#FFD5DE窟&#FFCFDA頭&#FFC9D6盔&#FFC3D2]"
+
+stats:
+  strength: 10
+  health: 30
+  defense: 15
+

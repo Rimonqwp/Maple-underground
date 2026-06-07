@@ -1,0 +1,56 @@
+name: underground_caves
+version: '1.0'
+main: maple.underground_caves.Test_dungeons
+api-version: '1.21'
+depend: [underground_state, underground_item]
+commands:
+  gen_dungeon:
+    description: Generates a dungeon visualization
+    usage: /gen_dungeon <width> <height> [1x2_count] [2x1_count] [2x2_count] [L_count] [3x1_count] [debug]
+    permission: test_dungeons.generate
+  gen_room:
+    description: Pastes a single room template for debugging
+    usage: /gen_room <name> <R0|R90|R180|R270> [-v]
+    permission: test_dungeons.generate
+  dungeon_map:
+    description: Gives a custom dungeon map
+    usage: /dungeon_map
+    permission: test_dungeons.generate
+  dungeon_template:
+    description: Capture and save dungeon room templates
+    usage: /dungeon_template <pos1|pos2|check|paste|save|save_variant|save_walls|save_doors|secret_edit|secret_save|secret_exit|monster_edit|monster_save|monster_exit|monster_reload|redstone_stop|redstone_save> [name] [rotation]
+    permission: test_dungeons.template
+  dungeon_unlimited_door:
+    description: Enable or disable unlimited door opening
+    usage: /dungeon_unlimited_door <on|off>
+    permission: test_dungeons.admin
+  dungeon_exit_room_complete:
+    description: Mark exit room as cleared
+    usage: /dungeon_exit_room_complete <cellX> <cellY>
+    permission: test_dungeons.admin
+  dungeon_last_boss_chests_dump:
+    description: Dump last boss chest stands
+    usage: /dungeon_last_boss_chests_dump
+    permission: test_dungeons.admin
+  dungeon_last_boss_chests_set:
+    description: Tune one last boss chest stand
+    usage: /dungeon_last_boss_chests_set <id> <localX> <localY> <localZ> <yaw4> [small|normal|scale]
+    permission: test_dungeons.admin
+  dungeon_go_last_boss:
+    description: Teleport to the current last boss room
+    usage: /dungeon_go_last_boss
+    permission: test_dungeons.admin
+  dungeon_team_score:
+    description: Manage dungeon team score
+    usage: /dungeon_team_score | set <0-310> [world] | clear [world]
+    permission: test_dungeons.admin
+  dungeon:
+    description: Dungeon XP commands
+    usage: /dungeon give xp dungeon <amount> | /dungeon addxp <player|UUID> <type> <amount>
+  p:
+    description: Party commands
+    usage: /p invite <ID> | accept [ID] | decline <ID> | leave
+  enchant_book:
+    description: Manage custom enchant books
+    usage: /enchant_book <enchantId> [level] [player]
+    permission: test_dungeons.admin

@@ -1,0 +1,29 @@
+# 憐觸石劍 - 石劍，F3 怪物 2% 掉落。能力：命中回血
+display_name: "&d&l憐觸石劍"
+material: STONE_SWORD
+
+stats:
+  damage: 60
+  strength: 30
+  bonus_attack_speed: 100
+
+ability:
+  name: "憐觸"
+  description: "命中實體時為你恢復 +10 生命"
+
+drop:
+  floor: F3
+  chance: 0.02
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - "&7攻速: &c+{bonus_attack_speed}"
+  - ""
+  - "&6能力：&6{skill_name} &e右鍵施放"
+  - "&7命中實體時為你恢復 &a+10 &7生命。"
+  - "&7劍鋒所及，敵損我補；每擊皆可觸發，續戰更穩。"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF武&#C4C4FF器&#CFC7FF]"

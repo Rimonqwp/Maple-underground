@@ -1,0 +1,35 @@
+name: underground_item
+version: '1.0'
+main: maple.underground_item.UndergroundItem
+api-version: '1.21.11'
+load: POSTWORLD
+depend: [underground_state]
+commands:
+  weapon:
+    description: Reload weapon configs
+    usage: /weapon reload
+    permission: test_dungeons.admin
+  gear:
+    description: Reload or give gear
+    usage: /gear reload | /gear give [player] | /gear give <slot|skull|weapon <ID>> [floor/player]
+    permission: test_dungeons.admin
+  immortalskull:
+    description: Shortcut for giving immortal skull gear
+    usage: /immortalskull give [player]
+    permission: test_dungeons.admin
+  itemmenu:
+    description: Open the custom item browser menu
+    usage: /itemmenu
+    permission: test_dungeons.admin
+  sublimation_workbench:
+    description: Open the sublimation workbench
+    usage: /sublimation_workbench
+    permission: test_dungeons.admin
+  iteminfo:
+    description: Inspect main hand item data
+    usage: /iteminfo
+    permission: test_dungeons.iteminfo
+permissions:
+  test_dungeons.iteminfo:
+    description: Use /iteminfo to inspect held items
+    default: op

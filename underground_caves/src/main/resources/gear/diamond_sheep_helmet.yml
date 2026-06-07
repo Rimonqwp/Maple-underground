@@ -1,0 +1,29 @@
+# 地底礦洞 F3 鑽石頭盔 - 20 Strength / 100 Health / 40 Defense（存活率 2 倍計劃）
+# 僅能透過指令取得：/gear give diamond_sheep_helmet [玩家]
+
+texture_id: "74a591eff7629fc0a24a87b759b18d89a7bb487f4b133fba75a9391818f31523"
+
+display_name: "&l&#FFEDEE钻&#FFE5E8石&#FFDCE3綿&#FFD4DD羊&#FFCBD8頭&#FFC3D2盔"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7力量: &c+{strength}"
+  - ""
+  - "&f「&7在第三層仍敢做夢的人，&f」"
+  - "&7會把這頂綿羊頭盔當成最後的護身符。"
+  - "&7有人說，真正被保護的是牠們脆弱的理智，"
+  - "&7因為穿上後，至少還敢往前再走一步。"
+  - ""
+  - "&e成功實施的研究項目："
+  - "&e『地底礦洞 F3 存活率提升 2 倍計劃』"
+  - ""
+  - "&o&#C1C1C1幽&#B4B4B4靈&#A7A7A7靈&#9B9B9B魂&#8E8E8E綁&#818181定"
+  - "&#FFEDEE[&#FFE7EA钻&#FFE1E6石&#FFDBE2洞&#FFD5DE窟&#FFCFDA頭&#FFC9D6盔&#FFC3D2]"
+
+stats:
+  strength: 20
+  health: 100
+  defense: 40

@@ -1,0 +1,28 @@
+# 崩岩之刃 - 木劍，傳奇。擊中時 5 格內怪物受到部分傷害。
+display_name: "&6&l崩岩之刃"
+material: WOODEN_SWORD
+
+stats:
+  damage: 235
+  strength: 120
+  crit_damage: 120
+  cleave_radius: 5
+
+ability:
+  name: "範圍劈斬"
+  description: "當擊中目標時，5格範圍內的怪物也會受到部分傷害。"
+
+rarity: "傳奇"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - "&7暴擊傷害: &9+{crit_damage}"
+  - ""
+  - "&6能力：&6{skill_name}"
+  - "&7揮擊時震盪之力向外擴散，&e{cleave_radius}格 &7內的敵人都會受到餘波傷害。"
+  - "&7崩岩之刃的威力，一擊即可橫掃群敵。"
+  - ""
+  - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF武&#FFC3E8器&#FFBEF0]"

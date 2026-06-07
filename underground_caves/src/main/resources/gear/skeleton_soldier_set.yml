@@ -1,0 +1,117 @@
+# 白骨先鋒套裝 - 擊殺地牢骷髏 2.5% 掉落。
+# 每件箭矢傷害 +5%；套裝獎勵「Skeleton Soldier」：箭矢傷害額外 +25%（穿齊 4 件共 45%）。
+# F1 基礎屬性依圖 Floor I (Bonzo)：防禦/生命/暴擊傷害/暴擊機率；F2=F1×1.1，F3=F2×1.1
+
+set_id: skeleton_soldier_set
+display_name_prefix: "白骨先鋒套裝"
+
+# 與白骨箭手套裝同款漸層：&l + &#B493FF→&#F7A2FF
+pieces:
+  helmet: "&l&#B493FF白&#C196FF骨&#CF99FF先&#DC9CFF鋒&#EA9FFF頭&#F7A2FF盔"
+  chest: "&l&#B493FF白&#C196FF骨&#CF99FF先&#DC9CFF鋒&#EA9FFF胸&#F7A2FF甲"
+  leggings: "&l&#B493FF白&#C196FF骨&#CF99FF先&#DC9CFF鋒&#EA9FFF護&#F7A2FF腿"
+  boots: "&l&#B493FF白&#C196FF骨&#CF99FF先&#DC9CFF鋒&#EA9FFF戰&#F7A2FF靴"
+
+leather_color_hex: "#8B7355"
+
+unbreakable: true
+
+# 每件 +5% 箭矢傷害；套裝獎勵額外 +25%
+arrow_damage_percent_per_piece: 5
+set_bonus_arrow_damage_percent: 25
+
+drop:
+  chance: 0.025
+  entity_type: SKELETON
+
+# 各樓層數值硬編碼（F1 依圖，F2=F1×1.1，F3=F2×1.1 取整）
+floors:
+  F1:
+    helmet:   { defense: 26,  health: 16,  crit_damage: 16,  crit_chance: 2 }
+    chest:    { defense: 42,  health: 26,  crit_damage: 17,  crit_chance: 2 }
+    leggings: { defense: 38,  health: 24,  crit_damage: 17,  crit_chance: 2 }
+    boots:    { defense: 22,  health: 14,  crit_damage: 17,  crit_chance: 2 }
+  F2:
+    helmet:   { defense: 29,  health: 18,  crit_damage: 18,  crit_chance: 2 }
+    chest:    { defense: 46,  health: 29,  crit_damage: 19,  crit_chance: 2 }
+    leggings: { defense: 42,  health: 26,  crit_damage: 19,  crit_chance: 2 }
+    boots:    { defense: 24,  health: 15,  crit_damage: 19,  crit_chance: 2 }
+  F3:
+    helmet:   { defense: 32,  health: 20,  crit_damage: 20,  crit_chance: 2 }
+    chest:    { defense: 51,  health: 32,  crit_damage: 21,  crit_chance: 2 }
+    leggings: { defense: 46,  health: 29,  crit_damage: 21,  crit_chance: 2 }
+    boots:    { defense: 26,  health: 17,  crit_damage: 21,  crit_chance: 2 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：白骨先鋒 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：白骨先鋒 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：白骨先鋒 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7防禦: &a+{defense}"
+    - "&7暴擊傷害: &c+{crit_damage}%"
+    - "&7暴擊機率: &c+{crit_chance}%"
+    - "&7箭矢傷害: &c+{arrow_damage}%"
+    - ""
+    - "&#FEB3FF◆ &#FEBEF1裝&#FEC9E3備&#FFD5D6獎&#FFE0C8勵 &#FFF6AC◆"
+    - "&7每件裝備使 &e弓/弩 &7造成的箭矢傷害 &c+{arrow_damage_percent_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：白骨先鋒 &f({set_progress})"
+    - "&7穿齊 4 件時，箭矢再額外增加 &c{set_bonus_arrow_damage_percent}% &7傷害"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#B493FF[&#BE95FF史&#C797FF詩&#D199FF洞&#DA9CFF窟&#E49EFF裝&#EDA0FF備&#F7A2FF]" 

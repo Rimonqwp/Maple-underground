@@ -1,0 +1,95 @@
+# 篩子身體套裝 - 擊殺地牢女巫 10% 掉落。每件 15% 箭矢擊退抗性，套裝獎勵 +20%。
+# F1 基礎屬性依 Floor I (Bonzo)：頭 70 血 10 力、胸 125 血 20 力、腿 110 血 15 力、靴 60 血 10 力；F2=F1×1.1，F3=F2×1.1
+
+set_id: sieve_set
+display_name_prefix: "篩網編織套裝"
+
+pieces:
+  helmet: "&l&#79A4FF編&#7CB7FF織&#7FCBFF者&#81DEFF頭&#84F1FF盔"
+  chest: "&l&#79A4FF編&#7CB7FF織&#7FCBFF者&#81DEFF胸&#84F1FF甲"
+  leggings: "&l&#79A4FF編&#7CB7FF織&#7FCBFF者&#81DEFF護&#84F1FF腿"
+  boots: "&l&#79A4FF編&#7CB7FF織&#7FCBFF者&#81DEFF戰&#84F1FF靴"
+
+leather_color_hex: "#4a7c4a"
+
+unbreakable: true
+
+# 每件 15% 箭矢擊退抗性；套裝獎勵 +20%
+arrow_knockback_resistance_per_piece: 15
+set_bonus_arrow_resistance: 20
+
+drop:
+  chance: 0.10
+  entity_type: WITCH
+
+# 各樓層數值硬編碼（F1 依圖 Floor I，F2=F1×1.1，F3=F2×1.1 取整）
+floors:
+  F1:
+    helmet:   { health: 70,  strength: 10 }
+    chest:    { health: 125, strength: 20 }
+    leggings: { health: 110, strength: 15 }
+    boots:    { health: 60,  strength: 10 }
+  F2:
+    helmet:   { health: 77,  strength: 11 }
+    chest:    { health: 138, strength: 22 }
+    leggings: { health: 121, strength: 17 }
+    boots:    { health: 66,  strength: 11 }
+  F3:
+    helmet:   { health: 85,  strength: 12 }
+    chest:    { health: 152, strength: 24 }
+    leggings: { health: 133, strength: 19 }
+    boots:    { health: 73,  strength: 12 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7力量: &c+{strength}"
+    - "&7箭矢擊退抗性: &e{arrow_knockback_resistance_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：篩網 &f({set_progress})"
+    - "&7額外 &e{set_bonus_arrow_resistance}% &7箭矢擊退抗性"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7力量: &c+{strength}"
+    - "&7箭矢擊退抗性: &e{arrow_knockback_resistance_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：篩網 &f({set_progress})"
+    - "&7額外 &e{set_bonus_arrow_resistance}% &7箭矢擊退抗性"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7力量: &c+{strength}"
+    - "&7箭矢擊退抗性: &e{arrow_knockback_resistance_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：篩網 &f({set_progress})"
+    - "&7額外 &e{set_bonus_arrow_resistance}% &7箭矢擊退抗性"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+{health}"
+    - "&7力量: &c+{strength}"
+    - "&7箭矢擊退抗性: &e{arrow_knockback_resistance_per_piece}%"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：篩網 &f({set_progress})"
+    - "&7額外 &e{set_bonus_arrow_resistance}% &7箭矢擊退抗性"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"

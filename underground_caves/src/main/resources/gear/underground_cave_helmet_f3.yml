@@ -1,0 +1,12 @@
+# 地下洞穴頭盔 F3
+
+texture_id: ""
+display_name: "&6&l地下洞穴頭盔 F3"
+
+lore:
+  - "&7洞窟 F3 專用頭盔"
+
+stats:
+  strength: 12
+  health: 50
+  defense: 20

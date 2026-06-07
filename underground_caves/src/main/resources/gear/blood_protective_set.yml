@@ -1,0 +1,86 @@
+# 傳說套裝 第2套 - 堅守（洞窟傳說）。每損失 1% 生命，每件裝備防禦 +1%
+set_id: blood_protective_set
+display_name_prefix: "堅守"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8堅&#FFDFC0守&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8堅&#FFDFC0守&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8堅&#FFDFC0守&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8堅&#FFDFC0守&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#8B0000"
+unbreakable: true
+
+ability:
+  name: "堅守"
+  description: "每損失 1% 生命，每件裝備的防禦增加 1%。"
+
+set_bonus:
+  name: "堅守"
+  defense_per_missing_hp_percent: 1
+
+stats:
+  helmet:   { health: 70,  defense: 120 }
+  chest:    { health: 123, defense: 210 }
+  leggings: { health: 98,  defense: 168 }
+  boots:    { health: 59,  defense: 102 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+70"
+    - "&7防禦: &a+120"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅守 &f({set_progress})"
+    - "&7每損失 &c1% &7生命，每件裝備的 &a防禦 &7增加 &a{defense_per_missing_hp_percent}%&7。"
+    - "&7殘血時護甲愈堅，適合扛傷與續戰。"
+    - "&8需穿齊 4 件才生效。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+123"
+    - "&7防禦: &a+210"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅守 &f({set_progress})"
+    - "&7每損失 &c1% &7生命，每件裝備的 &a防禦 &7增加 &a{defense_per_missing_hp_percent}%&7。"
+    - "&7殘血時護甲愈堅，適合扛傷與續戰。"
+    - "&8需穿齊 4 件才生效。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+98"
+    - "&7防禦: &a+168"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅守 &f({set_progress})"
+    - "&7每損失 &c1% &7生命，每件裝備的 &a防禦 &7增加 &a{defense_per_missing_hp_percent}%&7。"
+    - "&7殘血時護甲愈堅，適合扛傷與續戰。"
+    - "&8需穿齊 4 件才生效。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+59"
+    - "&7防禦: &a+102"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅守 &f({set_progress})"
+    - "&7每損失 &c1% &7生命，每件裝備的 &a防禦 &7增加 &a{defense_per_missing_hp_percent}%&7。"
+    - "&7殘血時護甲愈堅，適合扛傷與續戰。"
+    - "&8需穿齊 4 件才生效。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

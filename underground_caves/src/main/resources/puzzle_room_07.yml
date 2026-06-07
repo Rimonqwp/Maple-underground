@@ -1,0 +1,38 @@
+version: 1
+questions:
+  q1:
+    question: "1 + 1 等于多少？"
+    options:
+      A: "2"
+      B: "3"
+      C: "11"
+    answer: "A"
+  q2:
+    question: "下列哪一个是水桶？"
+    options:
+      A: "岩浆桶"
+      B: "水桶"
+      C: "牛奶桶"
+    answer: "B"
+  q3:
+    question: "Minecraft 中，红石信号的强度最大是多少？"
+    options:
+      A: "10"
+      B: "15"
+      C: "20"
+    answer: "B"
+  q4:
+    question: "以下哪种方块不会被水流推动？"
+    options:
+      A: "沙子"
+      B: "铁砧"
+      C: "火把"
+    answer: "B"
+  q5:
+    question: "以下哪一个是三叉戟的附魔？"
+    options:
+      A: "激流"
+      B: "锋利"
+      C: "火焰附加"
+    answer: "A"
+

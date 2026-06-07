@@ -1,0 +1,31 @@
+# 瞬步鑽石劍 - 鑽石劍，右鍵傳送 8 格 + 50 加速 3 秒
+display_name: "&b&l瞬步鑽石劍"
+material: DIAMOND_SWORD
+
+stats:
+  damage: 100
+  strength: 100
+
+ability:
+  name: "瞬間傳送"
+  type: right_click
+  description: "傳送至前方 8 格並獲得 +50 加速，持續 3 秒。"
+  mana_cost: 50
+  cooldown_seconds: 1
+  teleport_blocks: 8
+  speed_bonus: 50
+  speed_duration_seconds: 3
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - ""
+  - "&6能力：&6{skill_name} &e右鍵施放"
+  - "&7傳送至前方 &e8格 &7並獲得 &c+50 &7加速，持續 &e3秒&7。"
+  - ""
+  - "&7法力消耗: &b{mana_cost}"
+  - "&7冷卻: &f1秒"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"

@@ -1,0 +1,18 @@
+# 法術增幅頭盔 - 25% 能力傷害，150 智力
+
+texture_id: "247acb6e8f52d8935dbc4d09f6569adc2013cc8713dfe1838e5372e67a464a0c"
+
+display_name: "&l&#7FAFFF法&#8AB2FF術&#96B6FF增&#A1B9FF幅&#ADBDFF頭&#B8C0FF盔&#C4C4FF"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7能力傷害: &b+{ability_damage_percent}%"
+  - "&7智力: &b+{intelligence}"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+
+stats:
+  ability_damage_percent: 25
+  intelligence: 150

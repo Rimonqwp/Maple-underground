@@ -1,0 +1,15 @@
+texture_id: "b0ed3aa3599b45282f325a95aa48839d9fcfe697288dca9e8ca963e7c46a0fe2"
+
+display_name: "&#7FAFFF【&#8AB2FF地&#96B6FF心&#A1B9FF回&#ADBDFF聲&#B8C0FF · &#C4C4FF地&#CFC7FF脈&#CFC7FF】"
+
+lore:
+  - "&8不可用在鐵砧/附魔台"
+  - ""
+  - "&7「地脈」沿著岩層深處奔湧不息，"
+  - "&7將整座洞窟的脈動緊繫於一線。"
+  - ""
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF回&#C4C4FF聲&#CFC7FF]"
+
+stats: {}
+ability: {}
+

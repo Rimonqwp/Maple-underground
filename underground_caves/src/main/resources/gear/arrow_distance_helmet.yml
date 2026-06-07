@@ -1,0 +1,31 @@
+# 遠程蓄勢頭盔 - 箭矢飛行超過 20 格後，每 2 格增傷 1%。地牢弓箭手 5% 掉落
+
+texture_id: "b18c071f080dba50a62a6263ff724edc157ce4fb4883cceff2491d5bbde830c1"
+
+display_name: "&l&#7FAFFF遠&#8AB2FF程&#96B6FF蓄&#A1B9FF勢&#ADBDFF頭&#B8C0FF盔&#C4C4FF"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - ""
+  - "&7箭矢飛得越遠，貫穿力越強。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&6能力：&e遠程蓄勢"
+  - "&7箭矢飛行超過 &e20 格 &7後，每 &e2 格 &7箭矢傷害 &a+1%&7。"
+  - ""
+  - "&7擊殺地牢內弓箭手 &e5% &7機率掉落"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#7FAFFF[&#8AB2FF稀&#96B6FF有&#A1B9FF洞&#ADBDFF窟&#B8C0FF裝&#C4C4FF備&#CFC7FF]"
+
+stats:
+  health: 100
+  defense: 10
+
+drop:
+  chance: 0.05
+  entity_type: SKELETON
+  # 地牢弓箭手（依插件怪物類型可改為 DUNGEON_ARCHER 等）

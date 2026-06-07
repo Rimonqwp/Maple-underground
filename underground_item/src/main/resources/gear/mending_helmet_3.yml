@@ -1,0 +1,27 @@
+# 堅韌療癒之冠 - 270 血，地牢內 +100 治療量與活力，史詩
+
+texture_id: "336f0a51cfb10b819de1fcdf3470f3d336db261d1ffba943a7856540809db4ee"
+
+display_name: "&l&#C09BFF堅&#C79EF8韌&#CFA2F1療&#D6A5EA癒&#DDA9E3之&#E4ACDC冠&#ECB0D5"
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - ""
+  - "&7高血量與洞窟內治療、活力加成。"
+  - ""
+  - "&#D946EF✦ &#E46178被&#E76B50動&#EB783F效&#EE852E果 &#F59E0B✦"
+  - "&6能力：&e洞窟堅韌療癒"
+  - "&7在地底洞窟內獲得 &a+100 治療量 &7與 &a+100 活力&7。"
+  - ""
+  - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC裝&#ECB0D5備&#F3B3CE]"
+
+stats:
+  health: 270
+
+ability:
+  name: "洞窟堅韌療癒"
+  mending_in_dungeon: 100
+  vitality_in_dungeon: 100

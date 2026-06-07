@@ -1,0 +1,35 @@
+# 骷髏領主之刃 - 鐵劍，F1-3 怪物 2% 掉落。右鍵發射骷髏頭
+display_name: "&5&l骷髏領主之刃"
+material: IRON_SWORD
+
+stats:
+  damage: 52
+  strength: 23
+  intelligence: 85
+
+ability:
+  name: "骷髏領主"
+  type: right_click
+  description: "發射一枚骷髏頭，造成 500 傷害。"
+  mana_cost: 40
+  base_ability_damage: 500
+  ability_scaling: 0.3
+  cooldown_seconds: 1
+
+drop:
+  floors: [ F1, F2, F3 ]
+  chance: 0.02
+
+lore:
+  - "&8可放在鐵砧/附魔台"
+  - "&7洞窟評分: &d-"
+  - "&7傷害: &c+{damage}"
+  - "&7力量: &c+{strength}"
+  - "&7智力: &a+{intelligence}"
+  - ""
+  - "&6能力：&6{skill_name} &e右鍵施放"
+  - "&7發射一枚骷髏頭，造成 &c{base_ability_damage} &7傷害。"
+  - "&7法力消耗: &b{mana_cost}"
+  - "&7冷卻: &f{cooldown_seconds}秒"
+  - ""
+  - "&#C09BFF[&#C79EF8史&#CFA2F1詩&#D6A5EA洞&#DDA9E3窟&#E4ACDC武&#ECB0D5器&#F3B3CE]"

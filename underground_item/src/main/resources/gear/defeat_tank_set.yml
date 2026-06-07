@@ -1,0 +1,102 @@
+# 堅壁套裝 - 擊殺殭屍 10% 掉落。全身皮甲，套裝效果：每 50 防禦 +1 行走速度。
+# 速度每件均為 -5；裝備僅 F1～F3。防禦 F2=F1×1.1，F3=F2×1.1（已算好實數）
+
+set_id: defeat_tank
+display_name_prefix: "&7&l堅壁套裝"
+# 各部位顯示名稱：&#RRGGBB 每字一色（支援大寫 hex），例 &#8B9DC3堅&#9EA1B0壁
+pieces:
+  helmet: "&l&#79A4FF堅&#7DBEFF壁&#80D7FF頭&#84F1FF盔"
+  chest: "&l&#79A4FF堅&#7DBEFF壁&#80D7FF胸&#84F1FF甲"
+  leggings: "&l&#79A4FF堅&#7DBEFF壁&#80D7FF護&#84F1FF腿"
+  boots: "&l&#79A4FF堅&#7DBEFF壁&#80D7FF戰&#84F1FF靴"
+# 皮甲顏色：支援 #RRGGBB 或 leather_color_rgb: [R, G, B]
+leather_color_hex: "#50505a"
+leather_color_rgb: [ 80, 80, 90 ]
+
+# 是否無法破壞（裝備不會因耐久耗盡而消失）
+unbreakable: true
+
+# 各部位 lore 分開設定（& 為顏色代碼；{defense}、{speed} 會替換為該件數值）
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7防禦: &a{defense}"
+    - "&7速度: &f{speed}"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅壁 &f({set_progress})"
+    - "&7來自套裝的 &a防禦 &7每累積 &a50 &7點，"
+    - "&7可獲得 &f+{speed_per_50_defense} 行走速度&7，重甲亦能靈活移動。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7防禦: &a{defense}"
+    - "&7速度: &f{speed}"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅壁 &f({set_progress})"
+    - "&7來自套裝的 &a防禦 &7每累積 &a50 &7點，"
+    - "&7可獲得 &f+{speed_per_50_defense} 行走速度&7，重甲亦能靈活移動。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7防禦: &a{defense}"
+    - "&7速度: &f{speed}"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅壁 &f({set_progress})"
+    - "&7來自套裝的 &a防禦 &7每累積 &a50 &7點，"
+    - "&7可獲得 &f+{speed_per_50_defense} 行走速度&7，重甲亦能靈活移動。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7防禦: &a{defense}"
+    - "&7速度: &f{speed}"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：堅壁 &f({set_progress})"
+    - "&7來自套裝的 &a防禦 &7每累積 &a50 &7點，"
+    - "&7可獲得 &f+{speed_per_50_defense} 行走速度&7，重甲亦能靈活移動。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#79A4FF[&#7BAFFF稀&#7CBAFF有&#7EC5FF洞&#7FD0FF窟&#81DBFF裝&#82E6FF備&#84F1FF]"
+
+set_bonus:
+  description: "每擁有 50 點防禦力，即可獲得 +1 行走速度"
+  speed_per_50_defense: 1
+
+# 掉落規則：僅在地牢世界內擊殺「指定怪物類型」時才有機率掉落
+# monster_type: 對應 monsters.yml 的 key（本插件地牢怪的 PDC 標記），例如坦克僵尸 = ZOMBIE_TANK
+# chance: 掉落機率 0.0～1.0，例如 0.10 = 10%
+drop:
+  entity: ZOMBIE
+  monster_type: ZOMBIE_TANK
+  chance: 0.10
+
+# 各樓層數值（F1 為圖片基礎，其餘為上一層 ×1.1 取整）
+floors:
+  F1:
+    helmet:   { defense: 62,  speed: -5 }
+    chest:    { defense: 112, speed: -5 }
+    leggings: { defense: 92,  speed: -5 }
+    boots:    { defense: 57,  speed: -5 }
+  F2:
+    helmet:   { defense: 68,  speed: -5 }
+    chest:    { defense: 123, speed: -5 }
+    leggings: { defense: 101, speed: -5 }
+    boots:    { defense: 63,  speed: -5 }
+  F3:
+    helmet:   { defense: 75,  speed: -5 }
+    chest:    { defense: 135, speed: -5 }
+    leggings: { defense: 111, speed: -5 }
+    boots:    { defense: 69,  speed: -5 }

@@ -1,0 +1,29 @@
+# 地下洞穴頭盔 F3 - 10 Strength / 40 Health / 20 Defense
+# 僅能透過指令取得：/gear give golden_sheep_helmet [玩家]
+
+texture_id: "d0d5fb75e145f999df067fb9024d9aae0cc8336d0e2099ae483b4058de525d56"
+
+display_name: "&l&#FFEDEE黄&#FFE5E8金&#FFDCE3綿&#FFD4DD羊&#FFCBD8頭&#FFC3D2盔"
+
+lore:
+  - "&8可放在鐵砧/附魔台" 
+  - "&7洞窟評分: &d-"
+  - "&7生命: &a+{health}"
+  - "&7防禦: &a+{defense}"
+  - "&7力量: &c+{strength}"  
+  - ""
+  - "&7透過無數次在地下洞穴 F3 的殺戮與犧牲，"
+  - "&7這頂頭盔被記錄在冒險者公會的統計報告之中。"
+  - "&7據說曾有一位教授為了研究這片墓穴，"
+  - "&7在第三層反覆殉職，才換來寶貴的實戰數據。"
+  - ""
+  - "&e目前撥款中的研究項目："
+  - "&e『地底礦洞 F3 存活率提升 2 倍計劃』"
+  - ""
+  - "&#FFEDEE[&#FFE7EA永&#FFE1E6恆&#FFDBE2洞&#FFD5DE窟&#FFCFDA頭&#FFC9D6盔&#FFC3D2]"
+
+stats:
+  strength: 10
+  health: 40
+  defense: 20
+

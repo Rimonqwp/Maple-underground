@@ -1,0 +1,78 @@
+# 傳說套裝 第6套 - 古法（洞窟傳說）。強化成長、保護、羽落等附魔
+set_id: blood_old_set
+display_name_prefix: "古法"
+series: "傳說套裝"
+rarity: "傳奇"
+
+pieces:
+  helmet: "&l&#FFE4B8古&#FFDFC0法&#FFD9C8頭&#FFD4CF盔"
+  chest: "&l&#FFE4B8古&#FFDFC0法&#FFD9C8胸&#FFD4CF甲"
+  leggings: "&l&#FFE4B8古&#FFDFC0法&#FFD9C8護&#FFD4CF腿"
+  boots: "&l&#FFE4B8古&#FFDFC0法&#FFD9C8戰&#FFD4CF靴"
+
+leather_color_hex: "#808080"
+unbreakable: true
+
+ability:
+  name: "古法"
+  description: "裝備時，成長、保護、羽落、糖飆、真保護等附魔效果提升。"
+
+stats:
+  helmet:   { health: 90,  defense: 100 }
+  chest:    { health: 158, defense: 175 }
+  leggings: { health: 126, defense: 140 }
+  boots:    { health: 76,  defense: 85 }
+
+lore:
+  helmet:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+90"
+    - "&7防禦: &a+100"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：古法 &f({set_progress})"
+    - "&7裝備時，成長、保護、羽落、糖飆、真保護等附魔效果提升。"
+    - "&7與書本附魔疊加，適合長期養成與生存向。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  chest:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+158"
+    - "&7防禦: &a+175"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：古法 &f({set_progress})"
+    - "&7裝備時，成長、保護、羽落、糖飆、真保護等附魔效果提升。"
+    - "&7與書本附魔疊加，適合長期養成與生存向。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  leggings:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+126"
+    - "&7防禦: &a+140"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：古法 &f({set_progress})"
+    - "&7裝備時，成長、保護、羽落、糖飆、真保護等附魔效果提升。"
+    - "&7與書本附魔疊加，適合長期養成與生存向。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"
+  boots:
+    - "&8可放在鐵砧/附魔台"
+    - "&7洞窟評分: &d-"
+    - "&7生命: &a+76"
+    - "&7防禦: &a+85"
+    - ""
+    - "&#FFE066◆ &#FFCB49套&#FFC13A裝&#FFB72C獎&#FFAD1D勵 &#FF9800◆"
+    - "&e完整套裝：古法 &f({set_progress})"
+    - "&7裝備時，成長、保護、羽落、糖飆、真保護等附魔效果提升。"
+    - "&7與書本附魔疊加，適合長期養成與生存向。"
+    - ""
+    - "&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57壞"
+    - "&#FFE4B8[&#FFDFC0傳&#FFD9C8說&#FFD4CF洞&#FFCED7窟&#FFC9DF套&#FFC3E8裝&#FFBEF0]"

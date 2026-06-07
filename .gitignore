@@ -21,3 +21,20 @@ dependency-reduced-pom.xml
 
 Thumbs.db
 .DS_Store
+
+# 真实数据库密钥（编译期注入主插件）；只提交 build-secrets.cmd.example 模板
+build-secrets.cmd
+
+# Unpacked dependency class trees the build emits into module roots (not source).
+# Anchored to module roots so they never match real source under src/.
+underground_*/aopalliance/
+underground_*/club/
+underground_*/com/
+underground_*/commons-codec/
+underground_*/commons-io/
+underground_*/io/
+underground_*/it/
+underground_*/jakarta/
+underground_*/javax/
+underground_*/net/
+underground_*/org/

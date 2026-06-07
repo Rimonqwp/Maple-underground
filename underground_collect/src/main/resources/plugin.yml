@@ -3,3 +3,4 @@ version: '1.0'
 main: maple.underground_collect.UndergroundCollect
 api-version: '1.21.11'
 load: POSTWORLD
+depend: [underground_state]

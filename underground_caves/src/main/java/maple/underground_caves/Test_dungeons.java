@@ -1656,9 +1656,6 @@ public final class Test_dungeons extends JavaPlugin {
       this.dungeonBlessingManager = new DungeonBlessingManager();
       this.dungeonRoomRewardDB = new DungeonRoomRewardDB(this.getDataFolder(), this.getLogger());
       this.professionExperienceRemote = new ProfessionExperienceRemote(this.getDataFolder(), this.getLogger());
-      if (!(new File(this.getDataFolder(), "database.yml")).exists()) {
-         this.saveResource("database.yml", false);
-      }
 
       this.playerDungeonSettingsRemote = new PlayerDungeonSettingsRemote(this.getDataFolder(), this.getLogger());
       Bukkit.getScheduler().runTaskAsynchronously(this, () -> {

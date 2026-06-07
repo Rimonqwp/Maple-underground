@@ -1,7 +1,8 @@
 package maple.underground_caves.party;
 
+import maple.underground_state.db.MySqlConnectionFactory;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,13 +12,11 @@ import java.util.logging.Logger;
 
 /**
  * MySQL 儲存玩家的自動準備設定。
- * 資料庫: skyblock, 表: dungeon_player_auto_ready
+ * 資料庫: skyblock, 表: dungeon_player_auto_ready。
+ * 凭据集中在主插件 underground_state，连线一律经 {@link MySqlConnectionFactory#connect(String)} 取得。
  */
 public final class PlayerAutoReadyDB {
     private static final String TABLE = "dungeon_player_auto_ready";
-    private static final String JDBC_URL = "jdbc:mysql://mysql.rimon12.top:3306/skyblock?useSSL=false&allowPublicKeyRetrieval=true";
-    private static final String USER = "skyblock";
-    private static final String PASS = "N63dPTewDiPRYLM5";
 
     private final Logger logger;
 
@@ -27,7 +26,7 @@ public final class PlayerAutoReadyDB {
     }
 
     private Connection connect() throws SQLException {
-        return DriverManager.getConnection(JDBC_URL, USER, PASS);
+        return MySqlConnectionFactory.connect("skyblock");
     }
 
     private void init() {

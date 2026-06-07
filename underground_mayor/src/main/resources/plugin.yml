@@ -6,6 +6,7 @@ api-version: '1.21.11'
 load: POSTWORLD
 depend:
   - Citizens
+  - underground_state
 commands:
   mayor:
     description: Manage mayor NPCs and mayor progress.

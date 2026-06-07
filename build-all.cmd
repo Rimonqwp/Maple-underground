@@ -5,6 +5,31 @@ set "ROOT=%~dp0"
 set "DIST_DIR=%ROOT%dist"
 set "MAVEN_REPO=%ROOT%.m2-repo"
 
+REM ---- Centralized DB secrets: real values live in build-secrets.cmd (git-ignored) ----
+REM If missing, build with pom defaults (blank passwords; runtime falls back to env vars).
+REM See build-secrets.cmd.example for the template.
+if exist "%ROOT%build-secrets.cmd" (
+    call "%ROOT%build-secrets.cmd"
+    echo [INFO] Loaded database secrets from build-secrets.cmd
+) else (
+    echo [WARN] build-secrets.cmd not found - building with pom defaults ^(blank passwords^).
+    echo [WARN] Copy build-secrets.cmd.example to build-secrets.cmd and fill in real credentials.
+)
+
+REM Assemble -D properties passed to the underground_state build (all sources share DB_HOST).
+set "DB_PROPS="
+if defined DB_HOST set "DB_PROPS=%DB_PROPS% "-Ddb.host=%DB_HOST%""
+if defined DB_PORT set "DB_PROPS=%DB_PROPS% "-Ddb.port=%DB_PORT%""
+if defined DB_STATE_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.state.database=%DB_STATE_DATABASE%""
+if defined DB_STATE_USER set "DB_PROPS=%DB_PROPS% "-Ddb.state.user=%DB_STATE_USER%""
+if defined DB_STATE_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.state.password=%DB_STATE_PASSWORD%""
+if defined DB_CAVES_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.caves.database=%DB_CAVES_DATABASE%""
+if defined DB_CAVES_USER set "DB_PROPS=%DB_PROPS% "-Ddb.caves.user=%DB_CAVES_USER%""
+if defined DB_CAVES_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.caves.password=%DB_CAVES_PASSWORD%""
+if defined DB_SKYBLOCK_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.database=%DB_SKYBLOCK_DATABASE%""
+if defined DB_SKYBLOCK_USER set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.user=%DB_SKYBLOCK_USER%""
+if defined DB_SKYBLOCK_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.password=%DB_SKYBLOCK_PASSWORD%""
+
 set "JAVA_HOME_FALLBACK=C:\Program Files\Zulu\zulu-21"
 set "MAVEN_CMD_FALLBACK=C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\plugins\maven\lib\maven3\bin\mvn.cmd"
 set "JETBRAINS_DIR=C:\Program Files\JetBrains"
@@ -77,7 +102,7 @@ if not exist "%MAVEN_REPO%" mkdir "%MAVEN_REPO%"
 
 echo [INFO] Building underground_state...
 pushd "%ROOT%underground_state"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests%DB_PROPS% package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_state

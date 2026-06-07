@@ -1,11 +1,9 @@
 package maple.underground_caves.dungeon;
 
 import maple.underground_state.db.MySqlConnectionFactory;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,55 +15,30 @@ import java.util.logging.Logger;
  * Stores dungeon and class experience in the underground_state MySQL database.
  * Existing data from the old underground_caves MySQL table is migrated lazily
  * on read so players do not lose previously earned progress.
+ *
+ * <p>所有连线（含 legacy 迁移读取）皆经主插件集中工厂 {@link MySqlConnectionFactory} 取得：
+ * 目前进度走 connect()（state 库），legacy 旧表走 connect("caves")。</p>
  */
 public final class ProfessionExperienceRemote {
     private static final String PROGRESS_TABLE = "player_skill_progress";
     private static final String OLD_TABLE = "player_profession_experience";
     private static final int EXP_COUNT = 6;
-    private static final String LEGACY_DEFAULT_URL = "jdbc:mysql://mysql.rimon12.top:3306/underground_caves";
-    private static final String LEGACY_DEFAULT_USERNAME = "Underground_caves";
 
     private static final String[] EXP_COLUMNS = {
             "exp_underground_caves", "exp_profession_1", "exp_profession_2",
             "exp_profession_3", "exp_profession_4", "exp_profession_5"
     };
 
-    private final File configFile;
     private final Logger logger;
-    private String legacyUrl = LEGACY_DEFAULT_URL;
-    private String legacyUsername = LEGACY_DEFAULT_USERNAME;
-    private String legacyPassword = "";
-    private boolean legacyConfigLoaded;
     private volatile boolean progressSchemaReady;
     private final java.util.Map<UUID, long[]> cache = new java.util.concurrent.ConcurrentHashMap<>();
 
+    /**
+     * @param dataFolder 保留參數以相容呼叫端；凭据已集中至主插件，不再讀取本地設定檔。
+     */
     public ProfessionExperienceRemote(File dataFolder, Logger logger) {
-        this.configFile = new File(dataFolder, "database.yml");
         this.logger = logger != null ? logger : Logger.getAnonymousLogger();
         MySqlConnectionFactory.logTarget(this.logger);
-        loadLegacyConfig();
-    }
-
-    private void loadLegacyConfig() {
-        legacyUrl = LEGACY_DEFAULT_URL;
-        legacyUsername = LEGACY_DEFAULT_USERNAME;
-        legacyPassword = envOrDefault("UNDERGROUND_CAVES_MYSQL_PASSWORD", "");
-        if (configFile != null && configFile.isFile()) {
-            try {
-                YamlConfiguration cfg = YamlConfiguration.loadConfiguration(configFile);
-                if (cfg.contains("mysql.url")) legacyUrl = cfg.getString("mysql.url", legacyUrl);
-                if (cfg.contains("mysql.username")) legacyUsername = cfg.getString("mysql.username", legacyUsername);
-                if (cfg.contains("mysql.password")) legacyPassword = cfg.getString("mysql.password", legacyPassword);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "ProfessionExperienceRemote load legacy config failed, using defaults", e);
-            }
-        }
-        legacyConfigLoaded = true;
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value != null && !value.isBlank() ? value.trim() : fallback;
     }
 
     public void ensureRemoteTable() {
@@ -151,10 +124,7 @@ public final class ProfessionExperienceRemote {
     }
 
     private Connection connectLegacy() throws SQLException {
-        if (!legacyConfigLoaded) {
-            loadLegacyConfig();
-        }
-        return DriverManager.getConnection(legacyUrl, legacyUsername, legacyPassword);
+        return MySqlConnectionFactory.connect("caves");
     }
 
     private long[] fetchProgressByPlayer(UUID playerUuid) {
@@ -300,7 +270,7 @@ public final class ProfessionExperienceRemote {
         logger.log(Level.WARNING, context, e);
         String msg = e.getMessage() != null ? e.getMessage() : "";
         if (msg.contains("Access denied")) {
-            logger.warning("[underground_caves] MySQL access denied. Check underground_state credentials and legacy underground_caves/database.yml if migration is needed.");
+            logger.warning("[underground_caves] MySQL access denied. Check the centralized credentials in underground_state (build-secrets.cmd: state/caves accounts).");
         }
     }
 }

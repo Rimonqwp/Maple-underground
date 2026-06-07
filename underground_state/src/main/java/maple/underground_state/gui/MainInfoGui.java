@@ -1,5 +1,6 @@
 package maple.underground_state.gui;
 
+import maple.underground_state.UndergroundState;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -208,6 +209,20 @@ public final class MainInfoGui {
         }
         if (rawSlot == BOOKSHELF_SLOT) {
             BookshelfInfoGui.open(player);
+            return;
+        }
+        if (rawSlot == WRITABLE_BOOK_SLOT) {
+            player.closeInventory();
+            UndergroundState plugin = UndergroundState.getInstance();
+            if (plugin == null || !plugin.isEnabled()) {
+                player.performCommand("t");
+                return;
+            }
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (player.isOnline()) {
+                    player.performCommand("t");
+                }
+            });
             return;
         }
         if (rawSlot == BANK_SLOT) {

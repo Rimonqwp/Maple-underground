@@ -1,6 +1,6 @@
-package org.maple.untitled1.bridge;
+package org.maple.underground_velocity.bridge;
 
-import org.maple.untitled1.party.PartyMember;
+import org.maple.underground_velocity.party.PartyMember;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

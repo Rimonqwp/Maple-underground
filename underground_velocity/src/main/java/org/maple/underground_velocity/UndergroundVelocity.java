@@ -1,4 +1,4 @@
-package org.maple.untitled1;
+package org.maple.underground_velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -9,16 +9,16 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import org.maple.untitled1.command.DungeonProxyCommand;
-import org.maple.untitled1.command.PartyProxyCommand;
-import org.maple.untitled1.config.BridgeConfig;
-import org.maple.untitled1.dungeon.DungeonStartCoordinator;
-import org.maple.untitled1.party.PartyService;
+import org.maple.underground_velocity.command.DungeonProxyCommand;
+import org.maple.underground_velocity.command.PartyProxyCommand;
+import org.maple.underground_velocity.config.BridgeConfig;
+import org.maple.underground_velocity.dungeon.DungeonStartCoordinator;
+import org.maple.underground_velocity.party.PartyService;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-public final class Untitled1 {
+public final class UndergroundVelocity {
     public static final MinecraftChannelIdentifier DUNGEON_BRIDGE_CHANNEL =
             MinecraftChannelIdentifier.create("maple", "dungeon_bridge");
 
@@ -31,7 +31,7 @@ public final class Untitled1 {
     private DungeonStartCoordinator dungeonStartCoordinator;
 
     @Inject
-    public Untitled1(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public UndergroundVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;

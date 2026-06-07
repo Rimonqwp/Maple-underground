@@ -1,4 +1,4 @@
-package org.maple.untitled1.config;
+package org.maple.underground_velocity.config;
 
 import org.slf4j.Logger;
 

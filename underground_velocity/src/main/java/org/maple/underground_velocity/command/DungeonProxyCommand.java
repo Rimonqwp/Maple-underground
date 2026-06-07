@@ -1,8 +1,8 @@
-package org.maple.untitled1.command;
+package org.maple.underground_velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import org.maple.untitled1.dungeon.DungeonStartCoordinator;
+import org.maple.underground_velocity.dungeon.DungeonStartCoordinator;
 
 import java.util.List;
 import java.util.Locale;

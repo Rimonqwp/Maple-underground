@@ -1,4 +1,4 @@
-package org.maple.untitled1.party;
+package org.maple.underground_velocity.party;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;

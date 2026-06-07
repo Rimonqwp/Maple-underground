@@ -155,16 +155,16 @@ popd
 echo [INFO] Finished underground_mayor.
 echo.
 
-echo [INFO] Building untitled1 Velocity bridge...
-pushd "%ROOT%untitled1"
+echo [INFO] Building underground_velocity Velocity bridge...
+pushd "%ROOT%underground_velocity"
 call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
 if errorlevel 1 (
     popd
-    echo [ERROR] Build failed: untitled1
+    echo [ERROR] Build failed: underground_velocity
     exit /b 1
 )
 popd
-echo [INFO] Finished untitled1 Velocity bridge.
+echo [INFO] Finished underground_velocity Velocity bridge.
 echo.
 
 if exist "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" (
@@ -202,11 +202,11 @@ if exist "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" (
     echo [WARN] Missing artifact: %ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar
 )
 
-if exist "%ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar" (
-    copy /Y "%ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar" "%DIST_DIR%\untitled1-1.0-SNAPSHOT.jar" >nul
-    echo [INFO] Copied untitled1-1.0-SNAPSHOT.jar
+if exist "%ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar" (
+    copy /Y "%ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar" "%DIST_DIR%\underground_velocity-1.0-SNAPSHOT.jar" >nul
+    echo [INFO] Copied underground_velocity-1.0-SNAPSHOT.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar
+    echo [WARN] Missing artifact: %ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar
 )
 
 echo.

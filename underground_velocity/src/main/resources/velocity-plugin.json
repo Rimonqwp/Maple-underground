@@ -1,0 +1,6 @@
+{
+  "id": "underground_velocity",
+  "name": "underground_velocity",
+  "version": "${project.version}",
+  "main": "org.maple.underground_velocity.UndergroundVelocity"
+}

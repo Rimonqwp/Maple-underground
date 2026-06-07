@@ -1,4 +1,4 @@
-package org.maple.untitled1.dungeon;
+package org.maple.underground_velocity.dungeon;
 
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
@@ -6,10 +6,10 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import org.maple.untitled1.bridge.BridgeProtocol;
-import org.maple.untitled1.config.BridgeConfig;
-import org.maple.untitled1.party.PartyMember;
-import org.maple.untitled1.party.PartyService;
+import org.maple.underground_velocity.bridge.BridgeProtocol;
+import org.maple.underground_velocity.config.BridgeConfig;
+import org.maple.underground_velocity.party.PartyMember;
+import org.maple.underground_velocity.party.PartyService;
 import org.slf4j.Logger;
 
 import java.io.IOException;

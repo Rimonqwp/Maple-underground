@@ -1,4 +1,4 @@
-package org.maple.untitled1.command;
+package org.maple.underground_velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
@@ -6,7 +6,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.maple.untitled1.party.PartyService;
+import org.maple.underground_velocity.party.PartyService;
 
 import java.util.ArrayList;
 import java.util.List;

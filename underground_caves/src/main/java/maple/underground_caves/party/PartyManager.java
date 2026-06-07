@@ -109,6 +109,40 @@ public final class PartyManager {
     }
 
     /** 取得玩家的隊伍成員（含自己），若無則只含自己。隊長為第一個。 */
+    public synchronized void setPartySnapshot(UUID leaderId, List<UUID> memberIds) {
+        if (leaderId == null || memberIds == null || memberIds.isEmpty()) return;
+        LinkedHashSet<UUID> normalized = new LinkedHashSet<>();
+        normalized.add(leaderId);
+        for (UUID memberId : memberIds) {
+            if (memberId != null) normalized.add(memberId);
+            if (normalized.size() >= 5) break;
+        }
+
+        for (UUID memberId : normalized) {
+            UUID oldLeader = leaderByMember.remove(memberId);
+            if (oldLeader != null) {
+                Set<UUID> oldParty = partyByLeader.get(oldLeader);
+                if (oldParty != null) {
+                    oldParty.remove(memberId);
+                    if (oldParty.size() <= 1) {
+                        partyByLeader.remove(oldLeader);
+                        for (UUID oldMember : oldParty) {
+                            leaderByMember.remove(oldMember);
+                        }
+                    }
+                }
+            }
+            pendingInvites.remove(memberId);
+        }
+
+        Set<UUID> party = ConcurrentHashMap.newKeySet();
+        party.addAll(normalized);
+        partyByLeader.put(leaderId, party);
+        for (UUID memberId : normalized) {
+            leaderByMember.put(memberId, leaderId);
+        }
+    }
+
     public List<UUID> getPartyMembers(Player player) {
         if (player == null) return List.of();
         UUID id = player.getUniqueId();

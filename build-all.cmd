@@ -16,19 +16,14 @@ if exist "%ROOT%build-secrets.cmd" (
     echo [WARN] Copy build-secrets.cmd.example to build-secrets.cmd and fill in real credentials.
 )
 
-REM Assemble -D properties passed to the underground_state build (all sources share DB_HOST).
+REM Assemble -D properties passed to the underground_state build.
+REM Single shared database + account for the whole series (separated by table name).
 set "DB_PROPS="
 if defined DB_HOST set "DB_PROPS=%DB_PROPS% "-Ddb.host=%DB_HOST%""
 if defined DB_PORT set "DB_PROPS=%DB_PROPS% "-Ddb.port=%DB_PORT%""
-if defined DB_STATE_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.state.database=%DB_STATE_DATABASE%""
-if defined DB_STATE_USER set "DB_PROPS=%DB_PROPS% "-Ddb.state.user=%DB_STATE_USER%""
-if defined DB_STATE_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.state.password=%DB_STATE_PASSWORD%""
-if defined DB_CAVES_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.caves.database=%DB_CAVES_DATABASE%""
-if defined DB_CAVES_USER set "DB_PROPS=%DB_PROPS% "-Ddb.caves.user=%DB_CAVES_USER%""
-if defined DB_CAVES_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.caves.password=%DB_CAVES_PASSWORD%""
-if defined DB_SKYBLOCK_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.database=%DB_SKYBLOCK_DATABASE%""
-if defined DB_SKYBLOCK_USER set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.user=%DB_SKYBLOCK_USER%""
-if defined DB_SKYBLOCK_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.skyblock.password=%DB_SKYBLOCK_PASSWORD%""
+if defined DB_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.database=%DB_DATABASE%""
+if defined DB_USER set "DB_PROPS=%DB_PROPS% "-Ddb.user=%DB_USER%""
+if defined DB_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.password=%DB_PASSWORD%""
 
 set "JAVA_HOME_FALLBACK=C:\Program Files\Zulu\zulu-21"
 set "MAVEN_CMD_FALLBACK=C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\plugins\maven\lib\maven3\bin\mvn.cmd"
@@ -160,6 +155,18 @@ popd
 echo [INFO] Finished underground_mayor.
 echo.
 
+echo [INFO] Building untitled1 Velocity bridge...
+pushd "%ROOT%untitled1"
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+if errorlevel 1 (
+    popd
+    echo [ERROR] Build failed: untitled1
+    exit /b 1
+)
+popd
+echo [INFO] Finished untitled1 Velocity bridge.
+echo.
+
 if exist "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" (
     copy /Y "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" "%DIST_DIR%\underground_state-1.0-shaded.jar" >nul
     echo [INFO] Copied underground_state-1.0-shaded.jar
@@ -193,6 +200,13 @@ if exist "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" (
     echo [INFO] Copied underground_mayor-1.0-shaded.jar
 ) else (
     echo [WARN] Missing artifact: %ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar
+)
+
+if exist "%ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar" (
+    copy /Y "%ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar" "%DIST_DIR%\untitled1-1.0-SNAPSHOT.jar" >nul
+    echo [INFO] Copied untitled1-1.0-SNAPSHOT.jar
+) else (
+    echo [WARN] Missing artifact: %ROOT%untitled1\target\untitled1-1.0-SNAPSHOT.jar
 )
 
 echo.

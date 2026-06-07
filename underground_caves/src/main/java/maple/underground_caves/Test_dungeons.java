@@ -20,6 +20,7 @@ import maple.underground_caves.commands.ItemHandInfoCommand;
 import maple.underground_caves.dungeon.BossRoomManager;
 import maple.underground_caves.dungeon.ChestLootManager;
 import maple.underground_caves.dungeon.DungeonBlessingManager;
+import maple.underground_caves.dungeon.DungeonBridgeListener;
 import maple.underground_caves.dungeon.DungeonCommand;
 import maple.underground_caves.dungeon.DungeonDeathListener;
 import maple.underground_caves.dungeon.DungeonMonsters;
@@ -187,6 +188,7 @@ public final class Test_dungeons extends JavaPlugin {
    private ExitRoomManager exitRoomManager;
    private PlayerAutoReadyDB playerAutoReadyDB;
    private PartyManager partyManager;
+   private DungeonBridgeListener dungeonBridgeListener;
    private DungeonDeathListener dungeonDeathListener;
    private EnchantmentRegistry enchantmentRegistry;
    private EnchantmentListener enchantmentListener;
@@ -1676,6 +1678,9 @@ public final class Test_dungeons extends JavaPlugin {
       this.dungeonScoreboard.start();
       this.startRoomReadyManager = new StartRoomReadyManager(this, this.partyManager, this.dungeonScoreboard);
       DungeonCommand dungeonCommand = new DungeonCommand(this.dungeonSecrets, this.dungeonMonsters, this.partyManager);
+      this.saveDefaultConfigIfMissing("bridge.yml");
+      this.dungeonBridgeListener = new DungeonBridgeListener(this, this.partyManager, dungeonCommand);
+      this.dungeonBridgeListener.register();
       DungeonTemplateCommand dungeonTemplateCommand = new DungeonTemplateCommand(this.dungeonSecrets, this.dungeonMonsters);
       DungeonMapCommand dungeonMapCommand = new DungeonMapCommand(this);
       PluginCommand genDungeon = this.getCommand("gen_dungeon");
@@ -2412,6 +2417,11 @@ public final class Test_dungeons extends JavaPlugin {
    }
 
    public void onDisable() {
+      if (this.dungeonBridgeListener != null) {
+         this.dungeonBridgeListener.unregister();
+         this.dungeonBridgeListener = null;
+      }
+
       UndergroundState undergroundState = UndergroundState.getInstance();
       if (undergroundState != null) {
          undergroundState.setDungeonPanelDataProvider(null);

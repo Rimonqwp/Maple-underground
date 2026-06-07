@@ -86,35 +86,46 @@ public final class MySqlConnectionFactory {
         String port = value(props.getProperty("db.port"), FALLBACK_PORT);
         String params = value(props.getProperty("db.params"), FALLBACK_PARAMS);
 
+        // 多数主机只給「一个数据库 + 一个账号」：所有功能共用它，靠「表名」区分，
+        // 而不是分成多个库。以下是共用的库名 / 账号 / 密码。
+        String sharedDb = value(props.getProperty("db.database"), "underground_state");
+        String sharedUser = value(props.getProperty("db.user"), "underground_state");
+        String sharedPassword = clean(props.getProperty("db.password"));
+
         Map<String, DataSource> map = new HashMap<>();
-        // 目前的三个 schema；新增数据源时在此追加一行 putSource(...)。
-        putSource(map, props, host, port, params, "state", "underground_state", "underground_state");
-        putSource(map, props, host, port, params, "caves", "underground_caves", "underground_caves");
-        putSource(map, props, host, port, params, "skyblock", "skyblock", "skyblock");
+        // 逻辑数据源名：目前全部映射到同一个共用库。保留命名是为了：
+        // (1) 副插件呼叫端 connect("caves") 之类不必改；
+        // (2) 日后若主机能开独立库，只要在 database.properties 加 db.<key>.database/user/password
+        //     覆盖即可，代码不动。
+        for (String key : new String[]{"state", "caves", "skyblock"}) {
+            String database = value(props.getProperty("db." + key + ".database"), sharedDb);
+            String username = value(props.getProperty("db." + key + ".user"), sharedUser);
+            String password = resolvePassword(props.getProperty("db." + key + ".password"), sharedPassword, key);
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + database + params;
+            map.put(key, new DataSource(key, host, port, url, username, password));
+        }
         return Collections.unmodifiableMap(map);
     }
 
-    private static void putSource(Map<String, DataSource> map, Properties props,
-                                  String host, String port, String params,
-                                  String key, String defaultDatabase, String defaultUser) {
-        String database = value(props.getProperty("db." + key + ".database"), defaultDatabase);
-        String username = value(props.getProperty("db." + key + ".user"), defaultUser);
-        String password = resolvePassword(props.getProperty("db." + key + ".password"), key);
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database + params;
-        map.put(key, new DataSource(key, host, port, url, username, password));
-    }
-
     /**
-     * 解析密码：以编译期烧入的值为准；若为空则回退到环境变数
-     * {@code UNDERGROUND_<KEY>_MYSQL_PASSWORD}（保留既有开发/运维习惯，不破坏在跑的服）。
+     * 解析密码，依序：① 该数据源的覆盖值 → ② 共用密码 → ③ 环境变数
+     * {@code UNDERGROUND_<KEY>_MYSQL_PASSWORD} → ④ 共用环境变数
+     * {@code UNDERGROUND_STATE_MYSQL_PASSWORD}。保留环境变数回退以相容既有运维习惯。
      */
-    private static String resolvePassword(String baked, String key) {
-        String cleaned = clean(baked);
-        if (!cleaned.isEmpty()) {
-            return cleaned;
+    private static String resolvePassword(String perSourceBaked, String sharedBaked, String key) {
+        String perSource = clean(perSourceBaked);
+        if (!perSource.isEmpty()) {
+            return perSource;
+        }
+        if (!sharedBaked.isEmpty()) {
+            return sharedBaked;
         }
         String env = System.getenv("UNDERGROUND_" + key.toUpperCase(Locale.ROOT) + "_MYSQL_PASSWORD");
-        return env != null ? env.trim() : "";
+        if (env != null && !env.isBlank()) {
+            return env.trim();
+        }
+        String sharedEnv = System.getenv("UNDERGROUND_STATE_MYSQL_PASSWORD");
+        return sharedEnv != null ? sharedEnv.trim() : "";
     }
 
     /** 取设定值；空白或未被过滤的占位符（${...}）视为缺失，改用 fallback。 */

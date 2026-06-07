@@ -111,6 +111,17 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
             return handleGenRoom(player, args);
         }
 
+        return handleGenDungeon(player, args);
+    }
+
+    public boolean startDungeonRun(Player player, String rawFloor, boolean verbose) {
+        if (player == null) return false;
+        String floor = rawFloor != null ? rawFloor.trim().toUpperCase(Locale.ROOT) : "";
+        String[] args = verbose ? new String[]{floor, "debug"} : new String[]{floor};
+        return handleGenDungeon(player, args);
+    }
+
+    private boolean handleGenDungeon(Player player, String[] args) {
         if (args.length < 1) {
             player.sendMessage(Component.text("Usage: /gen_dungeon F1|F2|F3 [debug]", NamedTextColor.RED));
             return true;

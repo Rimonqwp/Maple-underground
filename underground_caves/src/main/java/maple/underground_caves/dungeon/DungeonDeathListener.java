@@ -304,6 +304,10 @@ public final class DungeonDeathListener implements Listener {
         dungeonFailCountdownWorlds.remove(worldName);
         deathQueueByWorld.remove(worldName);
         reviveCooldownUntilByWorld.remove(worldName);
+        DungeonBridgeListener bridgeListener = plugin.getDungeonBridgeListener();
+        if (bridgeListener != null) {
+            bridgeListener.sendEndRunForWorld(worldName, "通关失败，正在返回大厅。");
+        }
         Location spawn = plugin.getMainWorldSpawnLocation();
         if (spawn == null || spawn.getWorld() == null) return;
         for (Player p : new ArrayList<>(dungeonWorld.getPlayers())) {

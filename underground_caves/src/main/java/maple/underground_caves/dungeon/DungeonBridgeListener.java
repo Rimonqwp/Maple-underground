@@ -3,9 +3,11 @@ package maple.underground_caves.dungeon;
 import maple.underground_caves.Test_dungeons;
 import maple.underground_caves.party.PartyManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -17,18 +19,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class DungeonBridgeListener implements PluginMessageListener {
     public static final String CHANNEL = "maple:dungeon_bridge";
 
     private static final String ACTION_START_RUN = "START_RUN";
     private static final String ACTION_ACK = "ACK";
+    private static final String ACTION_END_RUN = "END_RUN";
 
     private final Test_dungeons plugin;
     private final PartyManager partyManager;
     private final DungeonCommand dungeonCommand;
     private final String bridgeToken;
+    private final Map<UUID, String> worldByRunId = new ConcurrentHashMap<>();
+    private final Map<String, UUID> runIdByWorld = new ConcurrentHashMap<>();
+    private final Map<UUID, BukkitTask> bindTasks = new ConcurrentHashMap<>();
 
     public DungeonBridgeListener(Test_dungeons plugin, PartyManager partyManager, DungeonCommand dungeonCommand) {
         this.plugin = plugin;
@@ -43,6 +52,12 @@ public final class DungeonBridgeListener implements PluginMessageListener {
     }
 
     public void unregister() {
+        for (BukkitTask task : bindTasks.values()) {
+            if (task != null) {
+                task.cancel();
+            }
+        }
+        bindTasks.clear();
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL, this);
         Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, CHANNEL);
     }
@@ -71,7 +86,11 @@ public final class DungeonBridgeListener implements PluginMessageListener {
             }
 
             boolean accepted = dungeonCommand.startDungeonRun(leader, request.floor(), false);
-            sendAck(carrier, runId, accepted, accepted ? "副本服务器已接受开局请求，正在生成地牢。" : "副本服务器无法开始该楼层。");
+            if (accepted) {
+                scheduleWorldBinding(request.runId());
+            }
+            sendAck(carrier, runId, accepted,
+                    accepted ? "副本服务器已接受开局请求，正在生成地图。" : "副本服务器无法开始该楼层。");
         } catch (Exception e) {
             plugin.getLogger().warning("[DungeonBridge] Failed to handle START_RUN: " + e.getMessage());
             if (runId != null) {
@@ -80,12 +99,90 @@ public final class DungeonBridgeListener implements PluginMessageListener {
         }
     }
 
+    public void sendEndRunForWorld(String worldName, String reason) {
+        if (worldName == null || worldName.isBlank()) {
+            return;
+        }
+        UUID runId = runIdByWorld.get(worldName);
+        if (runId == null) {
+            plugin.getLogger().warning("[DungeonBridge] Cannot send END_RUN, no runId bound for world=" + worldName);
+            return;
+        }
+        Optional<Player> carrier = findCarrier(worldName);
+        if (carrier.isEmpty()) {
+            plugin.getLogger().warning("[DungeonBridge] Cannot send END_RUN, no online carrier for world=" + worldName);
+            return;
+        }
+        sendEndRun(carrier.get(), runId, reason);
+    }
+
+    private void scheduleWorldBinding(UUID runId) {
+        BukkitTask previous = bindTasks.remove(runId);
+        if (previous != null) {
+            previous.cancel();
+        }
+        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            private int attempts = 0;
+
+            @Override
+            public void run() {
+                attempts++;
+                if (tryBindLatestDungeonWorld(runId) || attempts >= 600) {
+                    BukkitTask self = bindTasks.remove(runId);
+                    if (self != null) {
+                        self.cancel();
+                    }
+                }
+            }
+        }, 1L, 1L);
+        bindTasks.put(runId, task);
+    }
+
+    private boolean tryBindLatestDungeonWorld(UUID runId) {
+        if (worldByRunId.containsKey(runId)) {
+            return true;
+        }
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        if (snapshot == null || snapshot.worldName() == null || snapshot.worldName().isBlank()) {
+            return false;
+        }
+        String worldName = snapshot.worldName();
+        if (!worldName.startsWith("dungeon_")) {
+            return false;
+        }
+        World world = Bukkit.getWorld(worldName);
+        if (world == null || !plugin.isDungeonWorld(worldName)) {
+            return false;
+        }
+        worldByRunId.put(runId, worldName);
+        runIdByWorld.put(worldName, runId);
+        plugin.getLogger().info("[DungeonBridge] Bound runId=" + runId + " to world=" + worldName);
+        return true;
+    }
+
+    private Optional<Player> findCarrier(String worldName) {
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            for (Player player : world.getPlayers()) {
+                if (player != null && player.isOnline()) {
+                    return Optional.of(player);
+                }
+            }
+        }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player != null && player.isOnline()) {
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
     private String validate(StartRunRequest request) {
         if (request == null) {
             return "无效的开局请求。";
         }
         if (!bridgeToken.isBlank() && !bridgeToken.equals(request.token())) {
-            return "副本桥 token 不匹配。";
+            return "副本桥接 token 不匹配。";
         }
         String floor = normalizeFloor(request.floor());
         if (floor == null) {
@@ -146,6 +243,24 @@ public final class DungeonBridgeListener implements PluginMessageListener {
             carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
         } catch (IOException e) {
             plugin.getLogger().warning("[DungeonBridge] Failed to send ACK: " + e.getMessage());
+        }
+    }
+
+    private void sendEndRun(Player carrier, UUID runId, String reason) {
+        if (carrier == null || runId == null) {
+            return;
+        }
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(bytes);
+            out.writeUTF(ACTION_END_RUN);
+            out.writeUTF(runId.toString());
+            out.writeUTF(reason != null ? reason : "副本已结束。");
+            out.flush();
+            carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
+            plugin.getLogger().info("[DungeonBridge] Sent END_RUN runId=" + runId + " reason=" + reason);
+        } catch (IOException e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to send END_RUN: " + e.getMessage());
         }
     }
 

@@ -26,18 +26,22 @@ public final class DungeonProxyCommand implements SimpleCommand {
             coordinator.startDungeon(player, args[1]);
             return;
         }
+        if (args.length >= 1 && "leave".equalsIgnoreCase(args[0])) {
+            coordinator.leaveDungeon(player);
+            return;
+        }
 
-        player.sendPlainMessage("用法：/dungeon start <F1|F2|F3>");
+        player.sendPlainMessage("用法：/dungeon start <F1|F2|F3> 或 /dungeon leave");
     }
 
     @Override
     public List<String> suggest(Invocation invocation) {
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            return List.of("start");
+            return List.of("start", "leave");
         }
         if (args.length == 1) {
-            return filter(List.of("start"), args[0]);
+            return filter(List.of("start", "leave"), args[0]);
         }
         if (args.length == 2 && "start".equalsIgnoreCase(args[0])) {
             return filter(List.of("F1", "F2", "F3"), args[1]);

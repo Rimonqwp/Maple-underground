@@ -13,6 +13,7 @@ import java.util.UUID;
 public final class BridgeProtocol {
     public static final String ACTION_START_RUN = "START_RUN";
     public static final String ACTION_ACK = "ACK";
+    public static final String ACTION_END_RUN = "END_RUN";
 
     private BridgeProtocol() {
     }
@@ -39,17 +40,36 @@ public final class BridgeProtocol {
     }
 
     public static AckMessage decodeAck(byte[] data) throws IOException {
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
-        String action = in.readUTF();
-        if (!ACTION_ACK.equals(action)) {
-            throw new IOException("Unexpected action: " + action);
+        Message message = decode(data);
+        if (message instanceof AckMessage ack) {
+            return ack;
         }
-        UUID runId = UUID.fromString(in.readUTF());
-        boolean success = in.readBoolean();
-        String message = in.readUTF();
-        return new AckMessage(runId, success, message);
+        throw new IOException("Unexpected bridge message: " + message.getClass().getSimpleName());
     }
 
-    public record AckMessage(UUID runId, boolean success, String message) {
+    public static Message decode(byte[] data) throws IOException {
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
+        String action = in.readUTF();
+        if (ACTION_ACK.equals(action)) {
+            UUID runId = UUID.fromString(in.readUTF());
+            boolean success = in.readBoolean();
+            String message = in.readUTF();
+            return new AckMessage(runId, success, message);
+        }
+        if (ACTION_END_RUN.equals(action)) {
+            UUID runId = UUID.fromString(in.readUTF());
+            String reason = in.readUTF();
+            return new EndRunMessage(runId, reason);
+        }
+        throw new IOException("Unexpected action: " + action);
+    }
+
+    public sealed interface Message permits AckMessage, EndRunMessage {
+    }
+
+    public record AckMessage(UUID runId, boolean success, String message) implements Message {
+    }
+
+    public record EndRunMessage(UUID runId, String reason) implements Message {
     }
 }

@@ -1026,6 +1026,10 @@ public final class Test_dungeons extends JavaPlugin {
       return this.partyManager;
    }
 
+   public DungeonBridgeListener getDungeonBridgeListener() {
+      return this.dungeonBridgeListener;
+   }
+
    public void handleDungeonDeath(Player player) {
       if (this.dungeonDeathListener != null) {
          this.dungeonDeathListener.handleDungeonDeath(player);

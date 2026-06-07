@@ -45,7 +45,7 @@ public final class UndergroundVelocity {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         this.config = BridgeConfig.load(dataDirectory, logger);
         this.partyService = new PartyService(server, config.maxPartySize(), config.inviteTimeoutSeconds());
-        this.instanceManager = new DungeonInstanceManager(server, this, logger, config);
+        this.instanceManager = new DungeonInstanceManager(server, this, logger, config, DUNGEON_BRIDGE_CHANNEL);
         this.dungeonStartCoordinator = new DungeonStartCoordinator(
                 server,
                 this,
@@ -63,8 +63,9 @@ public final class UndergroundVelocity {
         );
         server.getCommandManager().register(
                 server.getCommandManager().metaBuilder("dungeon").plugin(this).build(),
-                new DungeonProxyCommand(dungeonStartCoordinator)
+                new DungeonProxyCommand(dungeonStartCoordinator, instanceManager, config)
         );
+        instanceManager.ensureMinimumPool();
 
         logger.info("Maple dungeon bridge enabled. instance-mode={} dungeon-server={} return-server={}",
                 config.instanceMode(), config.dungeonServer(), config.returnServer());

@@ -349,7 +349,7 @@ public final class ExitRoomManager implements Listener {
     /** 將觸發者所在隊伍所有人傳送到 last_boss_room local (29,17,10)。傳送成功回傳 true。 */
     private boolean teleportPartyToLastBossRoom(Player trigger, World world) {
         if (trigger == null || world == null) return false;
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         if (snapshot == null || !world.getName().equals(snapshot.worldName())) return false;
         maple.underground_caves.dungeon.BossRoomManager bossMgr = plugin.getBossRoomManager();
         if (bossMgr == null) return false;

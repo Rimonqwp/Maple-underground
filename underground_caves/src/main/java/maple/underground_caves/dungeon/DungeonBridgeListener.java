@@ -3,11 +3,11 @@ package maple.underground_caves.dungeon;
 import maple.underground_caves.Test_dungeons;
 import maple.underground_caves.party.PartyManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -16,11 +16,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,36 +36,51 @@ public final class DungeonBridgeListener implements PluginMessageListener {
     public static final String CHANNEL = "maple:dungeon_bridge";
 
     private static final String ACTION_START_RUN = "START_RUN";
+    private static final String ACTION_RESET_SLOTS = "RESET_SLOTS";
     private static final String ACTION_ACK = "ACK";
     private static final String ACTION_END_RUN = "END_RUN";
+    private static final DateTimeFormatter LOG_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Test_dungeons plugin;
     private final PartyManager partyManager;
     private final DungeonCommand dungeonCommand;
+    private final YamlConfiguration bridgeConfig;
     private final String bridgeToken;
-    private final Map<UUID, String> worldByRunId = new ConcurrentHashMap<>();
+    private final String serverName;
+    private final String preloadFloor;
+    private final File poolDir;
+    private final File logsDir;
+    private final File stateFile;
+    private final Map<UUID, RunBinding> runById = new ConcurrentHashMap<>();
     private final Map<String, UUID> runIdByWorld = new ConcurrentHashMap<>();
-    private final Map<UUID, BukkitTask> bindTasks = new ConcurrentHashMap<>();
+    private final Map<String, SlotBinding> slotById = new ConcurrentHashMap<>();
+    private final Map<String, String> slotIdByWorld = new ConcurrentHashMap<>();
+    private final Set<String> buildingWorlds = ConcurrentHashMap.newKeySet();
+    private final Map<String, List<Runnable>> readyCallbacksByWorld = new ConcurrentHashMap<>();
 
     public DungeonBridgeListener(Test_dungeons plugin, PartyManager partyManager, DungeonCommand dungeonCommand) {
         this.plugin = plugin;
         this.partyManager = partyManager;
         this.dungeonCommand = dungeonCommand;
-        this.bridgeToken = loadBridgeToken(plugin);
+        this.bridgeConfig = loadBridgeConfig(plugin);
+        this.bridgeToken = bridgeConfig.getString("bridge-token", "");
+        this.serverName = bridgeConfig.getString("server-name", Bukkit.getServer().getName());
+        String configuredPreloadFloor = normalizeFloor(bridgeConfig.getString("preload-floor", "F1"));
+        this.preloadFloor = configuredPreloadFloor != null ? configuredPreloadFloor : "F1";
+        String poolStateDir = bridgeConfig.getString("pool-state-dir", "dungeon-pool");
+        this.poolDir = new File(plugin.getDataFolder(), poolStateDir == null || poolStateDir.isBlank() ? "dungeon-pool" : poolStateDir);
+        this.logsDir = new File(poolDir, "logs");
+        this.stateFile = new File(poolDir, "slots.yml");
+        loadConfiguredSlots();
     }
 
     public void register() {
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL, this);
         Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL);
+        preloadConfiguredSlots();
     }
 
     public void unregister() {
-        for (BukkitTask task : bindTasks.values()) {
-            if (task != null) {
-                task.cancel();
-            }
-        }
-        bindTasks.clear();
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL, this);
         Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, CHANNEL);
     }
@@ -67,35 +90,20 @@ public final class DungeonBridgeListener implements PluginMessageListener {
         if (!CHANNEL.equals(channel)) {
             return;
         }
-
-        UUID runId = null;
         try {
-            StartRunRequest request = decodeStartRun(message);
-            runId = request.runId();
-            String error = validate(request);
-            if (error != null) {
-                sendAck(carrier, runId, false, error);
+            DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+            String action = in.readUTF();
+            if (ACTION_START_RUN.equals(action)) {
+                handleStartRun(carrier, decodeStartRun(in));
                 return;
             }
-
-            partyManager.setPartySnapshot(request.leaderUuid(), request.memberUuids());
-            Player leader = Bukkit.getPlayer(request.leaderUuid());
-            if (leader == null || !leader.isOnline()) {
-                sendAck(carrier, runId, false, "队长不在线，副本无法开始。");
+            if (ACTION_RESET_SLOTS.equals(action)) {
+                handleResetSlots(decodeResetSlots(in));
                 return;
             }
-
-            boolean accepted = dungeonCommand.startDungeonRun(leader, request.floor(), false);
-            if (accepted) {
-                scheduleWorldBinding(request.runId());
-            }
-            sendAck(carrier, runId, accepted,
-                    accepted ? "副本服务器已接受开局请求，正在生成地图。" : "副本服务器无法开始该楼层。");
+            plugin.getLogger().warning("[DungeonBridge] Unknown action: " + action);
         } catch (Exception e) {
-            plugin.getLogger().warning("[DungeonBridge] Failed to handle START_RUN: " + e.getMessage());
-            if (runId != null) {
-                sendAck(carrier, runId, false, "副本服务器处理开局请求时发生错误。");
-            }
+            plugin.getLogger().warning("[DungeonBridge] Failed to handle plugin message: " + e.getMessage());
         }
     }
 
@@ -104,6 +112,7 @@ public final class DungeonBridgeListener implements PluginMessageListener {
             return;
         }
         UUID runId = runIdByWorld.get(worldName);
+        String slotId = slotIdByWorld.getOrDefault(worldName, "");
         if (runId == null) {
             plugin.getLogger().warning("[DungeonBridge] Cannot send END_RUN, no runId bound for world=" + worldName);
             return;
@@ -113,51 +122,274 @@ public final class DungeonBridgeListener implements PluginMessageListener {
             plugin.getLogger().warning("[DungeonBridge] Cannot send END_RUN, no online carrier for world=" + worldName);
             return;
         }
-        sendEndRun(carrier.get(), runId, reason);
+        sendEndRun(carrier.get(), runId, slotId, worldName, reason);
     }
 
-    private void scheduleWorldBinding(UUID runId) {
-        BukkitTask previous = bindTasks.remove(runId);
-        if (previous != null) {
-            previous.cancel();
-        }
-        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
-            private int attempts = 0;
-
-            @Override
-            public void run() {
-                attempts++;
-                if (tryBindLatestDungeonWorld(runId) || attempts >= 600) {
-                    BukkitTask self = bindTasks.remove(runId);
-                    if (self != null) {
-                        self.cancel();
-                    }
-                }
+    private void handleStartRun(Player carrier, StartRunRequest request) {
+        UUID runId = request != null ? request.runId() : null;
+        try {
+            String error = validate(request);
+            if (error != null) {
+                sendAck(carrier, runId, false, error, request != null ? request.slotId() : "", request != null ? request.worldName() : "");
+                return;
             }
-        }, 1L, 1L);
-        bindTasks.put(runId, task);
+
+            SlotBinding previousSlot = slotById.get(request.slotId());
+            if (previousSlot != null && !previousSlot.worldName().equals(request.worldName())) {
+                logWorld(previousSlot.worldName(), "START_RUN replacing idle slot=" + request.slotId()
+                        + " oldWorld=" + previousSlot.worldName()
+                        + " newWorld=" + request.worldName()
+                        + " floor=" + request.floor());
+                deleteDungeonWorld(previousSlot.worldName());
+            }
+            bindSlot(request.slotId(), request.worldName(), request.floor());
+            partyManager.setPartySnapshot(request.leaderUuid(), request.memberUuids());
+            Player leader = Bukkit.getPlayer(request.leaderUuid());
+            if (leader == null || !leader.isOnline()) {
+                sendAck(carrier, runId, false, "队长不在线，副本无法开始。", request.slotId(), request.worldName());
+                logWorld(request.worldName(), "START_RUN rejected: leader offline runId=" + runId + " slot=" + request.slotId());
+                return;
+            }
+
+            RunBinding binding = new RunBinding(runId, request.slotId(), request.worldName(), request.floor(), request.memberUuids());
+            runById.put(runId, binding);
+            runIdByWorld.put(request.worldName(), runId);
+            slotIdByWorld.put(request.worldName(), request.slotId());
+            saveState();
+            logWorld(request.worldName(), "START_RUN accepted runId=" + runId
+                    + " server=" + serverName
+                    + " slot=" + request.slotId()
+                    + " floor=" + request.floor()
+                    + " members=" + request.memberNames());
+
+            if (buildingWorlds.contains(request.worldName())) {
+                logWorld(request.worldName(), "START_RUN waiting for build runId=" + runId + " slot=" + request.slotId());
+                onWorldReady(request.worldName(), () -> Bukkit.getScheduler().runTask(plugin, () -> handleStartRun(carrier, request)));
+                return;
+            }
+            if (plugin.getDungeonSnapshot(request.worldName()) == null) {
+                beginWorldBuild(request.worldName());
+            }
+            boolean accepted = dungeonCommand.startDungeonRun(leader, request.floor(), false, request.worldName(), () -> {
+                finishWorldBuild(request.worldName());
+                saveState();
+                logWorld(request.worldName(), "START_RUN ready runId=" + runId + " slot=" + request.slotId());
+                sendAck(carrier, runId, true, "副本地图已准备完成。", request.slotId(), request.worldName());
+            });
+            if (!accepted) {
+                finishWorldBuild(request.worldName());
+                runById.remove(runId);
+                runIdByWorld.remove(request.worldName(), runId);
+                sendAck(carrier, runId, false, "副本服务器无法开始该楼层。", request.slotId(), request.worldName());
+                logWorld(request.worldName(), "START_RUN failed runId=" + runId + " slot=" + request.slotId());
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to handle START_RUN: " + e.getMessage());
+            if (runId != null) {
+                finishWorldBuild(request != null ? request.worldName() : null);
+                sendAck(carrier, runId, false, "副本服务器处理开局请求时发生错误。", request != null ? request.slotId() : "", request != null ? request.worldName() : "");
+            }
+        }
     }
 
-    private boolean tryBindLatestDungeonWorld(UUID runId) {
-        if (worldByRunId.containsKey(runId)) {
-            return true;
+    private void handleResetSlots(ResetSlotsRequest request) {
+        String error = validateReset(request);
+        if (error != null) {
+            plugin.getLogger().warning("[DungeonBridge] RESET_SLOTS rejected: " + error);
+            return;
         }
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
-        if (snapshot == null || snapshot.worldName() == null || snapshot.worldName().isBlank()) {
-            return false;
+        if (request.slots().isEmpty()) {
+            return;
         }
-        String worldName = snapshot.worldName();
-        if (!worldName.startsWith("dungeon_")) {
-            return false;
+        preloadResetSlotsSequentially(request.preloadFloor(), request.slots(), 0);
+    }
+
+    private void preloadResetSlotsSequentially(String floor, List<SlotReset> slots, int index) {
+        if (index >= slots.size()) {
+            saveState();
+            return;
         }
-        World world = Bukkit.getWorld(worldName);
-        if (world == null || !plugin.isDungeonWorld(worldName)) {
-            return false;
+        SlotReset reset = slots.get(index);
+        SlotBinding previous = slotById.get(reset.slotId());
+        String oldWorld = previous != null ? previous.worldName() : null;
+        if (oldWorld != null && !oldWorld.isBlank() && !oldWorld.equals(reset.worldName())) {
+            logWorld(oldWorld, "RESET deleting old world for slot=" + reset.slotId() + " nextWorld=" + reset.worldName());
+            deleteDungeonWorld(oldWorld);
         }
-        worldByRunId.put(runId, worldName);
-        runIdByWorld.put(worldName, runId);
-        plugin.getLogger().info("[DungeonBridge] Bound runId=" + runId + " to world=" + worldName);
-        return true;
+
+        bindSlot(reset.slotId(), reset.worldName(), floor);
+        saveState();
+        logWorld(reset.worldName(), "RESET rebuilding slot=" + reset.slotId() + " floor=" + floor + " server=" + serverName);
+        beginWorldBuild(reset.worldName());
+        boolean accepted = dungeonCommand.preloadDungeonWorld(floor, reset.worldName(), () -> {
+            finishWorldBuild(reset.worldName());
+            logWorld(reset.worldName(), "RESET preload complete slot=" + reset.slotId() + " floor=" + floor);
+            preloadResetSlotsSequentially(floor, slots, index + 1);
+        });
+        if (!accepted) {
+            finishWorldBuild(reset.worldName());
+            logWorld(reset.worldName(), "RESET preload failed slot=" + reset.slotId() + " floor=" + floor);
+            preloadResetSlotsSequentially(floor, slots, index + 1);
+        }
+    }
+
+    private void preloadConfiguredSlots() {
+        List<SlotBinding> slots = new ArrayList<>(slotById.values());
+        slots.sort(Comparator.comparing(SlotBinding::slotId));
+        preloadConfiguredSlotsSequentially(slots, 0);
+    }
+
+    private void preloadConfiguredSlotsSequentially(List<SlotBinding> slots, int index) {
+        if (index >= slots.size()) {
+            saveState();
+            return;
+        }
+        SlotBinding slot = slots.get(index);
+        Test_dungeons.DungeonSnapshot existing = plugin.getDungeonSnapshot(slot.worldName());
+        if (existing != null && slot.floor().equalsIgnoreCase(existing.floor())) {
+            logWorld(slot.worldName(), "PRELOAD skipped existing slot=" + slot.slotId() + " floor=" + slot.floor());
+            preloadConfiguredSlotsSequentially(slots, index + 1);
+            return;
+        }
+        logWorld(slot.worldName(), "PRELOAD start server=" + serverName + " slot=" + slot.slotId() + " floor=" + slot.floor());
+        beginWorldBuild(slot.worldName());
+        boolean accepted = dungeonCommand.preloadDungeonWorld(slot.floor(), slot.worldName(), () -> {
+            finishWorldBuild(slot.worldName());
+            logWorld(slot.worldName(), "PRELOAD complete server=" + serverName + " slot=" + slot.slotId() + " floor=" + slot.floor());
+            preloadConfiguredSlotsSequentially(slots, index + 1);
+        });
+        if (!accepted) {
+            finishWorldBuild(slot.worldName());
+            logWorld(slot.worldName(), "PRELOAD failed server=" + serverName + " slot=" + slot.slotId() + " floor=" + slot.floor());
+            preloadConfiguredSlotsSequentially(slots, index + 1);
+        }
+    }
+
+    private String validate(StartRunRequest request) {
+        if (request == null) {
+            return "无效的开局请求。";
+        }
+        if (!bridgeToken.isBlank() && !bridgeToken.equals(request.token())) {
+            return "副本桥接 token 不匹配。";
+        }
+        if (normalizeFloor(request.floor()) == null) {
+            return "楼层无效，请使用 F1、F2 或 F3。";
+        }
+        if (request.slotId().isBlank() || request.worldName().isBlank()) {
+            return "副本槽位资料不完整。";
+        }
+        if (!request.worldName().startsWith("dungeon_")) {
+            return "副本世界名无效。";
+        }
+        if (request.memberUuids().isEmpty() || request.memberUuids().size() > 5) {
+            return "队伍人数无效。";
+        }
+        if (!request.memberUuids().contains(request.leaderUuid())) {
+            return "队伍资料缺少队长。";
+        }
+        for (UUID memberId : request.memberUuids()) {
+            Player player = Bukkit.getPlayer(memberId);
+            if (player == null || !player.isOnline()) {
+                return "队伍中有玩家尚未到达副本服。";
+            }
+        }
+        return null;
+    }
+
+    private String validateReset(ResetSlotsRequest request) {
+        if (request == null) {
+            return "empty request";
+        }
+        if (!bridgeToken.isBlank() && !bridgeToken.equals(request.token())) {
+            return "token mismatch";
+        }
+        if (normalizeFloor(request.preloadFloor()) == null) {
+            return "invalid floor";
+        }
+        for (SlotReset slot : request.slots()) {
+            if (slot.slotId().isBlank() || slot.worldName().isBlank() || !slot.worldName().startsWith("dungeon_")) {
+                return "invalid slot reset: " + slot;
+            }
+        }
+        return null;
+    }
+
+    private StartRunRequest decodeStartRun(DataInputStream in) throws IOException {
+        UUID runId = UUID.fromString(in.readUTF());
+        String token = in.readUTF();
+        String floor = normalizeFloor(in.readUTF());
+        String slotId = in.readUTF();
+        String worldName = in.readUTF();
+        UUID leaderUuid = UUID.fromString(in.readUTF());
+        int memberCount = in.readInt();
+        if (memberCount < 1 || memberCount > 5) {
+            throw new IOException("Invalid member count: " + memberCount);
+        }
+
+        List<UUID> memberUuids = new ArrayList<>();
+        List<String> memberNames = new ArrayList<>();
+        for (int i = 0; i < memberCount; i++) {
+            memberUuids.add(UUID.fromString(in.readUTF()));
+            memberNames.add(in.readUTF());
+        }
+        return new StartRunRequest(runId, token, floor, slotId, worldName, leaderUuid, memberUuids, memberNames);
+    }
+
+    private ResetSlotsRequest decodeResetSlots(DataInputStream in) throws IOException {
+        String token = in.readUTF();
+        String preloadFloor = normalizeFloor(in.readUTF());
+        int count = in.readInt();
+        if (count < 0 || count > 32) {
+            throw new IOException("Invalid reset slot count: " + count);
+        }
+        List<SlotReset> slots = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            slots.add(new SlotReset(in.readUTF(), in.readUTF()));
+        }
+        return new ResetSlotsRequest(token, preloadFloor, slots);
+    }
+
+    private void sendAck(Player carrier, UUID runId, boolean success, String message, String slotId, String worldName) {
+        if (carrier == null || runId == null) {
+            return;
+        }
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(bytes);
+            out.writeUTF(ACTION_ACK);
+            out.writeUTF(runId.toString());
+            out.writeBoolean(success);
+            out.writeUTF(message != null ? message : "");
+            out.writeUTF(slotId != null ? slotId : "");
+            out.writeUTF(worldName != null ? worldName : "");
+            out.flush();
+            carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
+        } catch (IOException e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to send ACK: " + e.getMessage());
+        }
+    }
+
+    private void sendEndRun(Player carrier, UUID runId, String slotId, String worldName, String reason) {
+        if (carrier == null || runId == null) {
+            return;
+        }
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(bytes);
+            out.writeUTF(ACTION_END_RUN);
+            out.writeUTF(runId.toString());
+            out.writeUTF(slotId != null ? slotId : "");
+            out.writeUTF(worldName != null ? worldName : "");
+            out.writeUTF(reason != null ? reason : "副本已结束。");
+            out.flush();
+            carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
+            runById.remove(runId);
+            runIdByWorld.remove(worldName, runId);
+            saveState();
+            logWorld(worldName, "END_RUN sent runId=" + runId + " slot=" + slotId + " reason=" + reason);
+        } catch (IOException e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to send END_RUN: " + e.getMessage());
+        }
     }
 
     private Optional<Player> findCarrier(String worldName) {
@@ -177,97 +409,183 @@ public final class DungeonBridgeListener implements PluginMessageListener {
         return Optional.empty();
     }
 
-    private String validate(StartRunRequest request) {
-        if (request == null) {
-            return "无效的开局请求。";
+    private void deleteDungeonWorld(String worldName) {
+        if (worldName == null || worldName.isBlank() || !worldName.startsWith("dungeon_")) {
+            return;
         }
-        if (!bridgeToken.isBlank() && !bridgeToken.equals(request.token())) {
-            return "副本桥接 token 不匹配。";
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            Location fallback = plugin.getMainWorldSpawnLocation();
+            for (Player player : new ArrayList<>(world.getPlayers())) {
+                if (player != null && player.isOnline() && fallback != null) {
+                    player.teleport(fallback);
+                }
+            }
+            Bukkit.unloadWorld(world, false);
         }
-        String floor = normalizeFloor(request.floor());
-        if (floor == null) {
-            return "楼层无效，请使用 F1、F2 或 F3。";
+        plugin.forgetDungeonWorld(worldName);
+        runIdByWorld.remove(worldName);
+        slotIdByWorld.remove(worldName);
+        Path worldContainer = Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
+        Path worldDir = worldContainer.resolve(worldName).normalize();
+        if (!worldDir.startsWith(worldContainer) || worldDir.equals(worldContainer) || worldDir.getFileName() == null
+                || !worldDir.getFileName().toString().equals(worldName)) {
+            plugin.getLogger().warning("[DungeonBridge] Refusing to delete unsafe dungeon world path: " + worldDir);
+            return;
         }
-        if (request.memberUuids().isEmpty() || request.memberUuids().size() > 5) {
-            return "队伍人数无效。";
+        if (Files.notExists(worldDir)) {
+            return;
         }
-        if (!request.memberUuids().contains(request.leaderUuid())) {
-            return "队伍资料缺少队长。";
+        try (var stream = Files.walk(worldDir)) {
+            for (Path path : stream.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
+            logWorld(worldName, "WORLD deleted path=" + worldDir);
+        } catch (IOException e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to delete world " + worldName + ": " + e.getMessage());
+            logWorld(worldName, "WORLD delete failed: " + e.getMessage());
         }
-        for (UUID memberId : request.memberUuids()) {
-            Player player = Bukkit.getPlayer(memberId);
-            if (player == null || !player.isOnline()) {
-                return "队伍中有玩家尚未到达副本服。";
+    }
+
+    private void loadConfiguredSlots() {
+        List<Map<?, ?>> rawSlots = bridgeConfig.getMapList("slots");
+        if (rawSlots.isEmpty()) {
+            int count = Math.max(0, bridgeConfig.getInt("maps-per-server", 0));
+            for (int i = 1; i <= count; i++) {
+                String slotId = "slot-" + i;
+                String worldName = "dungeon_" + UUID.randomUUID();
+                bindSlot(slotId, worldName, preloadFloor);
+            }
+            return;
+        }
+        for (Map<?, ?> raw : rawSlots) {
+            if (raw == null) {
+                continue;
+            }
+            String slotId = asString(raw.get("id"));
+            String worldName = asString(raw.get("world"));
+            String floor = normalizeFloor(asString(raw.get("floor")));
+            if (slotId.isBlank() || worldName.isBlank()) {
+                continue;
+            }
+            bindSlot(slotId, worldName, floor != null ? floor : preloadFloor);
+        }
+        saveState();
+    }
+
+    private void bindSlot(String slotId, String worldName, String floor) {
+        if (slotId == null || slotId.isBlank() || worldName == null || worldName.isBlank()) {
+            return;
+        }
+        SlotBinding previous = slotById.put(slotId, new SlotBinding(slotId, worldName, floor != null ? floor : preloadFloor));
+        if (previous != null && !previous.worldName().equals(worldName)) {
+            slotIdByWorld.remove(previous.worldName(), slotId);
+        }
+        slotIdByWorld.put(worldName, slotId);
+    }
+
+    private void beginWorldBuild(String worldName) {
+        if (worldName != null && !worldName.isBlank()) {
+            buildingWorlds.add(worldName);
+        }
+    }
+
+    private void finishWorldBuild(String worldName) {
+        if (worldName == null || worldName.isBlank()) {
+            return;
+        }
+        buildingWorlds.remove(worldName);
+        List<Runnable> callbacks = readyCallbacksByWorld.remove(worldName);
+        if (callbacks == null || callbacks.isEmpty()) {
+            return;
+        }
+        for (Runnable callback : List.copyOf(callbacks)) {
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(plugin, callback);
             }
         }
-        return null;
     }
 
-    private StartRunRequest decodeStartRun(byte[] message) throws IOException {
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-        String action = in.readUTF();
-        if (!ACTION_START_RUN.equals(action)) {
-            throw new IOException("Unexpected action: " + action);
+    private void onWorldReady(String worldName, Runnable callback) {
+        if (worldName == null || worldName.isBlank() || callback == null) {
+            return;
         }
-
-        UUID runId = UUID.fromString(in.readUTF());
-        String token = in.readUTF();
-        String floor = normalizeFloor(in.readUTF());
-        UUID leaderUuid = UUID.fromString(in.readUTF());
-        int memberCount = in.readInt();
-        if (memberCount < 1 || memberCount > 5) {
-            throw new IOException("Invalid member count: " + memberCount);
+        if (!buildingWorlds.contains(worldName)) {
+            Bukkit.getScheduler().runTask(plugin, callback);
+            return;
         }
-
-        List<UUID> memberUuids = new ArrayList<>();
-        List<String> memberNames = new ArrayList<>();
-        for (int i = 0; i < memberCount; i++) {
-            memberUuids.add(UUID.fromString(in.readUTF()));
-            memberNames.add(in.readUTF());
-        }
-        return new StartRunRequest(runId, token, floor, leaderUuid, memberUuids, memberNames);
+        readyCallbacksByWorld.compute(worldName, (ignored, callbacks) -> {
+            List<Runnable> list = callbacks != null ? callbacks : new ArrayList<>();
+            list.add(callback);
+            return list;
+        });
     }
 
-    private void sendAck(Player carrier, UUID runId, boolean success, String message) {
-        if (carrier == null || runId == null) {
+    private void saveState() {
+        try {
+            if (!poolDir.exists() && !poolDir.mkdirs()) {
+                return;
+            }
+            YamlConfiguration state = new YamlConfiguration();
+            state.set("server-name", serverName);
+            state.set("updated-at", LocalDateTime.now().format(LOG_TIME));
+            List<Map<String, Object>> slots = new ArrayList<>();
+            for (SlotBinding slot : slotById.values().stream().sorted(Comparator.comparing(SlotBinding::slotId)).toList()) {
+                Map<String, Object> data = new LinkedHashMap<>();
+                data.put("id", slot.slotId());
+                data.put("world", slot.worldName());
+                data.put("floor", slot.floor());
+                data.put("state", slotState(slot.worldName()));
+                slots.add(data);
+            }
+            state.set("slots", slots);
+            state.save(stateFile);
+        } catch (IOException e) {
+            plugin.getLogger().warning("[DungeonBridge] Failed to save slot state: " + e.getMessage());
+        }
+    }
+
+    private String slotState(String worldName) {
+        if (worldName == null || worldName.isBlank()) {
+            return "BUILDING";
+        }
+        if (buildingWorlds.contains(worldName)) {
+            return "BUILDING";
+        }
+        if (runIdByWorld.containsKey(worldName)) {
+            return "ACTIVE";
+        }
+        return plugin.getDungeonSnapshot(worldName) != null ? "IDLE" : "BUILDING";
+    }
+
+    private void logWorld(String worldName, String line) {
+        if (worldName == null || worldName.isBlank()) {
             return;
         }
         try {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(bytes);
-            out.writeUTF(ACTION_ACK);
-            out.writeUTF(runId.toString());
-            out.writeBoolean(success);
-            out.writeUTF(message != null ? message : "");
-            out.flush();
-            carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
+            if (!logsDir.exists() && !logsDir.mkdirs()) {
+                return;
+            }
+            File file = new File(logsDir, safeLogName(worldName) + ".log");
+            String text = "[" + LocalDateTime.now().format(LOG_TIME) + "] " + line + System.lineSeparator();
+            Files.writeString(file.toPath(), text, StandardCharsets.UTF_8,
+                    java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
         } catch (IOException e) {
-            plugin.getLogger().warning("[DungeonBridge] Failed to send ACK: " + e.getMessage());
+            plugin.getLogger().warning("[DungeonBridge] Failed to write world log: " + e.getMessage());
         }
     }
 
-    private void sendEndRun(Player carrier, UUID runId, String reason) {
-        if (carrier == null || runId == null) {
-            return;
-        }
-        try {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(bytes);
-            out.writeUTF(ACTION_END_RUN);
-            out.writeUTF(runId.toString());
-            out.writeUTF(reason != null ? reason : "副本已结束。");
-            out.flush();
-            carrier.sendPluginMessage(plugin, CHANNEL, bytes.toByteArray());
-            plugin.getLogger().info("[DungeonBridge] Sent END_RUN runId=" + runId + " reason=" + reason);
-        } catch (IOException e) {
-            plugin.getLogger().warning("[DungeonBridge] Failed to send END_RUN: " + e.getMessage());
-        }
-    }
-
-    private static String loadBridgeToken(Test_dungeons plugin) {
+    private static YamlConfiguration loadBridgeConfig(Test_dungeons plugin) {
         File file = new File(plugin.getDataFolder(), "bridge.yml");
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        return config.getString("bridge-token", "");
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    private static String asString(Object value) {
+        return value == null ? "" : String.valueOf(value).trim();
+    }
+
+    private static String safeLogName(String worldName) {
+        return worldName.replaceAll("[^A-Za-z0-9_.-]", "_");
     }
 
     private static String normalizeFloor(String raw) {
@@ -285,9 +603,23 @@ public final class DungeonBridgeListener implements PluginMessageListener {
             UUID runId,
             String token,
             String floor,
+            String slotId,
+            String worldName,
             UUID leaderUuid,
             List<UUID> memberUuids,
             List<String> memberNames
     ) {
+    }
+
+    private record ResetSlotsRequest(String token, String preloadFloor, List<SlotReset> slots) {
+    }
+
+    private record SlotReset(String slotId, String worldName) {
+    }
+
+    private record SlotBinding(String slotId, String worldName, String floor) {
+    }
+
+    private record RunBinding(UUID runId, String slotId, String worldName, String floor, List<UUID> members) {
     }
 }

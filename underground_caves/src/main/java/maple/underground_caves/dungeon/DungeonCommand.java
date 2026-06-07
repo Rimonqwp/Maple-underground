@@ -29,7 +29,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
@@ -122,8 +125,36 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleGenDungeon(Player player, String[] args) {
+        return startDungeonGeneration(player, args, null, true, null);
+    }
+
+    public boolean startDungeonRun(Player player, String rawFloor, boolean verbose, String worldName, @Nullable Runnable onComplete) {
+        if (player == null) return false;
+        String floor = rawFloor != null ? rawFloor.trim().toUpperCase(Locale.ROOT) : "";
+        String[] args = verbose ? new String[]{floor, "debug"} : new String[]{floor};
+        Test_dungeons.DungeonSnapshot existing = worldName != null ? Test_dungeons.getInstance().getDungeonSnapshot(worldName) : null;
+        if (existing != null && floor.equalsIgnoreCase(existing.floor())) {
+            teleportPartyToExistingDungeon(player, existing);
+            if (onComplete != null) onComplete.run();
+            return true;
+        }
+        return startDungeonGeneration(player, args, worldName, true, onComplete);
+    }
+
+    public boolean preloadDungeonWorld(String rawFloor, String worldName, @Nullable Runnable onComplete) {
+        String floor = rawFloor != null ? rawFloor.trim().toUpperCase(Locale.ROOT) : "";
+        if (worldName == null || worldName.isBlank()) return false;
+        Test_dungeons.DungeonSnapshot existing = Test_dungeons.getInstance().getDungeonSnapshot(worldName);
+        if (existing != null && floor.equalsIgnoreCase(existing.floor())) {
+            if (onComplete != null) onComplete.run();
+            return true;
+        }
+        return startDungeonGeneration(null, new String[]{floor}, worldName, false, onComplete);
+    }
+
+    private boolean startDungeonGeneration(@Nullable Player player, String[] args, @Nullable String requestedWorldName, boolean teleportPlayers, @Nullable Runnable onComplete) {
         if (args.length < 1) {
-            player.sendMessage(Component.text("Usage: /gen_dungeon F1|F2|F3 [debug]", NamedTextColor.RED));
+            if (player != null) player.sendMessage(Component.text("Usage: /gen_dungeon F1|F2|F3 [debug]", NamedTextColor.RED));
             return true;
         }
 
@@ -140,7 +171,7 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
         try {
             var parsed = parseFloor(args[0]);
             if (parsed == null) {
-                player.sendMessage(Component.text("Invalid floor. Use F1, F2 or F3 (F1/F2=4x4, F3=5x5)", NamedTextColor.RED));
+                if (player != null) player.sendMessage(Component.text("Invalid floor. Use F1, F2 or F3 (F1/F2=4x4, F3=5x5)", NamedTextColor.RED));
                 return true;
             }
             floor = parsed.floor;
@@ -157,7 +188,7 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                 try {
                     overrides.add(Integer.parseInt(a));
                 } catch (NumberFormatException e) {
-                    player.sendMessage(Component.text("Invalid argument: " + a, NamedTextColor.RED));
+                    if (player != null) player.sendMessage(Component.text("Invalid argument: " + a, NamedTextColor.RED));
                     return true;
                 }
             }
@@ -213,15 +244,15 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                     }
                 }
                 
-                player.sendMessage(Component.text("Auto-calculated structures: 2x2=" + quad2x2 + ", L=" + lShape + ", 1x2=" + double1x2 + ", 2x1=" + double2x1 + ", 3x1=" + triple3x1, NamedTextColor.GRAY));
+                if (player != null) player.sendMessage(Component.text("Auto-calculated structures: 2x2=" + quad2x2 + ", L=" + lShape + ", 1x2=" + double1x2 + ", 2x1=" + double2x1 + ", 3x1=" + triple3x1, NamedTextColor.GRAY));
             }
 
         } catch (NumberFormatException e) {
-            player.sendMessage(Component.text("Invalid number format.", NamedTextColor.RED));
+            if (player != null) player.sendMessage(Component.text("Invalid number format.", NamedTextColor.RED));
             return true;
         }
 
-        player.sendMessage(Component.text("Generating dungeon...", NamedTextColor.YELLOW));
+        if (player != null) player.sendMessage(Component.text("Generating dungeon...", NamedTextColor.YELLOW));
 
         // Initialize Data with some defaults
         boolean smallMap = Math.max(width, height) <= 4;
@@ -256,7 +287,7 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
             return null;
         }), (dungeon, ignored) -> dungeon).thenAccept(dungeon -> {
             // Schedule block placement on main thread
-            player.getScheduler().run(Test_dungeons.getInstance(), (task) -> {
+            Bukkit.getScheduler().runTask(Test_dungeons.getInstance(), () -> {
                 Logger log = Test_dungeons.getInstance().getLogger();
                 if (finalVerbose) {
                     log.info("[Build][V] Dungeon generated, floor=" + finalFloor + " width=" + finalWidth + " height=" + finalHeight);
@@ -264,13 +295,13 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                     logRoomsVerbose(dungeon, finalWidth, finalHeight, log);
                 }
                 pruneDungeonDoorsToTree(dungeon, finalWidth, finalHeight, finalVerbose, log);
-                World world = createVoidWorld();
+                World world = createVoidWorld(requestedWorldName);
                 Location dungeonOrigin = new Location(world, 0, 64, 0);
-                player.sendMessage(Component.text("Building dungeon...", NamedTextColor.YELLOW));
-                startBuildDungeonIncremental(player, dungeonOrigin, dungeon, finalWidth, finalHeight, finalFloor, finalVerbose, log, service.getGenerationStartTime());
-            }, null);
+                if (player != null) player.sendMessage(Component.text("Building dungeon...", NamedTextColor.YELLOW));
+                startBuildDungeonIncremental(player, dungeonOrigin, dungeon, finalWidth, finalHeight, finalFloor, finalVerbose, log, service.getGenerationStartTime(), teleportPlayers, onComplete);
+            });
         }).exceptionally(e -> {
-            player.sendMessage(Component.text("Error generating dungeon: " + e.getMessage(), NamedTextColor.RED));
+            if (player != null) player.sendMessage(Component.text("Error generating dungeon: " + e.getMessage(), NamedTextColor.RED));
             e.printStackTrace();
             return null;
         });
@@ -576,6 +607,10 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
     }
 
     private void startBuildDungeonIncremental(Player player, Location startLoc, SkyBlockDungeon dungeon, int width, int height, String floor, boolean verbose, Logger log, long generationStartTime) {
+        startBuildDungeonIncremental(player, startLoc, dungeon, width, height, floor, verbose, log, generationStartTime, true, null);
+    }
+
+    private void startBuildDungeonIncremental(@Nullable Player player, Location startLoc, SkyBlockDungeon dungeon, int width, int height, String floor, boolean verbose, Logger log, long generationStartTime, boolean teleportPlayers, @Nullable Runnable onComplete) {
         StructureTemplate startRoomTemplate = loadTemplateOrNull("start_room");
         List<StructureTemplate> puzzleRoomTemplates = loadTemplatesByPrefix("puzzle_room_");
         TemplatePair startRoomPair = loadTemplatePairOrNull("start_room");
@@ -629,11 +664,14 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
         }
 
         Test_dungeons.getInstance().setLastDungeon(dungeon, width, height, startLoc, roomScale, anchorDoorY, floor);
+        Test_dungeons.DungeonSnapshot snapshot = startLoc.getWorld() != null
+                ? Test_dungeons.getInstance().getDungeonSnapshot(startLoc.getWorld().getName())
+                : Test_dungeons.getInstance().getLastDungeon();
         if (dungeonSecrets != null) {
-            dungeonSecrets.beginRun(Test_dungeons.getInstance().getLastDungeon());
+            dungeonSecrets.beginRun(snapshot);
         }
         if (dungeonMonsters != null) {
-            dungeonMonsters.beginRun(Test_dungeons.getInstance().getLastDungeon());
+            dungeonMonsters.beginRun(snapshot);
         }
 
         List<BuildStep> steps = new ArrayList<>();
@@ -850,7 +888,7 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
 
             @Override
             public void run() {
-                if (player == null || !player.isOnline()) {
+                if (teleportPlayers && (player == null || !player.isOnline())) {
                     cancel();
                     return;
                 }
@@ -872,30 +910,37 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
                     if (teleport != null && teleport.getWorld() != null) {
                         Test_dungeons.getInstance().setDungeonStartRoomLocation(teleport.getWorld().getName(), teleport.clone());
                     }
-                    List<UUID> partyMemberIds = partyManager != null ? partyManager.getPartyMembers(player) : List.of(player.getUniqueId());
-                    for (UUID memberId : partyMemberIds) {
-                        Player p = Bukkit.getPlayer(memberId);
-                        if (p != null && p.isOnline()) {
-                            p.teleport(teleport);
-                            Test_dungeons.getInstance().giveDungeonMap(p);
-                            if (p.getUniqueId().equals(player.getUniqueId())) {
-                                p.sendMessage(Component.text("Dungeon generated!", NamedTextColor.GREEN));
-                                p.sendMessage(Component.text("Time taken: " + (System.currentTimeMillis() - generationStartTime) + "ms", NamedTextColor.GRAY));
-                            } else {
-                                p.sendMessage(Component.text("隊長已將你傳送至地牢！", NamedTextColor.GREEN));
+                    List<UUID> partyMemberIds = teleportPlayers && player != null
+                            ? (partyManager != null ? partyManager.getPartyMembers(player) : List.of(player.getUniqueId()))
+                            : List.of();
+                    if (teleportPlayers) {
+                        for (UUID memberId : partyMemberIds) {
+                            Player p = Bukkit.getPlayer(memberId);
+                            if (p != null && p.isOnline()) {
+                                p.teleport(teleport);
+                                Test_dungeons.getInstance().giveDungeonMap(p);
+                                if (player != null && p.getUniqueId().equals(player.getUniqueId())) {
+                                    p.sendMessage(Component.text("Dungeon generated!", NamedTextColor.GREEN));
+                                    p.sendMessage(Component.text("Time taken: " + (System.currentTimeMillis() - generationStartTime) + "ms", NamedTextColor.GRAY));
+                                } else {
+                                    p.sendMessage(Component.text("隊長已將你傳送至地牢！", NamedTextColor.GREEN));
+                                }
                             }
                         }
                     }
-                    if (Test_dungeons.getInstance().getDungeonScoreboard() != null && startLoc.getWorld() != null) {
+                    if (teleportPlayers && Test_dungeons.getInstance().getDungeonScoreboard() != null && startLoc.getWorld() != null) {
                         Test_dungeons.getInstance().getDungeonScoreboard().setPartyForWorld(startLoc.getWorld().getName(), partyMemberIds);
                     }
                     // 從遠端 MySQL 拉取隊伍內每人的 6 項經驗（地底洞窟 + 5 職業）並寫入本地 SQLite
-                    if (startLoc.getWorld() != null && partyMemberIds != null && !partyMemberIds.isEmpty()) {
+                    if (teleportPlayers && startLoc.getWorld() != null && partyMemberIds != null && !partyMemberIds.isEmpty()) {
                         Test_dungeons.getInstance().syncPartyProfessionExperienceFromRemote(startLoc.getWorld().getName(), partyMemberIds);
                     }
                     var readyMgr = Test_dungeons.getInstance().getStartRoomReadyManager();
-                    if (readyMgr != null && startLoc.getWorld() != null && bigRoomMode) {
+                    if (teleportPlayers && readyMgr != null && startLoc.getWorld() != null && bigRoomMode) {
                         readyMgr.startReadyPhase(startLoc.getWorld().getName(), partyMemberIds, startLoc, dungeon, width, height, roomScale, finalAnchorDoorY);
+                    }
+                    if (onComplete != null) {
+                        onComplete.run();
                     }
                 }
             }
@@ -1608,14 +1653,89 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
         return findStartRoomTeleport(startLoc, dungeon, width, height, roomScale, startTop, verbose, log);
     }
 
+    private void teleportPartyToExistingDungeon(Player leader, Test_dungeons.DungeonSnapshot snapshot) {
+        if (leader == null || snapshot == null || snapshot.worldName() == null || snapshot.worldName().isBlank()) {
+            return;
+        }
+        Test_dungeons plugin = Test_dungeons.getInstance();
+        World world = Bukkit.getWorld(snapshot.worldName());
+        if (world == null) {
+            WorldCreator creator = new WorldCreator(snapshot.worldName());
+            creator.environment(World.Environment.NORMAL);
+            creator.generateStructures(false);
+            creator.generator(new VoidChunkGenerator());
+            world = Bukkit.createWorld(creator);
+        }
+        if (world == null) {
+            leader.sendMessage(Component.text("Dungeon world is not available.", NamedTextColor.RED));
+            return;
+        }
+        configureDungeonWorld(world);
+
+        Location origin = plugin.getDungeonOriginLocation(snapshot.worldName());
+        if (origin == null) {
+            origin = new Location(world, snapshot.originX(), snapshot.originY(), snapshot.originZ());
+        }
+        Location teleport = plugin.getDungeonStartRoomLocation(snapshot.worldName());
+        if (teleport == null) {
+            teleport = findStartRoomTeleport(origin, snapshot.dungeon(), snapshot.width(), snapshot.height(),
+                    snapshot.roomScale(), 0, false, plugin.getLogger());
+        }
+        if (teleport == null) {
+            teleport = origin.clone().add(snapshot.roomScale() / 2.0, 1.0, snapshot.roomScale() / 2.0);
+        }
+
+        List<UUID> partyMemberIds = partyManager != null ? partyManager.getPartyMembers(leader) : List.of(leader.getUniqueId());
+        for (UUID memberId : partyMemberIds) {
+            Player member = Bukkit.getPlayer(memberId);
+            if (member != null && member.isOnline()) {
+                member.teleport(teleport);
+                plugin.giveDungeonMap(member);
+                if (member.getUniqueId().equals(leader.getUniqueId())) {
+                    member.sendMessage(Component.text("Dungeon is ready.", NamedTextColor.GREEN));
+                } else {
+                    member.sendMessage(Component.text("The party leader sent you into the dungeon.", NamedTextColor.GREEN));
+                }
+            }
+        }
+        if (plugin.getDungeonScoreboard() != null) {
+            plugin.getDungeonScoreboard().setPartyForWorld(snapshot.worldName(), partyMemberIds);
+        }
+        plugin.syncPartyProfessionExperienceFromRemote(snapshot.worldName(), partyMemberIds);
+        var readyMgr = plugin.getStartRoomReadyManager();
+        if (readyMgr != null && snapshot.roomScale() > 5) {
+            readyMgr.startReadyPhase(snapshot.worldName(), partyMemberIds, origin, snapshot.dungeon(),
+                    snapshot.width(), snapshot.height(), snapshot.roomScale(), snapshot.anchorDoorY());
+        }
+    }
+
     private World createVoidWorld() {
-        WorldCreator creator = new WorldCreator("dungeon_" + UUID.randomUUID());
+        return createVoidWorld(null);
+    }
+
+    private World createVoidWorld(@Nullable String requestedWorldName) {
+        String worldName = requestedWorldName != null && !requestedWorldName.isBlank()
+                ? requestedWorldName.trim()
+                : "dungeon_" + UUID.randomUUID();
+        if (!worldName.startsWith("dungeon_")) {
+            throw new IllegalArgumentException("Dungeon world name must start with dungeon_: " + worldName);
+        }
+        deleteExistingDungeonWorld(worldName);
+        WorldCreator creator = new WorldCreator(worldName);
         creator.environment(World.Environment.NORMAL);
         creator.generateStructures(false);
         creator.generator(new VoidChunkGenerator());
         World world = Bukkit.createWorld(creator);
         if (world == null) {
             throw new IllegalStateException("Failed to create void world");
+        }
+        configureDungeonWorld(world);
+        return world;
+    }
+
+    private void configureDungeonWorld(World world) {
+        if (world == null) {
+            return;
         }
         world.setDifficulty(Difficulty.HARD);
         world.setSpawnFlags(true, true);
@@ -1627,7 +1747,35 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
         world.setTime(18000);
         world.setStorm(false);
         world.setThundering(false);
-        return world;
+    }
+
+    private void deleteExistingDungeonWorld(String worldName) {
+        if (worldName == null || worldName.isBlank() || !worldName.startsWith("dungeon_")) {
+            return;
+        }
+        World loaded = Bukkit.getWorld(worldName);
+        if (loaded != null) {
+            if (!loaded.getPlayers().isEmpty()) {
+                throw new IllegalStateException("Cannot rebuild dungeon world with players inside: " + worldName);
+            }
+            Bukkit.unloadWorld(loaded, false);
+        }
+        Path worldContainer = Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
+        Path worldDir = worldContainer.resolve(worldName).normalize();
+        if (!worldDir.startsWith(worldContainer) || worldDir.equals(worldContainer) || worldDir.getFileName() == null
+                || !worldDir.getFileName().toString().equals(worldName)) {
+            throw new IllegalStateException("Unsafe dungeon world path: " + worldDir);
+        }
+        if (Files.notExists(worldDir)) {
+            return;
+        }
+        try (var stream = Files.walk(worldDir)) {
+            for (Path path : stream.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to delete existing dungeon world " + worldName, e);
+        }
     }
 
     private Location findStartRoomTeleport(Location dungeonOrigin, SkyBlockDungeon dungeon, int width, int height, int roomScale, int startRoomTopY, boolean verbose, Logger log) {

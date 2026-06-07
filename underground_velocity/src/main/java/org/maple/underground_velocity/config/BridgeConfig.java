@@ -31,7 +31,13 @@ public record BridgeConfig(
         int emptyShutdownDelaySeconds,
         int shutdownGraceSeconds,
         boolean deleteInstanceOnStop,
-        String forwardingSecretFile
+        String forwardingSecretFile,
+        int poolMinServers,
+        int poolMaxServers,
+        int mapsPerServer,
+        String preloadFloor,
+        List<String> onDemandFloors,
+        String adminPermission
 ) {
     private static final String DEFAULT_CONFIG = """
             dungeon-server: dungeon-server
@@ -54,6 +60,12 @@ public record BridgeConfig(
             shutdown-grace-seconds: 20
             delete-instance-on-stop: true
             forwarding-secret-file: forwarding.secret
+            pool-min-servers: 3
+            pool-max-servers: 5
+            maps-per-server: 2
+            preload-floor: F1
+            on-demand-floors: F2,F3
+            admin-permission: underground_velocity.admin
             """;
 
     public BridgeConfig {
@@ -67,6 +79,15 @@ public record BridgeConfig(
         instanceXms = stringOr(instanceXms, "512M");
         instanceXmx = stringOr(instanceXmx, "4G");
         forwardingSecretFile = stringOr(forwardingSecretFile, "forwarding.secret");
+        poolMinServers = Math.max(0, poolMinServers);
+        poolMaxServers = Math.max(1, poolMaxServers);
+        if (poolMinServers > poolMaxServers) {
+            poolMinServers = poolMaxServers;
+        }
+        mapsPerServer = Math.max(1, mapsPerServer);
+        preloadFloor = normalizeFloor(stringOr(preloadFloor, "F1"));
+        onDemandFloors = normalizeFloors(onDemandFloors);
+        adminPermission = stringOr(adminPermission, "underground_velocity.admin");
         if (portMax < portMin) {
             int tmp = portMin;
             portMin = portMax;
@@ -102,7 +123,13 @@ public record BridgeConfig(
                     integer(values, "empty-shutdown-delay-seconds", 10, 1, 300),
                     integer(values, "shutdown-grace-seconds", 20, 1, 300),
                     bool(values, "delete-instance-on-stop", true),
-                    string(values, "forwarding-secret-file", "forwarding.secret")
+                    string(values, "forwarding-secret-file", "forwarding.secret"),
+                    integer(values, "pool-min-servers", 3, 0, 50),
+                    integer(values, "pool-max-servers", 5, 1, 50),
+                    integer(values, "maps-per-server", 2, 1, 20),
+                    string(values, "preload-floor", "F1"),
+                    csv(values, "on-demand-floors", List.of("F2", "F3")),
+                    string(values, "admin-permission", "underground_velocity.admin")
             );
         } catch (IOException e) {
             logger.warn("Failed to load config.yml, using defaults.", e);
@@ -126,7 +153,13 @@ public record BridgeConfig(
                     10,
                     20,
                     true,
-                    "forwarding.secret"
+                    "forwarding.secret",
+                    3,
+                    5,
+                    2,
+                    "F1",
+                    List.of("F2", "F3"),
+                    "underground_velocity.admin"
             );
         }
     }
@@ -174,6 +207,35 @@ public record BridgeConfig(
 
     private static String stringOr(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value;
+    }
+
+    private static List<String> csv(Map<String, String> values, String key, List<String> fallback) {
+        String raw = values.get(key);
+        if (raw == null || raw.isBlank()) {
+            return fallback;
+        }
+        return List.of(raw.split(","));
+    }
+
+    private static String normalizeFloor(String raw) {
+        if (raw == null) {
+            return "F1";
+        }
+        String floor = raw.trim().toUpperCase(Locale.ROOT);
+        return switch (floor) {
+            case "F1", "F2", "F3" -> floor;
+            default -> "F1";
+        };
+    }
+
+    private static List<String> normalizeFloors(List<String> rawFloors) {
+        if (rawFloors == null || rawFloors.isEmpty()) {
+            return List.of();
+        }
+        return rawFloors.stream()
+                .map(BridgeConfig::normalizeFloor)
+                .distinct()
+                .toList();
     }
 
     private static int integer(Map<String, String> values, String key, int fallback, int min, int max) {

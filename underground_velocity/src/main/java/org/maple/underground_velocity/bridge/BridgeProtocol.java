@@ -12,13 +12,43 @@ import java.util.UUID;
 
 public final class BridgeProtocol {
     public static final String ACTION_START_RUN = "START_RUN";
+    public static final String ACTION_RESET_SLOTS = "RESET_SLOTS";
     public static final String ACTION_ACK = "ACK";
     public static final String ACTION_END_RUN = "END_RUN";
 
     private BridgeProtocol() {
     }
 
-    public static byte[] encodeStartRun(UUID runId, String token, String floor, UUID leaderId, List<PartyMember> members) {
+    public static byte[] encodeResetSlots(String token, String preloadFloor, List<SlotReset> slots) {
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(bytes);
+            out.writeUTF(ACTION_RESET_SLOTS);
+            out.writeUTF(token != null ? token : "");
+            out.writeUTF(preloadFloor != null ? preloadFloor : "F1");
+            out.writeInt(slots != null ? slots.size() : 0);
+            if (slots != null) {
+                for (SlotReset slot : slots) {
+                    out.writeUTF(slot.slotId() != null ? slot.slotId() : "");
+                    out.writeUTF(slot.worldName() != null ? slot.worldName() : "");
+                }
+            }
+            out.flush();
+            return bytes.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to encode dungeon slot reset message.", e);
+        }
+    }
+
+    public static byte[] encodeStartRun(
+            UUID runId,
+            String token,
+            String floor,
+            String slotId,
+            String worldName,
+            UUID leaderId,
+            List<PartyMember> members
+    ) {
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(bytes);
@@ -26,6 +56,8 @@ public final class BridgeProtocol {
             out.writeUTF(runId.toString());
             out.writeUTF(token != null ? token : "");
             out.writeUTF(floor != null ? floor : "F1");
+            out.writeUTF(slotId != null ? slotId : "");
+            out.writeUTF(worldName != null ? worldName : "");
             out.writeUTF(leaderId.toString());
             out.writeInt(members.size());
             for (PartyMember member : members) {
@@ -54,12 +86,16 @@ public final class BridgeProtocol {
             UUID runId = UUID.fromString(in.readUTF());
             boolean success = in.readBoolean();
             String message = in.readUTF();
-            return new AckMessage(runId, success, message);
+            String slotId = in.available() > 0 ? in.readUTF() : "";
+            String worldName = in.available() > 0 ? in.readUTF() : "";
+            return new AckMessage(runId, success, message, slotId, worldName);
         }
         if (ACTION_END_RUN.equals(action)) {
             UUID runId = UUID.fromString(in.readUTF());
-            String reason = in.readUTF();
-            return new EndRunMessage(runId, reason);
+            String slotId = in.available() > 0 ? in.readUTF() : "";
+            String worldName = in.available() > 0 ? in.readUTF() : "";
+            String reason = in.available() > 0 ? in.readUTF() : "";
+            return new EndRunMessage(runId, slotId, worldName, reason);
         }
         throw new IOException("Unexpected action: " + action);
     }
@@ -67,9 +103,12 @@ public final class BridgeProtocol {
     public sealed interface Message permits AckMessage, EndRunMessage {
     }
 
-    public record AckMessage(UUID runId, boolean success, String message) implements Message {
+    public record AckMessage(UUID runId, boolean success, String message, String slotId, String worldName) implements Message {
     }
 
-    public record EndRunMessage(UUID runId, String reason) implements Message {
+    public record EndRunMessage(UUID runId, String slotId, String worldName, String reason) implements Message {
+    }
+
+    public record SlotReset(String slotId, String worldName) {
     }
 }

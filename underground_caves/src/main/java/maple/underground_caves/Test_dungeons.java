@@ -160,6 +160,7 @@ public final class Test_dungeons extends JavaPlugin {
    private static Test_dungeons instance;
    private static final String TRAP_CONFIG_FILE_NAME = "traps.yml";
    private volatile DungeonSnapshot lastDungeon;
+   private final Map<String, DungeonSnapshot> dungeonSnapshotsByWorld = new ConcurrentHashMap();
    private final Map<String, String> dungeonWorldFloor = new ConcurrentHashMap();
    private final Map<String, Long> dungeonRunStartedMsByWorld = new ConcurrentHashMap();
    private final Map<String, Location> dungeonStartRoomByWorld = new ConcurrentHashMap();
@@ -313,6 +314,7 @@ public final class Test_dungeons extends JavaPlugin {
    public void setLastDungeon(SkyBlockDungeon dungeon, int width, int height, Location origin, int roomScale, int anchorDoorY, String floor) {
       if (dungeon == null) {
          this.lastDungeon = null;
+         this.dungeonSnapshotsByWorld.clear();
          this.trapsByWorld.clear();
       } else {
          String worldName = origin != null && origin.getWorld() != null ? origin.getWorld().getName() : null;
@@ -322,6 +324,7 @@ public final class Test_dungeons extends JavaPlugin {
          String f = floor != null && !floor.isBlank() ? floor : "F1";
          this.lastDungeon = new DungeonSnapshot(dungeon, width, height, worldName, ox, oy, oz, roomScale, anchorDoorY, f);
          if (worldName != null) {
+            this.dungeonSnapshotsByWorld.put(worldName, this.lastDungeon);
             this.dungeonWorldFloor.put(worldName, f);
             this.trapsByWorld.remove(worldName);
             if (this.dungeonScoreboard != null) {
@@ -342,6 +345,10 @@ public final class Test_dungeons extends JavaPlugin {
             return f;
          } else {
             DungeonSnapshot snap = this.getLastDungeon();
+            DungeonSnapshot byWorld = this.getDungeonSnapshot(worldName);
+            if (byWorld != null) {
+               return byWorld.floor() != null ? byWorld.floor() : "F1";
+            }
             if (snap != null && worldName.equals(snap.worldName())) {
                return snap.floor() != null ? snap.floor() : "F1";
             } else {
@@ -357,8 +364,7 @@ public final class Test_dungeons extends JavaPlugin {
       } else if (this.dungeonWorldFloor.containsKey(worldName)) {
          return true;
       } else {
-         DungeonSnapshot snap = this.getLastDungeon();
-         return snap != null && worldName.equals(snap.worldName());
+         return this.dungeonSnapshotsByWorld.containsKey(worldName);
       }
    }
 
@@ -930,6 +936,45 @@ public final class Test_dungeons extends JavaPlugin {
       return this.lastDungeon;
    }
 
+   public DungeonSnapshot getDungeonSnapshot(String worldName) {
+      if (worldName == null || worldName.isBlank()) {
+         return null;
+      }
+      DungeonSnapshot snap = (DungeonSnapshot)this.dungeonSnapshotsByWorld.get(worldName);
+      if (snap != null) {
+         return snap;
+      }
+      DungeonSnapshot latest = this.lastDungeon;
+      return latest != null && worldName.equals(latest.worldName()) ? latest : null;
+   }
+
+   public Location getDungeonOriginLocation(String worldName) {
+      DungeonSnapshot snap = this.getDungeonSnapshot(worldName);
+      if (snap == null || snap.worldName() == null) {
+         return null;
+      }
+      World world = Bukkit.getWorld(snap.worldName());
+      if (world == null) {
+         return null;
+      }
+      return new Location(world, snap.originX(), snap.originY(), snap.originZ());
+   }
+
+   public void forgetDungeonWorld(String worldName) {
+      if (worldName == null || worldName.isBlank()) {
+         return;
+      }
+      this.dungeonSnapshotsByWorld.remove(worldName);
+      this.dungeonWorldFloor.remove(worldName);
+      this.dungeonRunStartedMsByWorld.remove(worldName);
+      this.dungeonStartRoomByWorld.remove(worldName);
+      this.trapsByWorld.remove(worldName);
+      DungeonSnapshot latest = this.lastDungeon;
+      if (latest != null && worldName.equals(latest.worldName())) {
+         this.lastDungeon = null;
+      }
+   }
+
    public DungeonSecrets getDungeonSecrets() {
       return this.dungeonSecrets;
    }
@@ -1180,8 +1225,8 @@ public final class Test_dungeons extends JavaPlugin {
       if (world == null) {
          return null;
       } else {
-         DungeonSnapshot snap = this.getLastDungeon();
-         return snap != null && world.getName().equals(snap.worldName()) ? this.createDungeonMapItem(world, snap) : null;
+         DungeonSnapshot snap = this.getDungeonSnapshot(world.getName());
+         return snap != null ? this.createDungeonMapItem(world, snap) : null;
       }
    }
 
@@ -1387,11 +1432,12 @@ public final class Test_dungeons extends JavaPlugin {
       if (player == null) {
          return false;
       } else {
-         DungeonSnapshot snapshot = this.getLastDungeon();
+         World world = player.getWorld();
+         DungeonSnapshot snapshot = world != null ? this.getDungeonSnapshot(world.getName()) : this.getLastDungeon();
          if (snapshot == null) {
             return false;
          } else {
-            ItemStack map = this.createDungeonMapItem(player.getWorld(), snapshot);
+            ItemStack map = this.createDungeonMapItem(world, snapshot);
             if (map == null) {
                return false;
             } else {
@@ -1768,7 +1814,7 @@ public final class Test_dungeons extends JavaPlugin {
                   if (sender instanceof Player) {
                      Player p = (Player)sender;
                      if (args.length >= 2 && args.length <= 4) {
-                        DungeonSnapshot snapshot = this.getLastDungeon();
+                        DungeonSnapshot snapshot = this.getDungeonSnapshot(p.getWorld().getName());
                         if (snapshot != null && p.getWorld().getName().equals(snapshot.worldName())) {
                            BossRoomManager bm = this.getBossRoomManager();
                            if (bm != null) {
@@ -1885,7 +1931,7 @@ public final class Test_dungeons extends JavaPlugin {
       if (goLastBossCmd != null) {
          goLastBossCmd.setExecutor((sender, cmd, label, args) -> {
             if (sender instanceof Player p) {
-               DungeonSnapshot snapshot = this.getLastDungeon();
+               DungeonSnapshot snapshot = this.getDungeonSnapshot(p.getWorld().getName());
                if (snapshot != null && p.getWorld().getName().equals(snapshot.worldName())) {
                   BossRoomManager bm = this.getBossRoomManager();
                   if (bm == null) {
@@ -3091,7 +3137,7 @@ public final class Test_dungeons extends JavaPlugin {
             sender.sendMessage(Component.text("Only players can use this command.", NamedTextColor.RED));
             return true;
          } else {
-            DungeonSnapshot snapshot = Test_dungeons.this.getLastDungeon();
+            DungeonSnapshot snapshot = Test_dungeons.this.getDungeonSnapshot(player.getWorld().getName());
             if (snapshot == null) {
                player.sendMessage(Component.text("No dungeon generated yet. Run /gen_dungeon first.", NamedTextColor.RED));
                return true;
@@ -3313,7 +3359,7 @@ public final class Test_dungeons extends JavaPlugin {
 
          Player player = event.getPlayer();
          Location clickedLoc = clicked.getLocation();
-         DungeonSnapshot snapshot = Test_dungeons.this.getLastDungeon();
+         DungeonSnapshot snapshot = Test_dungeons.this.getDungeonSnapshot(world.getName());
          if (snapshot != null
             && world.getName().equals(snapshot.worldName())
             && isDoorTunnelBlock(snapshot, clickedLoc)) {

@@ -460,7 +460,7 @@ public final class DungeonMonsters implements Listener {
         sendToNearby(world, at.getBlockX(), at.getBlockY(), at.getBlockZ(), Component.text("目标怪物已击杀，房间通关", NamedTextColor.GREEN));
         if (!giveReward || roomRewardManager == null || plugin == null) return;
         String groupKey = getGroupKeyForCell(world.getName(), cellX, cellY);
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         boolean isMainPath = snapshot != null && snapshot.dungeon() != null
                 && Test_dungeons.isAnyCellOnMainPath(snapshot.dungeon(), Set.of(packCell(cellX, cellY)));
         roomRewardManager.onRoomCleared(world, at != null ? at : new Location(world, 0, 0, 0), groupKey != null ? groupKey : "", isMainPath);
@@ -746,7 +746,7 @@ public final class DungeonMonsters implements Listener {
         }
         String treasureName = ChestLootManager.getTreasureNameByChestId(chestId);
         if (treasureName == null) return;
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(player.getWorld().getName());
         if (snapshot == null || !player.getWorld().getName().equals(snapshot.worldName())) {
             player.sendMessage(Component.text("請在地牢內開啟寶箱。", NamedTextColor.RED));
             event.setCancelled(true);
@@ -1087,7 +1087,7 @@ public final class DungeonMonsters implements Listener {
                 sendToNearby(ent.getWorld(), group.baseX, group.baseY, group.baseZ, Component.text("目标怪物已击杀，房间通关", NamedTextColor.GREEN));
                 Location deathLoc = ent.getLocation();
                 if (roomRewardManager != null && plugin != null) {
-                    Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+                    Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(ent.getWorld().getName());
                     boolean isMainPath = snapshot != null && snapshot.dungeon() != null
                             && Test_dungeons.isAnyCellOnMainPath(snapshot.dungeon(), group.cells);
                     roomRewardManager.onRoomCleared(ent.getWorld(), deathLoc, group.groupKey, isMainPath);
@@ -3670,7 +3670,7 @@ public final class DungeonMonsters implements Listener {
     /** F1–F4 生成五箱（銅/銀/金/白金/紅）；F5+ 再加第六箱（橙）。第二隻 last boss 死亡時在 last_boss_room 生成箱子盔甲架。 */
     private void spawnLastBossChestsOnSecondBossDeath(World world) {
         if (world == null) return;
-        Test_dungeons.DungeonSnapshot snapshot = plugin != null ? plugin.getLastDungeon() : null;
+        Test_dungeons.DungeonSnapshot snapshot = plugin != null ? plugin.getDungeonSnapshot(world.getName()) : null;
         if (snapshot == null || !world.getName().equals(snapshot.worldName())) return;
         maple.underground_caves.dungeon.BossRoomManager bm = plugin.getBossRoomManager();
         if (bm == null) return;
@@ -3763,7 +3763,7 @@ public final class DungeonMonsters implements Listener {
         if (normalizedTargetId == null || normalizedTargetId.isBlank()) normalizedTargetId = chestId.toLowerCase(java.util.Locale.ROOT);
         maple.underground_caves.dungeon.BossRoomManager bm = plugin.getBossRoomManager();
         if (bm == null) return false;
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         if (snapshot == null || !world.getName().equals(snapshot.worldName())) return false;
         Location origin = bm.getLastBossRoomOrigin(world.getName(), snapshot.floor());
         if (origin == null) return false;
@@ -3802,7 +3802,7 @@ public final class DungeonMonsters implements Listener {
     public void dumpLastBossChestStands(Player player) {
         if (player == null || plugin == null) return;
         World world = player.getWorld();
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         if (snapshot == null || !world.getName().equals(snapshot.worldName())) {
             player.sendMessage(Component.text("當前世界不是上次生成的地牢世界，無法計算 local 座標。", NamedTextColor.RED));
             return;

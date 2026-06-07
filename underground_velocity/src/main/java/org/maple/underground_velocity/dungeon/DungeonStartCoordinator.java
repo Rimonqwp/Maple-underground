@@ -78,8 +78,8 @@ public final class DungeonStartCoordinator {
         UUID runId = UUID.randomUUID();
         Map<UUID, RegisteredServer> originalServers = currentServersOf(members);
         if (config.dynamicInstancesEnabled()) {
-            partyService.broadcast(memberIds(members), "正在创建动态副本服务器，请稍候。");
-            instanceManager.createInstance(runId).thenAccept(handle -> {
+            partyService.broadcast(memberIds(members), "正在分配副本地图，请稍候。");
+            instanceManager.reserveSlot(floor, runId, members).thenAccept(handle -> {
                 PendingRun run = new PendingRun(
                         runId,
                         leader.getUniqueId(),
@@ -88,15 +88,16 @@ public final class DungeonStartCoordinator {
                         originalServers,
                         handle.registeredServer(),
                         true,
-                        handle.serverName()
+                        handle.serverName(),
+                        handle.slotId(),
+                        handle.worldName()
                 );
                 pendingRuns.put(runId, run);
-                instanceManager.activateRun(runId, members);
                 connectPartyAndStart(run);
                 scheduleAckTimeout(runId);
             }).exceptionally(error -> {
                 String message = DungeonInstanceManager.userMessage(error);
-                partyService.broadcast(memberIds(members), "动态副本服务器创建失败：" + message);
+                partyService.broadcast(memberIds(members), "副本地图分配失败：" + message);
                 return null;
             });
             return;
@@ -115,7 +116,9 @@ public final class DungeonStartCoordinator {
                 originalServers,
                 dungeonServer.get(),
                 false,
-                dungeonServer.get().getServerInfo().getName()
+                dungeonServer.get().getServerInfo().getName(),
+                "",
+                ""
         );
         pendingRuns.put(runId, run);
         connectPartyAndStart(run);
@@ -203,6 +206,8 @@ public final class DungeonStartCoordinator {
                 run.runId(),
                 config.bridgeToken(),
                 run.floor(),
+                run.slotId(),
+                run.worldName(),
                 run.leaderId(),
                 run.members()
         );
@@ -229,7 +234,7 @@ public final class DungeonStartCoordinator {
     }
 
     private void handleEndRun(BridgeProtocol.EndRunMessage endRun) {
-        instanceManager.endRun(endRun.runId(), endRun.reason());
+        instanceManager.endRun(endRun.runId(), endRun.slotId(), endRun.worldName(), endRun.reason());
     }
 
     private void failRun(UUID runId, String message, boolean returnPlayers) {
@@ -293,7 +298,9 @@ public final class DungeonStartCoordinator {
             Map<UUID, RegisteredServer> originalServers,
             RegisteredServer dungeonServer,
             boolean dynamicInstance,
-            String serverName
+            String serverName,
+            String slotId,
+            String worldName
     ) {
     }
 }

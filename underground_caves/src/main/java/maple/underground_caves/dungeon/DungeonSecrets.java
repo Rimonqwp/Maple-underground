@@ -912,11 +912,6 @@ public final class DungeonSecrets implements Listener {
     }
 
     private void tickHud() {
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
-        String worldName = snapshot != null ? snapshot.worldName() : null;
-        RunState run = worldName != null ? runsByWorld.get(worldName) : null;
-        boolean useSnapshot = snapshot != null && worldName != null && run != null;
-
         Set<String> clampedBatWorlds = new HashSet<>();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p == null || !p.isOnline()) continue;
@@ -927,12 +922,10 @@ public final class DungeonSecrets implements Listener {
             if (w == null) continue;
 
             RunState activeRun;
-            if (useSnapshot && worldName.equals(w.getName())) {
-                activeRun = run;
-            } else {
-                activeRun = runsByWorld.get(w.getName());
-                if (activeRun == null || !activeRun.testMode) continue;
-            }
+            activeRun = runsByWorld.get(w.getName());
+            if (activeRun == null) continue;
+            Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(w.getName());
+            if (snapshot == null && !activeRun.testMode) continue;
 
             if (clampedBatWorlds.add(w.getName())) {
                 clampSecretBats(w, activeRun);
@@ -1193,7 +1186,7 @@ public final class DungeonSecrets implements Listener {
         RunState run = runsByWorld.get(world.getName());
         if (run == null) return;
 
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         int originX;
         int originZ;
         int width;
@@ -1235,7 +1228,7 @@ public final class DungeonSecrets implements Listener {
         RunState run = runsByWorld.get(world.getName());
         if (run == null) return;
 
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         int originX;
         int originZ;
         int width;
@@ -1356,7 +1349,7 @@ public final class DungeonSecrets implements Listener {
     private GroupState groupAtLocation(World world, RunState run, Location loc) {
         if (world == null || run == null || loc == null) return null;
 
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         int originX;
         int originZ;
         int width;
@@ -1397,7 +1390,7 @@ public final class DungeonSecrets implements Listener {
         if (world == null) return;
         RunState run = runsByWorld.get(world.getName());
         if (run == null) return;
-        Test_dungeons.DungeonSnapshot snapshot = plugin.getLastDungeon();
+        Test_dungeons.DungeonSnapshot snapshot = plugin.getDungeonSnapshot(world.getName());
         boolean useSnapshot = snapshot != null && snapshot.worldName() != null && snapshot.worldName().equals(world.getName());
         int originX;
         int originZ;

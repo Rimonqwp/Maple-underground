@@ -470,7 +470,7 @@ public final class DungeonScoreboard {
             run = runByWorld.get(worldName);
         }
         if (run != null && run.totalRooms <= 0 && plugin != null) {
-            Test_dungeons.DungeonSnapshot snap = plugin.getLastDungeon();
+            Test_dungeons.DungeonSnapshot snap = plugin.getDungeonSnapshot(worldName);
             if (snap != null && worldName.equals(snap.worldName())) {
                 initRunFromSnapshot(snap);
             }

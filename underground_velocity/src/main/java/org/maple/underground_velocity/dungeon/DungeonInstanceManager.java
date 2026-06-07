@@ -4,8 +4,10 @@ import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
+import org.maple.underground_velocity.bridge.BridgeProtocol;
 import org.maple.underground_velocity.config.BridgeConfig;
 import org.maple.underground_velocity.party.PartyMember;
 import org.slf4j.Logger;
@@ -56,34 +58,271 @@ public final class DungeonInstanceManager {
     private final Object plugin;
     private final Logger logger;
     private final BridgeConfig config;
+    private final ChannelIdentifier channel;
     private final Path templateDir;
     private final Path workDir;
-    private final Map<UUID, Instance> byRunId = new ConcurrentHashMap<>();
     private final Map<String, Instance> byServerName = new ConcurrentHashMap<>();
     private final Map<Integer, Instance> byPort = new ConcurrentHashMap<>();
+    private final Map<UUID, Slot> slotByRunId = new ConcurrentHashMap<>();
 
-    public DungeonInstanceManager(ProxyServer server, Object plugin, Logger logger, BridgeConfig config) {
+    public DungeonInstanceManager(
+            ProxyServer server,
+            Object plugin,
+            Logger logger,
+            BridgeConfig config,
+            ChannelIdentifier channel
+    ) {
         this.server = server;
         this.plugin = plugin;
         this.logger = logger;
         this.config = config;
+        this.channel = channel;
         this.templateDir = resolveProcessPath(config.instanceTemplateDir());
         this.workDir = resolveProcessPath(config.instanceWorkDir());
     }
 
-    public CompletableFuture<InstanceHandle> createInstance(UUID runId) {
+    public void ensureMinimumPool() {
+        if (!config.dynamicInstancesEnabled()) {
+            return;
+        }
+        int missing = Math.max(0, config.poolMinServers() - byServerName.size());
+        for (int i = 0; i < missing; i++) {
+            createPoolInstance().exceptionally(error -> {
+                logger.warn("Failed to create startup dungeon pool server: {}", userMessage(error));
+                return null;
+            });
+        }
+    }
+
+    public CompletableFuture<SlotHandle> reserveSlot(String floor, UUID runId, List<PartyMember> members) {
+        String normalizedFloor = normalizeFloor(floor);
+        Slot slot = reserveExistingSlot(normalizedFloor, runId, members);
+        if (slot != null) {
+            return CompletableFuture.completedFuture(slot.handle());
+        }
+        if (byServerName.size() >= config.poolMaxServers()) {
+            return failedFuture(new InstanceStartupException("动态副本服务器池已满。"));
+        }
+        return createPoolInstance().thenApply(instance -> {
+            Slot created = reserveExistingSlot(normalizedFloor, runId, members);
+            if (created == null) {
+                throw new CompletionException(new InstanceStartupException("新副本服务器没有可用地图槽位。"));
+            }
+            return created.handle();
+        });
+    }
+
+    public void activateRun(UUID runId, List<PartyMember> members) {
+        Slot slot = slotByRunId.get(runId);
+        if (slot == null) {
+            return;
+        }
+        synchronized (slot.instance) {
+            slot.state = SlotState.ACTIVE;
+            addMembers(slot.instance, members);
+        }
+    }
+
+    public void endRun(UUID runId, String slotId, String worldName, String reason) {
+        Slot slot = findSlot(runId, slotId, worldName);
+        if (slot == null) {
+            return;
+        }
+        String message = reason == null || reason.isBlank() ? "副本已结束，正在返回大厅。" : reason;
+        returnSlotPlayersToLobby(slot, message);
+        synchronized (slot.instance) {
+            slot.state = SlotState.WAITING_RESET;
+            slot.runId = null;
+            slot.instance.memberIds.removeAll(slot.members);
+            slot.members.clear();
+            slotByRunId.remove(runId, slot);
+            logger.info("Dungeon slot ended: server={} slot={} world={} reason={}",
+                    slot.instance.serverName, slot.slotId, slot.worldName, reason);
+            maybeResetInstance(slot.instance);
+        }
+    }
+
+    public void failRun(UUID runId, String reason, boolean returnPlayers) {
+        Slot slot = slotByRunId.remove(runId);
+        if (slot == null) {
+            return;
+        }
+        if (returnPlayers) {
+            returnSlotPlayersToLobby(slot, reason == null || reason.isBlank() ? "副本已取消，正在返回大厅。" : reason);
+        }
+        synchronized (slot.instance) {
+            slot.state = SlotState.IDLE;
+            slot.runId = null;
+            slot.instance.memberIds.removeAll(slot.members);
+            slot.members.clear();
+        }
+    }
+
+    public void leave(Player player) {
+        if (player == null) {
+            return;
+        }
+        Optional<ServerConnection> current = player.getCurrentServer();
+        if (current.isEmpty()) {
+            player.sendPlainMessage("你当前不在动态副本服务器中。");
+            return;
+        }
+        String serverName = current.get().getServerInfo().getName();
+        if (!byServerName.containsKey(serverName)) {
+            player.sendPlainMessage("你当前不在动态副本服务器中。");
+            return;
+        }
+        connectToReturnServer(player, "正在返回大厅。");
+    }
+
+    public boolean isDynamicServer(String serverName) {
+        return serverName != null && byServerName.containsKey(serverName);
+    }
+
+    public void scheduleEmptyCheck(RegisteredServer registeredServer) {
+        // 池化模式不因空服自动关闭；服务器生命周期由池和管理员命令管理。
+    }
+
+    public void scheduleEmptyCheck(String serverName) {
+        // 池化模式不因空服自动关闭；服务器生命周期由池和管理员命令管理。
+    }
+
+    public CompletableFuture<Integer> addServers(int count) {
+        int allowed = Math.max(0, Math.min(count, config.poolMaxServers() - byServerName.size()));
+        List<CompletableFuture<Instance>> futures = new ArrayList<>();
+        for (int i = 0; i < allowed; i++) {
+            futures.add(createPoolInstance());
+        }
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenApply(ignored -> futures.size());
+    }
+
+    public AdminResult deleteServer(String serverName, boolean force) {
+        Instance instance = byServerName.get(serverName);
+        if (instance == null) {
+            return AdminResult.fail("找不到动态副本服务器：" + serverName);
+        }
+        if (!force && !canStopSafely(instance)) {
+            return AdminResult.fail("该服务器仍有玩家或活动槽位，请加 force。");
+        }
+        stopInstance(instance, force, "admin-delete");
+        return AdminResult.ok("已删除动态副本服务器：" + serverName);
+    }
+
+    public CompletableFuture<AdminResult> restartServer(String serverName, boolean force) {
+        Instance instance = byServerName.get(serverName);
+        if (instance == null) {
+            return CompletableFuture.completedFuture(AdminResult.fail("找不到动态副本服务器：" + serverName));
+        }
+        if (!force && !canStopSafely(instance)) {
+            return CompletableFuture.completedFuture(AdminResult.fail("该服务器仍有玩家或活动槽位，请加 force。"));
+        }
+        stopInstance(instance, force, "admin-restart");
+        return createPoolInstance()
+                .thenApply(created -> AdminResult.ok("已重启动态副本服务器：" + serverName + " -> " + created.serverName))
+                .exceptionally(error -> AdminResult.fail("重启失败：" + userMessage(error)));
+    }
+
+    public String describeStatus() {
+        StringBuilder out = new StringBuilder();
+        out.append("动态副本池：").append(byServerName.size()).append("/")
+                .append(config.poolMaxServers()).append(" 台\n");
+        for (Instance instance : byServerName.values().stream()
+                .sorted(Comparator.comparing(i -> i.serverName))
+                .toList()) {
+            out.append("- ").append(instance.serverName)
+                    .append(" port=").append(instance.port)
+                    .append(" state=").append(instance.state)
+                    .append(" players=").append(instance.registeredServer.getPlayersConnected().size())
+                    .append("\n");
+            for (Slot slot : instance.slots) {
+                out.append("  * ").append(slot.slotId)
+                        .append(" ").append(slot.floor)
+                        .append(" ").append(slot.state)
+                        .append(" ").append(slot.worldName)
+                        .append("\n");
+            }
+        }
+        return out.toString().stripTrailing();
+    }
+
+    public List<String> serverNames() {
+        return byServerName.keySet().stream().sorted().toList();
+    }
+
+    public void stopAll() {
+        for (Instance instance : List.copyOf(byServerName.values())) {
+            stopInstanceSynchronously(instance, true, "proxy-shutdown");
+        }
+    }
+
+    public static String userMessage(Throwable throwable) {
+        Throwable current = throwable;
+        while (current instanceof CompletionException && current.getCause() != null) {
+            current = current.getCause();
+        }
+        if (current instanceof InstanceStartupException) {
+            return current.getMessage();
+        }
+        String message = current != null ? current.getMessage() : null;
+        return message == null || message.isBlank() ? "动态副本实例启动失败。" : message;
+    }
+
+    private synchronized Slot reserveExistingSlot(String floor, UUID runId, List<PartyMember> members) {
+        List<Instance> candidates = byServerName.values().stream()
+                .filter(instance -> instance.state == InstanceState.READY)
+                .filter(instance -> instance.freeSlotCountFor(floor) > 0 || instance.anyIdleSlot() != null)
+                .sorted(Comparator
+                        .comparingInt((Instance instance) -> {
+                            int exact = instance.freeSlotCountFor(floor);
+                            return exact > 0 ? exact : Integer.MAX_VALUE;
+                        })
+                        .thenComparing(instance -> instance.serverName))
+                .toList();
+        for (Instance instance : candidates) {
+            synchronized (instance) {
+                Slot slot = instance.findIdleSlotFor(floor);
+                if (slot == null && config.onDemandFloors().contains(floor)) {
+                    slot = instance.anyIdleSlot();
+                    if (slot != null) {
+                        slot.floor = floor;
+                        slot.worldName = randomWorldName();
+                    }
+                }
+                if (slot == null) {
+                    continue;
+                }
+                slot.state = SlotState.RESERVED;
+                slot.runId = runId;
+                slot.members.clear();
+                addMembers(instance, members);
+                if (members != null) {
+                    for (PartyMember member : members) {
+                        if (member != null && member.uuid() != null) {
+                            slot.members.add(member.uuid());
+                        }
+                    }
+                }
+                slotByRunId.put(runId, slot);
+                return slot;
+            }
+        }
+        return null;
+    }
+
+    private CompletableFuture<Instance> createPoolInstance() {
         return CompletableFuture.supplyAsync(() -> {
             int port = -1;
             Instance instance = null;
             Path instanceDir = null;
             ServerInfo info = null;
             Process process = null;
+            String serverName = null;
             try {
                 validateTemplate();
                 Files.createDirectories(workDir);
 
                 port = allocatePort();
-                String serverName = uniqueServerName(runId);
+                serverName = uniqueServerName();
                 instanceDir = workDir.resolve(serverName).normalize();
                 if (!instanceDir.startsWith(workDir)) {
                     throw new InstanceStartupException("实例路径不安全：" + instanceDir);
@@ -92,24 +331,29 @@ public final class DungeonInstanceManager {
                     throw new InstanceStartupException("实例目录已存在：" + instanceDir);
                 }
 
+                List<Slot> slots = createSlots(serverName, null);
                 copyTemplate(instanceDir);
                 patchServerProperties(instanceDir, port);
                 writePaperForwardingConfig(instanceDir);
-                writeBridgeConfig(instanceDir);
+                writeBridgeConfig(instanceDir, serverName, slots);
 
                 info = new ServerInfo(serverName, new InetSocketAddress("127.0.0.1", port));
                 process = startPaper(instanceDir);
                 RegisteredServer registeredServer = server.registerServer(info);
-                instance = new Instance(runId, serverName, port, instanceDir, info, registeredServer, process);
-                byRunId.put(runId, instance);
+                instance = new Instance(serverName, port, instanceDir, info, registeredServer, process, slots);
+                for (Slot slot : slots) {
+                    slot.instance = instance;
+                }
                 byServerName.put(serverName, instance);
                 byPort.put(port, instance);
                 watchProcess(instance);
 
                 waitForPing(instance);
-                logger.info("Dynamic dungeon instance ready: runId={} server={} port={} dir={}",
-                        runId, serverName, port, instanceDir);
-                return instance.handle();
+                waitForSlotsReady(instance);
+                instance.state = InstanceState.READY;
+                logger.info("Dynamic dungeon pool server ready: server={} port={} dir={}",
+                        serverName, port, instanceDir);
+                return instance;
             } catch (Exception e) {
                 if (instance != null) {
                     cleanupFailedInstance(instance);
@@ -129,99 +373,50 @@ public final class DungeonInstanceManager {
         });
     }
 
-    public void activateRun(UUID runId, List<PartyMember> members) {
-        Instance instance = byRunId.get(runId);
-        if (instance == null || members == null) {
+    private void maybeResetInstance(Instance instance) {
+        if (instance == null || instance.state != InstanceState.READY) {
             return;
         }
-        for (PartyMember member : members) {
-            if (member != null && member.uuid() != null) {
-                instance.memberIds.add(member.uuid());
+        boolean allWaiting = instance.slots.stream().allMatch(slot -> slot.state == SlotState.WAITING_RESET);
+        if (!allWaiting) {
+            return;
+        }
+        instance.state = InstanceState.DRAINING;
+        List<BridgeProtocol.SlotReset> resetSlots = new ArrayList<>();
+        for (Slot slot : instance.slots) {
+            slot.state = SlotState.RESETTING;
+            slot.floor = config.preloadFloor();
+            slot.worldName = randomWorldName();
+            resetSlots.add(new BridgeProtocol.SlotReset(slot.slotId, slot.worldName));
+        }
+        byte[] payload = BridgeProtocol.encodeResetSlots(config.bridgeToken(), config.preloadFloor(), resetSlots);
+        if (!instance.registeredServer.sendPluginMessage(channel, payload)) {
+            logger.warn("Failed to send RESET_SLOTS to {}", instance.serverName);
+            for (Slot slot : instance.slots) {
+                slot.state = SlotState.FAILED;
             }
-        }
-    }
-
-    public void endRun(UUID runId, String reason) {
-        Instance instance = byRunId.get(runId);
-        if (instance == null) {
-            return;
-        }
-        String message = reason == null || reason.isBlank() ? "副本已结束，正在返回大厅。" : reason;
-        returnPlayersToLobby(instance, message);
-        server.getScheduler().buildTask(plugin, () -> stopInstance(instance, false, "END_RUN"))
-                .delay(2, TimeUnit.SECONDS)
-                .schedule();
-    }
-
-    public void failRun(UUID runId, String reason, boolean returnPlayers) {
-        Instance instance = byRunId.get(runId);
-        if (instance == null) {
-            return;
-        }
-        stopInstance(instance, returnPlayers, reason);
-    }
-
-    public void leave(Player player) {
-        if (player == null) {
-            return;
-        }
-        Optional<ServerConnection> current = player.getCurrentServer();
-        if (current.isEmpty()) {
-            player.sendPlainMessage("你当前不在动态副本服务器中。");
-            return;
-        }
-        String serverName = current.get().getServerInfo().getName();
-        Instance instance = byServerName.get(serverName);
-        if (instance == null) {
-            player.sendPlainMessage("你当前不在动态副本服务器中。");
-            return;
-        }
-        connectToReturnServer(player, "正在返回大厅。").thenRun(() -> scheduleEmptyCheck(instance.serverName));
-    }
-
-    public boolean isDynamicServer(String serverName) {
-        return serverName != null && byServerName.containsKey(serverName);
-    }
-
-    public void scheduleEmptyCheck(RegisteredServer registeredServer) {
-        if (registeredServer == null) {
-            return;
-        }
-        scheduleEmptyCheck(registeredServer.getServerInfo().getName());
-    }
-
-    public void scheduleEmptyCheck(String serverName) {
-        Instance instance = byServerName.get(serverName);
-        if (instance == null || instance.stopping.get()) {
+            instance.state = InstanceState.READY;
             return;
         }
         server.getScheduler().buildTask(plugin, () -> {
-            Instance still = byServerName.get(serverName);
-            if (still == null || still.stopping.get()) {
-                return;
+            synchronized (instance) {
+                for (Slot slot : instance.slots) {
+                    if (slot.state == SlotState.RESETTING) {
+                        slot.state = SlotState.IDLE;
+                    }
+                }
+                instance.state = InstanceState.READY;
             }
-            if (still.registeredServer.getPlayersConnected().isEmpty()) {
-                stopInstance(still, false, "empty");
-            }
-        }).delay(config.emptyShutdownDelaySeconds(), TimeUnit.SECONDS).schedule();
+        }).delay(Math.max(5, config.startTimeoutSeconds()), TimeUnit.SECONDS).schedule();
     }
 
-    public void stopAll() {
-        for (Instance instance : List.copyOf(byRunId.values())) {
-            stopInstanceSynchronously(instance, false, "proxy-shutdown");
+    private List<Slot> createSlots(String serverName, Instance instance) {
+        List<Slot> slots = new ArrayList<>();
+        for (int i = 1; i <= config.mapsPerServer(); i++) {
+            String slotId = "slot-" + i;
+            slots.add(new Slot(instance, slotId, config.preloadFloor(), randomWorldName()));
         }
-    }
-
-    public static String userMessage(Throwable throwable) {
-        Throwable current = throwable;
-        while (current instanceof CompletionException && current.getCause() != null) {
-            current = current.getCause();
-        }
-        if (current instanceof InstanceStartupException) {
-            return current.getMessage();
-        }
-        String message = current != null ? current.getMessage() : null;
-        return message == null || message.isBlank() ? "动态副本实例启动失败。" : message;
+        return slots;
     }
 
     private void validateTemplate() {
@@ -258,15 +453,18 @@ public final class DungeonInstanceManager {
         }
     }
 
-    private String uniqueServerName(UUID runId) {
-        String compact = runId.toString().replace("-", "");
-        for (int length = 8; length <= compact.length(); length += 4) {
-            String name = "dungeon_" + compact.substring(0, length);
+    private String uniqueServerName() {
+        for (int i = 1; i <= config.poolMaxServers() + 20; i++) {
+            String name = "dungeon_pool_" + i;
             if (server.getServer(name).isEmpty() && !byServerName.containsKey(name)) {
                 return name;
             }
         }
-        return "dungeon_" + compact;
+        return "dungeon_pool_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    }
+
+    private String randomWorldName() {
+        return "dungeon_" + UUID.randomUUID();
     }
 
     private void copyTemplate(Path instanceDir) throws IOException {
@@ -380,11 +578,23 @@ public final class DungeonInstanceManager {
         return out;
     }
 
-    private void writeBridgeConfig(Path instanceDir) throws IOException {
+    private void writeBridgeConfig(Path instanceDir, String serverName, List<Slot> slots) throws IOException {
         Path dir = instanceDir.resolve("plugins").resolve("underground_caves");
         Files.createDirectories(dir);
         Path file = dir.resolve("bridge.yml");
-        Files.writeString(file, "bridge-token: \"" + yamlDoubleQuoted(config.bridgeToken()) + "\"\n", StandardCharsets.UTF_8);
+        List<String> lines = new ArrayList<>();
+        lines.add("bridge-token: \"" + yamlDoubleQuoted(config.bridgeToken()) + "\"");
+        lines.add("server-name: \"" + yamlDoubleQuoted(serverName) + "\"");
+        lines.add("maps-per-server: " + config.mapsPerServer());
+        lines.add("preload-floor: \"" + yamlDoubleQuoted(config.preloadFloor()) + "\"");
+        lines.add("pool-state-dir: \"dungeon-pool\"");
+        lines.add("slots:");
+        for (Slot slot : slots) {
+            lines.add("  - id: \"" + yamlDoubleQuoted(slot.slotId) + "\"");
+            lines.add("    floor: \"" + yamlDoubleQuoted(slot.floor) + "\"");
+            lines.add("    world: \"" + yamlDoubleQuoted(slot.worldName) + "\"");
+        }
+        Files.write(file, lines, StandardCharsets.UTF_8);
     }
 
     private String yamlDoubleQuoted(String value) {
@@ -405,7 +615,7 @@ public final class DungeonInstanceManager {
         builder.directory(instanceDir.toFile());
         builder.redirectErrorStream(true);
         builder.redirectOutput(ProcessBuilder.Redirect.appendTo(instanceDir.resolve("instance.log").toFile()));
-        logger.info("Starting dynamic dungeon instance: dir={} portRange={}-{} command={}",
+        logger.info("Starting dynamic dungeon pool server: dir={} portRange={}-{} command={}",
                 instanceDir, config.portMin(), config.portMax(), String.join(" ", command));
         return builder.start();
     }
@@ -426,13 +636,49 @@ public final class DungeonInstanceManager {
         throw new InstanceStartupException("动态副本实例启动超时：" + instance.serverName);
     }
 
+    private void waitForSlotsReady(Instance instance) {
+        Path stateFile = instance.instanceDir
+                .resolve("plugins")
+                .resolve("underground_caves")
+                .resolve("dungeon-pool")
+                .resolve("slots.yml");
+        long deadline = System.nanoTime() + Duration.ofSeconds(config.instanceStartupTimeoutSeconds()).toNanos();
+        while (System.nanoTime() < deadline) {
+            if (!instance.process.isAlive()) {
+                throw new InstanceStartupException("Dynamic dungeon process exited before slots were ready: " + instance.serverName);
+            }
+            if (areAllSlotsIdle(stateFile, instance.slots.size())) {
+                return;
+            }
+            sleep(1000L);
+        }
+        throw new InstanceStartupException("Dynamic dungeon slot preload timed out: " + instance.serverName);
+    }
+
+    private boolean areAllSlotsIdle(Path stateFile, int expectedSlots) {
+        if (expectedSlots <= 0 || stateFile == null || Files.notExists(stateFile)) {
+            return false;
+        }
+        try {
+            int idle = 0;
+            for (String line : Files.readAllLines(stateFile, StandardCharsets.UTF_8)) {
+                String trimmed = line != null ? line.trim() : "";
+                if ("state: IDLE".equalsIgnoreCase(trimmed) || "state: \"IDLE\"".equalsIgnoreCase(trimmed)) {
+                    idle++;
+                }
+            }
+            return idle >= expectedSlots;
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
     private void watchProcess(Instance instance) {
         instance.process.onExit().thenRun(() -> {
             if (instance.stopping.get()) {
                 return;
             }
-            logger.warn("Dynamic dungeon instance crashed/exited unexpectedly: server={} runId={}",
-                    instance.serverName, instance.runId);
+            logger.warn("Dynamic dungeon pool server crashed/exited unexpectedly: server={}", instance.serverName);
             returnPlayersToLobby(instance, "副本服务器已关闭，正在返回大厅。");
             removeInstance(instance);
             deleteInstanceDirectory(instance);
@@ -446,24 +692,32 @@ public final class DungeonInstanceManager {
         deleteInstanceDirectory(instance);
     }
 
+    private boolean canStopSafely(Instance instance) {
+        if (instance == null || !instance.registeredServer.getPlayersConnected().isEmpty()) {
+            return false;
+        }
+        return instance.slots.stream().noneMatch(slot ->
+                slot.state == SlotState.RESERVED || slot.state == SlotState.ACTIVE || slot.state == SlotState.BUILDING);
+    }
+
     private void stopInstance(Instance instance, boolean returnPlayers, String reason) {
         if (instance == null || !instance.stopping.compareAndSet(false, true)) {
             return;
         }
+        instance.state = InstanceState.STOPPING;
         if (returnPlayers) {
-            returnPlayersToLobby(instance, reason == null || reason.isBlank() ? "副本已取消，正在返回大厅。" : reason);
+            returnPlayersToLobby(instance, reason == null || reason.isBlank() ? "副本服务器正在关闭，正在返回大厅。" : reason);
         }
-        CompletableFuture.runAsync(() -> {
-            stopInstanceResources(instance, reason);
-        });
+        CompletableFuture.runAsync(() -> stopInstanceResources(instance, reason));
     }
 
     private void stopInstanceSynchronously(Instance instance, boolean returnPlayers, String reason) {
         if (instance == null || !instance.stopping.compareAndSet(false, true)) {
             return;
         }
+        instance.state = InstanceState.STOPPING;
         if (returnPlayers) {
-            returnPlayersToLobby(instance, reason == null || reason.isBlank() ? "副本已取消，正在返回大厅。" : reason);
+            returnPlayersToLobby(instance, reason == null || reason.isBlank() ? "副本服务器正在关闭，正在返回大厅。" : reason);
         }
         stopInstanceResources(instance, reason);
     }
@@ -472,8 +726,7 @@ public final class DungeonInstanceManager {
         stopProcess(instance);
         removeInstance(instance);
         deleteInstanceDirectory(instance);
-        logger.info("Dynamic dungeon instance stopped: server={} runId={} reason={}",
-                instance.serverName, instance.runId, reason);
+        logger.info("Dynamic dungeon pool server stopped: server={} reason={}", instance.serverName, reason);
     }
 
     private void stopProcess(Instance instance) {
@@ -503,6 +756,13 @@ public final class DungeonInstanceManager {
                 Thread.currentThread().interrupt();
                 process.destroyForcibly();
             }
+        }
+    }
+
+    private void returnSlotPlayersToLobby(Slot slot, String message) {
+        Set<UUID> ids = new HashSet<>(slot.members);
+        for (UUID id : ids) {
+            server.getPlayer(id).ifPresent(player -> connectToReturnServer(player, message));
         }
     }
 
@@ -536,9 +796,13 @@ public final class DungeonInstanceManager {
     }
 
     private void removeInstance(Instance instance) {
-        byRunId.remove(instance.runId, instance);
         byServerName.remove(instance.serverName, instance);
         byPort.remove(instance.port, instance);
+        for (Slot slot : instance.slots) {
+            if (slot.runId != null) {
+                slotByRunId.remove(slot.runId, slot);
+            }
+        }
         try {
             server.unregisterServer(instance.serverInfo);
         } catch (Exception e) {
@@ -559,7 +823,7 @@ public final class DungeonInstanceManager {
         }
         Path dir = instanceDir.normalize();
         if (!dir.startsWith(workDir) || dir.equals(workDir) || dir.getFileName() == null
-                || !dir.getFileName().toString().startsWith("dungeon_")) {
+                || !dir.getFileName().toString().startsWith("dungeon_pool_")) {
             logger.warn("Refusing to delete unsafe dynamic instance directory: {}", dir);
             return;
         }
@@ -575,6 +839,37 @@ public final class DungeonInstanceManager {
             }
         } catch (IOException e) {
             logger.warn("Failed to delete dynamic dungeon instance directory {}", dir, e);
+        }
+    }
+
+    private Slot findSlot(UUID runId, String slotId, String worldName) {
+        if (runId != null) {
+            Slot slot = slotByRunId.get(runId);
+            if (slot != null) {
+                return slot;
+            }
+        }
+        for (Instance instance : byServerName.values()) {
+            for (Slot slot : instance.slots) {
+                if (worldName != null && !worldName.isBlank() && slot.worldName.equals(worldName)) {
+                    return slot;
+                }
+                if (slotId != null && !slotId.isBlank() && slot.slotId.equals(slotId)) {
+                    return slot;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void addMembers(Instance instance, List<PartyMember> members) {
+        if (instance == null || members == null) {
+            return;
+        }
+        for (PartyMember member : members) {
+            if (member != null && member.uuid() != null) {
+                instance.memberIds.add(member.uuid());
+            }
         }
     }
 
@@ -595,7 +890,41 @@ public final class DungeonInstanceManager {
         }
     }
 
-    public record InstanceHandle(UUID runId, String serverName, RegisteredServer registeredServer) {
+    private static String normalizeFloor(String raw) {
+        if (raw == null) {
+            return "F1";
+        }
+        String floor = raw.trim().toUpperCase(Locale.ROOT);
+        return switch (floor) {
+            case "F1", "F2", "F3" -> floor;
+            default -> "F1";
+        };
+    }
+
+    private static <T> CompletableFuture<T> failedFuture(Throwable error) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(error);
+        return future;
+    }
+
+    public record SlotHandle(
+            UUID runId,
+            String serverName,
+            RegisteredServer registeredServer,
+            String slotId,
+            String worldName,
+            String floor
+    ) {
+    }
+
+    public record AdminResult(boolean success, String message) {
+        public static AdminResult ok(String message) {
+            return new AdminResult(true, message);
+        }
+
+        public static AdminResult fail(String message) {
+            return new AdminResult(false, message);
+        }
     }
 
     public static final class InstanceStartupException extends RuntimeException {
@@ -604,41 +933,104 @@ public final class DungeonInstanceManager {
         }
     }
 
+    private enum InstanceState {
+        STARTING,
+        READY,
+        DRAINING,
+        STOPPING
+    }
+
+    private enum SlotState {
+        BUILDING,
+        IDLE,
+        RESERVED,
+        ACTIVE,
+        WAITING_RESET,
+        RESETTING,
+        FAILED
+    }
+
     private static final class Instance {
-        private final UUID runId;
         private final String serverName;
         private final int port;
         private final Path instanceDir;
         private final ServerInfo serverInfo;
         private final RegisteredServer registeredServer;
         private final Process process;
+        private final List<Slot> slots;
         private final Set<UUID> memberIds = ConcurrentHashMap.newKeySet();
         private final AtomicBoolean stopping = new AtomicBoolean(false);
+        private volatile InstanceState state = InstanceState.STARTING;
 
         private Instance(
-                UUID runId,
                 String serverName,
                 int port,
                 Path instanceDir,
                 ServerInfo serverInfo,
                 RegisteredServer registeredServer,
-                Process process
+                Process process,
+                List<Slot> slots
         ) {
-            this.runId = runId;
             this.serverName = serverName;
             this.port = port;
             this.instanceDir = instanceDir;
             this.serverInfo = serverInfo;
             this.registeredServer = registeredServer;
             this.process = process;
+            this.slots = slots;
         }
 
         private static Instance reserved(int port) {
-            return new Instance(new UUID(0L, port), "reserved_" + port, port, Path.of("."), null, null, null);
+            return new Instance("reserved_" + port, port, Path.of("."), null, null, null, List.of());
         }
 
-        private InstanceHandle handle() {
-            return new InstanceHandle(runId, serverName, registeredServer);
+        private int freeSlotCountFor(String floor) {
+            int count = 0;
+            for (Slot slot : slots) {
+                if (slot.state == SlotState.IDLE && slot.floor.equalsIgnoreCase(floor)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private Slot findIdleSlotFor(String floor) {
+            for (Slot slot : slots) {
+                if (slot.state == SlotState.IDLE && slot.floor.equalsIgnoreCase(floor)) {
+                    return slot;
+                }
+            }
+            return null;
+        }
+
+        private Slot anyIdleSlot() {
+            for (Slot slot : slots) {
+                if (slot.state == SlotState.IDLE) {
+                    return slot;
+                }
+            }
+            return null;
+        }
+    }
+
+    private static final class Slot {
+        private Instance instance;
+        private final String slotId;
+        private String floor;
+        private String worldName;
+        private SlotState state = SlotState.IDLE;
+        private UUID runId;
+        private final Set<UUID> members = ConcurrentHashMap.newKeySet();
+
+        private Slot(Instance instance, String slotId, String floor, String worldName) {
+            this.instance = instance;
+            this.slotId = slotId;
+            this.floor = floor;
+            this.worldName = worldName;
+        }
+
+        private SlotHandle handle() {
+            return new SlotHandle(runId, instance.serverName, instance.registeredServer, slotId, worldName, floor);
         }
     }
 }

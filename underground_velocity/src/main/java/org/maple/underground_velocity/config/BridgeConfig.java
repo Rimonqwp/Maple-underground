@@ -30,7 +30,8 @@ public record BridgeConfig(
         int instanceStartupTimeoutSeconds,
         int emptyShutdownDelaySeconds,
         int shutdownGraceSeconds,
-        boolean deleteInstanceOnStop
+        boolean deleteInstanceOnStop,
+        String forwardingSecretFile
 ) {
     private static final String DEFAULT_CONFIG = """
             dungeon-server: dungeon-server
@@ -52,6 +53,7 @@ public record BridgeConfig(
             empty-shutdown-delay-seconds: 10
             shutdown-grace-seconds: 20
             delete-instance-on-stop: true
+            forwarding-secret-file: forwarding.secret
             """;
 
     public BridgeConfig {
@@ -64,6 +66,7 @@ public record BridgeConfig(
         paperJar = stringOr(paperJar, "paper-1.21.11-127.jar");
         instanceXms = stringOr(instanceXms, "512M");
         instanceXmx = stringOr(instanceXmx, "4G");
+        forwardingSecretFile = stringOr(forwardingSecretFile, "forwarding.secret");
         if (portMax < portMin) {
             int tmp = portMin;
             portMin = portMax;
@@ -98,7 +101,8 @@ public record BridgeConfig(
                     integer(values, "instance-startup-timeout-seconds", 90, 5, 600),
                     integer(values, "empty-shutdown-delay-seconds", 10, 1, 300),
                     integer(values, "shutdown-grace-seconds", 20, 1, 300),
-                    bool(values, "delete-instance-on-stop", true)
+                    bool(values, "delete-instance-on-stop", true),
+                    string(values, "forwarding-secret-file", "forwarding.secret")
             );
         } catch (IOException e) {
             logger.warn("Failed to load config.yml, using defaults.", e);
@@ -121,7 +125,8 @@ public record BridgeConfig(
                     90,
                     10,
                     20,
-                    true
+                    true,
+                    "forwarding.secret"
             );
         }
     }

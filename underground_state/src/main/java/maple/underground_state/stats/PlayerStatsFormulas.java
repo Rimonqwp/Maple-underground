@@ -55,13 +55,17 @@ public final class PlayerStatsFormulas {
         return random < Math.min(100, Math.max(0, critChancePercent)) / 100.0;
     }
 
-    public static double damageWithStrengthAndCrit(double baseDamage, double strength, double critDamagePercent) {
-        double withStrength = (5.0 + baseDamage) * (1.0 + strength / 100.0);
+    public static double damageWithStrengthAndCrit(double baseDamage,
+                                                   double strength,
+                                                   double critDamagePercent,
+                                                   boolean addPluginWeaponBaseDamage) {
+        double withStrength = damageWithStrength(baseDamage, strength, addPluginWeaponBaseDamage);
         return withStrength * critMultiplier(critDamagePercent);
     }
 
-    public static double damageWithStrength(double baseDamage, double strength) {
-        return (5.0 + baseDamage) * (1.0 + Math.max(0D, strength) / 100.0);
+    public static double damageWithStrength(double baseDamage, double strength, boolean addPluginWeaponBaseDamage) {
+        double weaponBaseDamage = addPluginWeaponBaseDamage ? 5.0 : 0.0;
+        return (weaponBaseDamage + baseDamage) * (1.0 + Math.max(0D, strength) / 100.0);
     }
 
     public static double attackCooldownDamageMultiplier(double cooldownProgress) {

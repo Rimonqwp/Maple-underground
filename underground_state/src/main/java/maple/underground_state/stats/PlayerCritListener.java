@@ -1,5 +1,6 @@
 package maple.underground_state.stats;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
@@ -9,11 +10,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PlayerCritListener implements Listener {
 
     private static final ThreadLocal<Boolean> FEROCITY_CHAIN_DAMAGE = new ThreadLocal<>();
+    private static final NamespacedKey UNDERGROUND_ITEM_WEAPON_ID_KEY =
+            new NamespacedKey("underground_item", "weapon_id");
 
     private final PlayerStatsManager statsManager;
     private final PlayerStatsRuntime runtime;
@@ -47,7 +53,7 @@ public final class PlayerCritListener implements Listener {
 
         double effectiveStrength = runtime.getEffectiveStrength(player);
         if (meleeHit || rangedArrowHit) {
-            damage = PlayerStatsFormulas.damageWithStrength(damage, effectiveStrength);
+            damage = PlayerStatsFormulas.damageWithStrength(damage, effectiveStrength, hasUndergroundItemWeapon(player));
         }
 
         damage = runtime.applyOutgoingDamageModifiers(player, event, damage);
@@ -102,5 +108,15 @@ public final class PlayerCritListener implements Listener {
             return player;
         }
         return null;
+    }
+
+    private static boolean hasUndergroundItemWeapon(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item == null || item.getType().isAir() || !item.hasItemMeta()) {
+            return false;
+        }
+        ItemMeta meta = item.getItemMeta();
+        return meta != null
+                && meta.getPersistentDataContainer().has(UNDERGROUND_ITEM_WEAPON_ID_KEY, PersistentDataType.STRING);
     }
 }

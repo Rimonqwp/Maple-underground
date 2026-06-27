@@ -64,6 +64,7 @@ public final class DungeonInstanceManager {
     private final Map<String, Instance> byServerName = new ConcurrentHashMap<>();
     private final Map<Integer, Instance> byPort = new ConcurrentHashMap<>();
     private final Map<UUID, Slot> slotByRunId = new ConcurrentHashMap<>();
+    private final Set<String> reservedServerNames = ConcurrentHashMap.newKeySet();
 
     public DungeonInstanceManager(
             ProxyServer server,
@@ -405,7 +406,7 @@ public final class DungeonInstanceManager {
                 Files.createDirectories(workDir);
 
                 port = allocatePort();
-                serverName = uniqueServerName();
+                serverName = allocateServerName();
                 instanceDir = workDir.resolve(serverName).normalize();
                 if (!instanceDir.startsWith(workDir)) {
                     throw new InstanceStartupException("实例路径不安全：" + instanceDir);
@@ -429,6 +430,7 @@ public final class DungeonInstanceManager {
                 }
                 byServerName.put(serverName, instance);
                 byPort.put(port, instance);
+                releaseServerName(serverName);
                 watchProcess(instance);
 
                 waitForPing(instance);
@@ -451,6 +453,7 @@ public final class DungeonInstanceManager {
                     }
                     deleteInstanceDirectory(instanceDir);
                 }
+                releaseServerName(serverName);
                 throw new CompletionException(e);
             }
         });
@@ -544,14 +547,22 @@ public final class DungeonInstanceManager {
         }
     }
 
-    private String uniqueServerName() {
+    private String allocateServerName() {
         for (int i = 1; i <= config.poolMaxServers() + 20; i++) {
             String name = "dungeon_pool_" + i;
-            if (server.getServer(name).isEmpty() && !byServerName.containsKey(name)) {
+            if (server.getServer(name).isEmpty() && !byServerName.containsKey(name) && reservedServerNames.add(name)) {
                 return name;
             }
         }
-        return "dungeon_pool_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        String name = "dungeon_pool_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        reservedServerNames.add(name);
+        return name;
+    }
+
+    private void releaseServerName(String serverName) {
+        if (serverName != null) {
+            reservedServerNames.remove(serverName);
+        }
     }
 
     private String randomWorldName() {
@@ -1015,13 +1026,23 @@ public final class DungeonInstanceManager {
             return;
         }
         try {
-            if (Files.notExists(dir)) {
-                return;
-            }
-            try (var stream = Files.walk(dir)) {
-                List<Path> paths = stream.sorted(Comparator.reverseOrder()).toList();
-                for (Path path : paths) {
-                    Files.deleteIfExists(path);
+            for (int attempt = 1; attempt <= 5; attempt++) {
+                try {
+                    if (Files.notExists(dir)) {
+                        return;
+                    }
+                    try (var stream = Files.walk(dir)) {
+                        List<Path> paths = stream.sorted(Comparator.reverseOrder()).toList();
+                        for (Path path : paths) {
+                            Files.deleteIfExists(path);
+                        }
+                    }
+                    return;
+                } catch (IOException e) {
+                    if (attempt == 5) {
+                        throw e;
+                    }
+                    sleep(200L * attempt);
                 }
             }
         } catch (IOException e) {

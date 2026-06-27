@@ -1,0 +1,22 @@
+name: underground_quest
+version: '1.0'
+main: maple.underground_quest.UndergroundQuest
+api-version: '1.21.11'
+load: POSTWORLD
+depend: [underground_state, underground_caves]
+commands:
+  quest:
+    description: 開啟任務面板、查看進度或領取獎勵
+    usage: /quest [open|list|track <id>|claim <id>|abandon <id>]
+    permission: underground_quest.use
+  questadmin:
+    description: 任務管理（重載、給予、重置）
+    usage: /questadmin reload | give <player> <questId> | reset <player> [questId]
+    permission: underground_quest.admin
+permissions:
+  underground_quest.use:
+    description: 使用任務系統相關指令
+    default: true
+  underground_quest.admin:
+    description: 任務系統管理權限
+    default: op

@@ -1,0 +1,65 @@
+# 任務定義檔。每個任務以 id 為鍵，包含顯示名稱、說明、目標列表、獎勵列表、可選的前置任務。
+# 任務類型（type）目前支援：MAIN（主線）、DAILY（每日）、WEEKLY（每週）、ACHIEVEMENT（成就）。
+#
+# 目標（objectives）的 type 欄位對應 QuestProgressListener 監聽的事件種類：
+#   KILL_MOB    擊殺怪物（entityType 可選，指定則只計該類型）
+#   BREAK_BLOCK 破壞方塊（material 可選）
+#   COMPLETE_DUNGEON 完成一次副本（floor 可選，指定樓層字串如 F1）
+#   REACH_LEVEL 達到某個等級（這個交由 underground_state 的等級系統驅動，此處僅作範例）
+#
+# 獎勵（rewards）的 type 欄位：
+#   COMMAND  以伺服器指令發放（consolerun=true 由後台執行），command 內可用 %player% 佔位。
+#   MESSAGE  發送一段訊息給玩家（支援顏色碼 &）。
+
+quests:
+  example_kill_zombies:
+    name: "&6新手試煉：殭屍獵人"
+    type: MAIN
+    description: "清除地底的殭屍，證明你的實力。"
+    objectives:
+      - type: KILL_MOB
+        entityType: ZOMBIE
+        amount: 10
+        description: "擊殺 10 隻殭屍"
+    rewards:
+      - type: COMMAND
+        command: "give %player% iron_ingot 16"
+        description: "獲得 16 個鐵錠"
+      - type: MESSAGE
+        message: "&a任務完成！你已證明自己的勇氣。"
+        description: "完成訊息"
+
+  example_mine_stone:
+    name: "&b礦工的日常"
+    type: DAILY
+    description: "每日挖礦任務，維持地底的運作。"
+    objectives:
+      - type: BREAK_BLOCK
+        material: STONE
+        amount: 64
+        description: "挖掘 64 個石頭"
+    rewards:
+      - type: COMMAND
+        command: "eco give %player% 100"
+        description: "獲得 100 經濟點數"
+      - type: MESSAGE
+        message: "&b礦工任務完成！"
+        description: "完成訊息"
+
+  example_dungeon_clear:
+    name: "&d勇闖地城"
+    type: MAIN
+    description: "完成一次地城副本挑戰。"
+    prerequisites:
+      - example_kill_zombies
+    objectives:
+      - type: COMPLETE_DUNGEON
+        amount: 1
+        description: "完成 1 次地城副本"
+    rewards:
+      - type: COMMAND
+        command: "give %player% diamond 4"
+        description: "獲得 4 顆鑽石"
+      - type: MESSAGE
+        message: "&d地城征服者！"
+        description: "完成訊息"

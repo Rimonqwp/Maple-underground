@@ -101,7 +101,7 @@ public final class DungeonInstanceManager {
             return CompletableFuture.completedFuture(slot.handle());
         }
         if (byServerName.size() >= config.poolMaxServers()) {
-            return failedFuture(new InstanceStartupException("动态副本服务器池已满。"));
+            return failedFuture(new PoolFullException("动态副本服务器池已满，已进入候补队列。"));
         }
         return createPoolInstance().thenApply(instance -> {
             Slot created = reserveExistingSlot(normalizedFloor, runId, members);
@@ -119,6 +119,7 @@ public final class DungeonInstanceManager {
         }
         synchronized (slot.instance) {
             slot.state = SlotState.ACTIVE;
+            slot.disconnectedAt.clear();
             addMembers(slot.instance, members);
         }
     }
@@ -135,6 +136,7 @@ public final class DungeonInstanceManager {
             slot.runId = null;
             slot.instance.memberIds.removeAll(slot.members);
             slot.members.clear();
+            slot.disconnectedAt.clear();
             slotByRunId.remove(runId, slot);
             logger.info("Dungeon slot ended: server={} slot={} world={} reason={}",
                     slot.instance.serverName, slot.slotId, slot.worldName, reason);
@@ -155,6 +157,7 @@ public final class DungeonInstanceManager {
             slot.runId = null;
             slot.instance.memberIds.removeAll(slot.members);
             slot.members.clear();
+            slot.disconnectedAt.clear();
         }
     }
 
@@ -172,7 +175,55 @@ public final class DungeonInstanceManager {
             player.sendPlainMessage("你当前不在动态副本服务器中。");
             return;
         }
+        removeFromActiveSlot(player.getUniqueId(), "玩家主动离开副本。");
         connectToReturnServer(player, "正在返回大厅。");
+    }
+
+    public void handleDisconnect(UUID playerId) {
+        Slot slot = findActiveSlotByMember(playerId);
+        if (slot == null) {
+            return;
+        }
+        synchronized (slot.instance) {
+            if (slot.state != SlotState.ACTIVE || !slot.members.contains(playerId)) {
+                return;
+            }
+            slot.disconnectedAt.put(playerId, System.currentTimeMillis());
+        }
+        logger.info("Player {} disconnected in dungeon run {}; holding slot for {} seconds.",
+                playerId, slot.runId, config.reconnectGraceSeconds());
+        scheduleReconnectExpiry(slot, playerId);
+    }
+
+    public boolean tryReconnect(Player player) {
+        if (player == null) {
+            return false;
+        }
+        Slot slot = findActiveSlotByMember(player.getUniqueId());
+        if (slot == null) {
+            return false;
+        }
+        synchronized (slot.instance) {
+            Long disconnectedAt = slot.disconnectedAt.get(player.getUniqueId());
+            if (disconnectedAt == null) {
+                return false;
+            }
+            long ageMillis = System.currentTimeMillis() - disconnectedAt;
+            if (ageMillis > TimeUnit.SECONDS.toMillis(config.reconnectGraceSeconds())) {
+                expireDisconnectedMember(slot, player.getUniqueId());
+                return false;
+            }
+            slot.disconnectedAt.remove(player.getUniqueId());
+        }
+        player.sendPlainMessage("已恢复你的副本会话，正在送回副本服务器。");
+        player.createConnectionRequest(slot.instance.registeredServer)
+                .connect()
+                .exceptionally(error -> {
+                    logger.warn("Failed to reconnect player {} to dungeon server {}",
+                            player.getUsername(), slot.instance.serverName, error);
+                    return null;
+                });
+        return true;
     }
 
     public boolean isDynamicServer(String serverName) {
@@ -180,11 +231,20 @@ public final class DungeonInstanceManager {
     }
 
     public void scheduleEmptyCheck(RegisteredServer registeredServer) {
-        // 池化模式不因空服自动关闭；服务器生命周期由池和管理员命令管理。
+        if (registeredServer == null) {
+            return;
+        }
+        scheduleEmptyCheck(registeredServer.getServerInfo().getName());
     }
 
     public void scheduleEmptyCheck(String serverName) {
-        // 池化模式不因空服自动关闭；服务器生命周期由池和管理员命令管理。
+        Instance instance = byServerName.get(serverName);
+        if (instance == null) {
+            return;
+        }
+        server.getScheduler().buildTask(plugin, () -> recoverAbandonedSlots(instance))
+                .delay(Math.max(5, config.emptyShutdownDelaySeconds()), TimeUnit.SECONDS)
+                .schedule();
     }
 
     public CompletableFuture<Integer> addServers(int count) {
@@ -224,8 +284,20 @@ public final class DungeonInstanceManager {
 
     public String describeStatus() {
         StringBuilder out = new StringBuilder();
-        out.append("动态副本池：").append(byServerName.size()).append("/")
-                .append(config.poolMaxServers()).append(" 台\n");
+        int totalSlots = byServerName.values().stream().mapToInt(instance -> instance.slots.size()).sum();
+        long idleSlots = byServerName.values().stream()
+                .flatMap(instance -> instance.slots.stream())
+                .filter(slot -> slot.state == SlotState.IDLE)
+                .count();
+        long activeSlots = byServerName.values().stream()
+                .flatMap(instance -> instance.slots.stream())
+                .filter(slot -> slot.state == SlotState.ACTIVE || slot.state == SlotState.RESERVED)
+                .count();
+        out.append("动态副本实例面板\n");
+        out.append("服务器：").append(byServerName.size()).append("/")
+                .append(config.poolMaxServers()).append(" 台，槽位：")
+                .append(idleSlots).append("/").append(totalSlots).append(" 可用，")
+                .append(activeSlots).append(" 使用中\n");
         for (Instance instance : byServerName.values().stream()
                 .sorted(Comparator.comparing(i -> i.serverName))
                 .toList()) {
@@ -238,7 +310,17 @@ public final class DungeonInstanceManager {
                 out.append("  * ").append(slot.slotId)
                         .append(" ").append(slot.floor)
                         .append(" ").append(slot.state)
-                        .append(" ").append(slot.worldName)
+                        .append(" world=").append(slot.worldName);
+                if (slot.runId != null) {
+                    out.append(" run=").append(shortId(slot.runId));
+                }
+                if (!slot.members.isEmpty()) {
+                    out.append(" members=").append(slot.members.size());
+                }
+                if (!slot.disconnectedAt.isEmpty()) {
+                    out.append(" reconnecting=").append(slot.disconnectedAt.size());
+                }
+                out
                         .append("\n");
             }
         }
@@ -256,15 +338,16 @@ public final class DungeonInstanceManager {
     }
 
     public static String userMessage(Throwable throwable) {
-        Throwable current = throwable;
-        while (current instanceof CompletionException && current.getCause() != null) {
-            current = current.getCause();
-        }
+        Throwable current = unwrap(throwable);
         if (current instanceof InstanceStartupException) {
             return current.getMessage();
         }
         String message = current != null ? current.getMessage() : null;
         return message == null || message.isBlank() ? "动态副本实例启动失败。" : message;
+    }
+
+    public static boolean isPoolFull(Throwable throwable) {
+        return unwrap(throwable) instanceof PoolFullException;
     }
 
     private synchronized Slot reserveExistingSlot(String floor, UUID runId, List<PartyMember> members) {
@@ -377,13 +460,21 @@ public final class DungeonInstanceManager {
         if (instance == null || instance.state != InstanceState.READY) {
             return;
         }
-        boolean allWaiting = instance.slots.stream().allMatch(slot -> slot.state == SlotState.WAITING_RESET);
-        if (!allWaiting) {
+        boolean hasWaiting = instance.slots.stream().anyMatch(slot -> slot.state == SlotState.WAITING_RESET);
+        boolean hasBusySlot = instance.slots.stream().anyMatch(slot ->
+                slot.state == SlotState.BUILDING
+                        || slot.state == SlotState.RESERVED
+                        || slot.state == SlotState.ACTIVE
+                        || slot.state == SlotState.RESETTING);
+        if (!hasWaiting || hasBusySlot) {
             return;
         }
         instance.state = InstanceState.DRAINING;
         List<BridgeProtocol.SlotReset> resetSlots = new ArrayList<>();
         for (Slot slot : instance.slots) {
+            if (slot.state != SlotState.WAITING_RESET) {
+                continue;
+            }
             slot.state = SlotState.RESETTING;
             slot.floor = config.preloadFloor();
             slot.worldName = randomWorldName();
@@ -685,6 +776,102 @@ public final class DungeonInstanceManager {
         });
     }
 
+    private void scheduleReconnectExpiry(Slot slot, UUID playerId) {
+        server.getScheduler().buildTask(plugin, () -> {
+            synchronized (slot.instance) {
+                Long disconnectedAt = slot.disconnectedAt.get(playerId);
+                if (disconnectedAt == null) {
+                    return;
+                }
+                long ageMillis = System.currentTimeMillis() - disconnectedAt;
+                if (ageMillis < TimeUnit.SECONDS.toMillis(config.reconnectGraceSeconds())) {
+                    return;
+                }
+                expireDisconnectedMember(slot, playerId);
+            }
+        }).delay(config.reconnectGraceSeconds(), TimeUnit.SECONDS).schedule();
+    }
+
+    private void expireDisconnectedMember(Slot slot, UUID playerId) {
+        slot.disconnectedAt.remove(playerId);
+        slot.members.remove(playerId);
+        slot.instance.memberIds.remove(playerId);
+        logger.info("Dungeon reconnect window expired: player={} server={} slot={} run={}",
+                playerId, slot.instance.serverName, slot.slotId, slot.runId);
+        if (slot.state == SlotState.ACTIVE && slot.members.isEmpty()) {
+            recycleAbandonedSlot(slot, "所有队员均已断线，自动回收副本槽位。");
+        }
+    }
+
+    private void recoverAbandonedSlots(Instance instance) {
+        if (instance == null || instance.state != InstanceState.READY) {
+            return;
+        }
+        synchronized (instance) {
+            Set<UUID> online = new HashSet<>();
+            for (Player player : instance.registeredServer.getPlayersConnected()) {
+                online.add(player.getUniqueId());
+            }
+            for (Slot slot : instance.slots) {
+                if (slot.state != SlotState.ACTIVE) {
+                    continue;
+                }
+                boolean hasOnlineMember = slot.members.stream().anyMatch(online::contains);
+                if (!hasOnlineMember && slot.disconnectedAt.size() >= slot.members.size()) {
+                    boolean expired = slot.disconnectedAt.values().stream().allMatch(disconnectedAt ->
+                            System.currentTimeMillis() - disconnectedAt >= TimeUnit.SECONDS.toMillis(config.reconnectGraceSeconds()));
+                    if (expired) {
+                        recycleAbandonedSlot(slot, "活跃槽位已无在线队员，自动回收。");
+                    }
+                }
+            }
+        }
+    }
+
+    private void removeFromActiveSlot(UUID playerId, String reason) {
+        Slot slot = findActiveSlotByMember(playerId);
+        if (slot == null) {
+            return;
+        }
+        synchronized (slot.instance) {
+            slot.disconnectedAt.remove(playerId);
+            slot.members.remove(playerId);
+            slot.instance.memberIds.remove(playerId);
+            if (slot.state == SlotState.ACTIVE && slot.members.isEmpty()) {
+                recycleAbandonedSlot(slot, reason);
+            }
+        }
+    }
+
+    private void recycleAbandonedSlot(Slot slot, String reason) {
+        UUID oldRunId = slot.runId;
+        if (oldRunId != null) {
+            slotByRunId.remove(oldRunId, slot);
+        }
+        slot.state = SlotState.WAITING_RESET;
+        slot.runId = null;
+        slot.instance.memberIds.removeAll(slot.members);
+        slot.members.clear();
+        slot.disconnectedAt.clear();
+        logger.info("Dungeon slot recycled: server={} slot={} reason={}",
+                slot.instance.serverName, slot.slotId, reason);
+        maybeResetInstance(slot.instance);
+    }
+
+    private Slot findActiveSlotByMember(UUID playerId) {
+        if (playerId == null) {
+            return null;
+        }
+        for (Instance instance : byServerName.values()) {
+            for (Slot slot : instance.slots) {
+                if (slot.state == SlotState.ACTIVE && slot.members.contains(playerId)) {
+                    return slot;
+                }
+            }
+        }
+        return null;
+    }
+
     private void cleanupFailedInstance(Instance instance) {
         instance.stopping.set(true);
         stopProcess(instance);
@@ -901,6 +1088,22 @@ public final class DungeonInstanceManager {
         };
     }
 
+    private static Throwable unwrap(Throwable throwable) {
+        Throwable current = throwable;
+        while (current instanceof CompletionException && current.getCause() != null) {
+            current = current.getCause();
+        }
+        return current;
+    }
+
+    private static String shortId(UUID uuid) {
+        if (uuid == null) {
+            return "";
+        }
+        String text = uuid.toString();
+        return text.length() <= 8 ? text : text.substring(0, 8);
+    }
+
     private static <T> CompletableFuture<T> failedFuture(Throwable error) {
         CompletableFuture<T> future = new CompletableFuture<>();
         future.completeExceptionally(error);
@@ -927,8 +1130,14 @@ public final class DungeonInstanceManager {
         }
     }
 
-    public static final class InstanceStartupException extends RuntimeException {
+    public static class InstanceStartupException extends RuntimeException {
         public InstanceStartupException(String message) {
+            super(message);
+        }
+    }
+
+    public static final class PoolFullException extends InstanceStartupException {
+        public PoolFullException(String message) {
             super(message);
         }
     }
@@ -1021,6 +1230,7 @@ public final class DungeonInstanceManager {
         private SlotState state = SlotState.IDLE;
         private UUID runId;
         private final Set<UUID> members = ConcurrentHashMap.newKeySet();
+        private final Map<UUID, Long> disconnectedAt = new ConcurrentHashMap<>();
 
         private Slot(Instance instance, String slotId, String floor, String worldName) {
             this.instance = instance;

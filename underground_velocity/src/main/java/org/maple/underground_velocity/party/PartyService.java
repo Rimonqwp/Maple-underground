@@ -23,6 +23,7 @@ public final class PartyService {
     private final Map<UUID, LinkedHashSet<UUID>> partyByLeader = new ConcurrentHashMap<>();
     private final Map<UUID, UUID> leaderByMember = new ConcurrentHashMap<>();
     private final Map<UUID, Invite> pendingInvites = new ConcurrentHashMap<>();
+    private final Set<UUID> disconnectedMembers = ConcurrentHashMap.newKeySet();
 
     public PartyService(ProxyServer server, int maxPartySize, int inviteTimeoutSeconds) {
         this.server = server;
@@ -43,6 +44,9 @@ public final class PartyService {
         }
         if (leaderByMember.containsKey(targetId)) {
             return Result.fail(target.getUsername() + " 已经在队伍中。");
+        }
+        if (disconnectedMembers.contains(inviterId)) {
+            disconnectedMembers.remove(inviterId);
         }
 
         LinkedHashSet<UUID> party = partyByLeader.computeIfAbsent(inviterId, ignored -> {
@@ -81,6 +85,7 @@ public final class PartyService {
         }
 
         pendingInvites.remove(accepterId);
+        disconnectedMembers.remove(accepterId);
         party.add(accepterId);
         leaderByMember.put(accepterId, invite.inviterId());
         return Result.ok("你已加入 " + nameOf(invite.inviterId()) + " 的队伍。");
@@ -116,6 +121,7 @@ public final class PartyService {
         List<UUID> oldMembers = new ArrayList<>(party);
         party.remove(playerId);
         leaderByMember.remove(playerId);
+        disconnectedMembers.remove(playerId);
 
         if (party.isEmpty()) {
             partyByLeader.remove(leaderId);
@@ -145,6 +151,18 @@ public final class PartyService {
         pendingInvites.remove(playerId);
         pendingInvites.entrySet().removeIf(entry -> entry.getValue().inviterId().equals(playerId));
         leave(playerId);
+    }
+
+    public synchronized void markDisconnected(UUID playerId) {
+        pendingInvites.remove(playerId);
+        pendingInvites.entrySet().removeIf(entry -> entry.getValue().inviterId().equals(playerId));
+        if (leaderByMember.containsKey(playerId)) {
+            disconnectedMembers.add(playerId);
+        }
+    }
+
+    public synchronized void markOnline(UUID playerId) {
+        disconnectedMembers.remove(playerId);
     }
 
     public synchronized UUID getLeaderId(UUID playerId) {
@@ -192,7 +210,8 @@ public final class PartyService {
         List<String> names = new ArrayList<>();
         for (UUID member : members) {
             String suffix = member.equals(leaderId) ? "（队长）" : "";
-            names.add(nameOf(member) + suffix);
+            String offline = disconnectedMembers.contains(member) ? "（断线保护中）" : "";
+            names.add(nameOf(member) + suffix + offline);
         }
         return "当前队伍：" + String.join("、", names);
     }

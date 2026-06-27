@@ -33,6 +33,8 @@ public final class DungeonStartCoordinator {
     private final ChannelIdentifier channel;
     private final DungeonInstanceManager instanceManager;
     private final Map<UUID, PendingRun> pendingRuns = new ConcurrentHashMap<>();
+    private final List<QueuedRun> queuedRuns = new ArrayList<>();
+    private volatile boolean queueProcessing;
 
     public DungeonStartCoordinator(
             ProxyServer server,
@@ -74,32 +76,15 @@ public final class DungeonStartCoordinator {
             leader.sendPlainMessage("无法取得队伍成员。");
             return;
         }
+        if (hasPendingOrQueuedRun(members)) {
+            leader.sendPlainMessage("你的队伍已经有副本开局或候补正在进行。");
+            return;
+        }
 
         UUID runId = UUID.randomUUID();
         Map<UUID, RegisteredServer> originalServers = currentServersOf(members);
         if (config.dynamicInstancesEnabled()) {
-            partyService.broadcast(memberIds(members), "正在分配副本地图，请稍候。");
-            instanceManager.reserveSlot(floor, runId, members).thenAccept(handle -> {
-                PendingRun run = new PendingRun(
-                        runId,
-                        leader.getUniqueId(),
-                        floor,
-                        members,
-                        originalServers,
-                        handle.registeredServer(),
-                        true,
-                        handle.serverName(),
-                        handle.slotId(),
-                        handle.worldName()
-                );
-                pendingRuns.put(runId, run);
-                connectPartyAndStart(run);
-                scheduleAckTimeout(runId);
-            }).exceptionally(error -> {
-                String message = DungeonInstanceManager.userMessage(error);
-                partyService.broadcast(memberIds(members), "副本地图分配失败：" + message);
-                return null;
-            });
+            requestDynamicRun(new QueuedRun(runId, leader.getUniqueId(), floor, members, originalServers, System.currentTimeMillis()), false);
             return;
         }
 
@@ -157,6 +142,143 @@ public final class DungeonStartCoordinator {
             if (related) {
                 failRun(run.runId(), "有队员断线，已取消副本开局。", false);
             }
+        }
+        List<QueuedRun> removed = new ArrayList<>();
+        synchronized (queuedRuns) {
+            queuedRuns.removeIf(run -> {
+                boolean related = run.members().stream().anyMatch(member -> member.uuid().equals(playerId));
+                if (related) {
+                    removed.add(run);
+                }
+                return related;
+            });
+        }
+        for (QueuedRun run : removed) {
+            partyService.broadcast(memberIds(run.members()), "有队员断线，已取消副本候补。");
+        }
+    }
+
+    public String describeQueue() {
+        synchronized (queuedRuns) {
+            if (queuedRuns.isEmpty()) {
+                return "候补队列：空";
+            }
+            StringBuilder out = new StringBuilder("候补队列：").append(queuedRuns.size()).append(" 组");
+            for (int i = 0; i < queuedRuns.size(); i++) {
+                QueuedRun run = queuedRuns.get(i);
+                out.append("\n").append(i + 1).append(". ")
+                        .append(run.floor()).append(" ")
+                        .append(memberNames(run.members()))
+                        .append(" 等待 ").append(waitSeconds(run.enqueuedAtMillis())).append(" 秒");
+            }
+            return out.toString();
+        }
+    }
+
+    public void sendQueueStatus(Player player) {
+        synchronized (queuedRuns) {
+            for (int i = 0; i < queuedRuns.size(); i++) {
+                QueuedRun run = queuedRuns.get(i);
+                boolean related = run.members().stream().anyMatch(member -> member.uuid().equals(player.getUniqueId()));
+                if (related) {
+                    player.sendPlainMessage("你的队伍正在副本候补队列第 " + (i + 1) + " 位，楼层：" + run.floor() + "。");
+                    return;
+                }
+            }
+        }
+        player.sendPlainMessage("你的队伍当前不在副本候补队列中。");
+    }
+
+    private void requestDynamicRun(QueuedRun queued, boolean fromQueue) {
+        if (!fromQueue) {
+            partyService.broadcast(memberIds(queued.members()), "正在分配副本地图，请稍候。");
+        }
+        instanceManager.reserveSlot(queued.floor(), queued.runId(), queued.members()).thenAccept(handle -> {
+            PendingRun run = new PendingRun(
+                    queued.runId(),
+                    queued.leaderId(),
+                    queued.floor(),
+                    queued.members(),
+                    queued.originalServers(),
+                    handle.registeredServer(),
+                    true,
+                    handle.serverName(),
+                    handle.slotId(),
+                    handle.worldName()
+            );
+            pendingRuns.put(run.runId(), run);
+            partyService.broadcast(memberIds(run.members()), fromQueue
+                    ? "候补已轮到你的队伍，正在传送到副本。"
+                    : "已分配副本地图，正在准备传送。");
+            connectPartyAndStart(run);
+            scheduleAckTimeout(run.runId());
+            finishQueueAttempt(true, queued);
+        }).exceptionally(error -> {
+            if (DungeonInstanceManager.isPoolFull(error)) {
+                if (!fromQueue) {
+                    enqueueRun(queued);
+                } else {
+                    finishQueueAttempt(false, queued);
+                    scheduleQueuePump();
+                }
+                return null;
+            }
+            String message = DungeonInstanceManager.userMessage(error);
+            partyService.broadcast(memberIds(queued.members()), "副本地图分配失败：" + message);
+            finishQueueAttempt(true, queued);
+            return null;
+        });
+    }
+
+    private void enqueueRun(QueuedRun queued) {
+        int position;
+        synchronized (queuedRuns) {
+            queuedRuns.add(queued);
+            position = queuedRuns.size();
+        }
+        partyService.broadcast(memberIds(queued.members()),
+                "副本实例暂时满载，已加入候补队列（第 " + position + " 位）。可用 /dungeon queue 查看进度。");
+        scheduleQueuePump();
+    }
+
+    private void scheduleQueuePump() {
+        server.getScheduler().buildTask(plugin, this::processQueue)
+                .delay(10, TimeUnit.SECONDS)
+                .schedule();
+    }
+
+    private void processQueue() {
+        QueuedRun next;
+        synchronized (queuedRuns) {
+            if (queueProcessing || queuedRuns.isEmpty()) {
+                return;
+            }
+            queueProcessing = true;
+            next = queuedRuns.get(0);
+        }
+        if (!queuedMembersOnline(next)) {
+            synchronized (queuedRuns) {
+                queuedRuns.remove(next);
+                queueProcessing = false;
+            }
+            partyService.broadcast(memberIds(next.members()), "候补队伍有成员不在线，已移出副本队列。");
+            processQueue();
+            return;
+        }
+        requestDynamicRun(next, true);
+    }
+
+    private void finishQueueAttempt(boolean remove, QueuedRun queued) {
+        boolean hasMore;
+        synchronized (queuedRuns) {
+            if (remove) {
+                queuedRuns.remove(queued);
+            }
+            queueProcessing = false;
+            hasMore = !queuedRuns.isEmpty();
+        }
+        if (hasMore && remove) {
+            processQueue();
         }
     }
 
@@ -288,6 +410,50 @@ public final class DungeonStartCoordinator {
 
     private static List<UUID> memberIds(List<PartyMember> members) {
         return members.stream().map(PartyMember::uuid).toList();
+    }
+
+    private boolean hasPendingOrQueuedRun(List<PartyMember> members) {
+        List<UUID> ids = memberIds(members);
+        for (PendingRun run : pendingRuns.values()) {
+            if (run.members().stream().anyMatch(member -> ids.contains(member.uuid()))) {
+                return true;
+            }
+        }
+        synchronized (queuedRuns) {
+            for (QueuedRun run : queuedRuns) {
+                if (run.members().stream().anyMatch(member -> ids.contains(member.uuid()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean queuedMembersOnline(QueuedRun run) {
+        for (PartyMember member : run.members()) {
+            if (server.getPlayer(member.uuid()).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static String memberNames(List<PartyMember> members) {
+        return members.stream().map(PartyMember::name).toList().toString();
+    }
+
+    private static long waitSeconds(long enqueuedAtMillis) {
+        return Math.max(0L, TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - enqueuedAtMillis));
+    }
+
+    private record QueuedRun(
+            UUID runId,
+            UUID leaderId,
+            String floor,
+            List<PartyMember> members,
+            Map<UUID, RegisteredServer> originalServers,
+            long enqueuedAtMillis
+    ) {
     }
 
     private record PendingRun(

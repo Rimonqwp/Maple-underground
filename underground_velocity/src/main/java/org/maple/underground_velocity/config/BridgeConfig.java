@@ -28,6 +28,7 @@ public record BridgeConfig(
         String instanceXms,
         String instanceXmx,
         int instanceStartupTimeoutSeconds,
+        int reconnectGraceSeconds,
         int emptyShutdownDelaySeconds,
         int shutdownGraceSeconds,
         boolean deleteInstanceOnStop,
@@ -56,6 +57,7 @@ public record BridgeConfig(
             instance-xms: 512M
             instance-xmx: 4G
             instance-startup-timeout-seconds: 90
+            reconnect-grace-seconds: 180
             empty-shutdown-delay-seconds: 10
             shutdown-grace-seconds: 20
             delete-instance-on-stop: true
@@ -120,6 +122,7 @@ public record BridgeConfig(
                     string(values, "instance-xms", "512M"),
                     string(values, "instance-xmx", "4G"),
                     integer(values, "instance-startup-timeout-seconds", 90, 5, 600),
+                    integer(values, "reconnect-grace-seconds", 180, 30, 1800),
                     integer(values, "empty-shutdown-delay-seconds", 10, 1, 300),
                     integer(values, "shutdown-grace-seconds", 20, 1, 300),
                     bool(values, "delete-instance-on-stop", true),
@@ -150,6 +153,7 @@ public record BridgeConfig(
                     "512M",
                     "4G",
                     90,
+                    180,
                     10,
                     20,
                     true,

@@ -87,13 +87,19 @@ public final class UndergroundVelocity {
         event.getPlayer().getCurrentServer()
                 .map(ServerConnection::getServer)
                 .ifPresent(registeredServer -> instanceManager.scheduleEmptyCheck(registeredServer));
-        partyService.removePlayer(event.getPlayer().getUniqueId());
+        partyService.markDisconnected(event.getPlayer().getUniqueId());
+        instanceManager.handleDisconnect(event.getPlayer().getUniqueId());
         dungeonStartCoordinator.handleDisconnect(event.getPlayer().getUniqueId());
     }
 
     @Subscribe
     public void onServerConnected(ServerConnectedEvent event) {
+        partyService.markOnline(event.getPlayer().getUniqueId());
         event.getPreviousServer().ifPresent(previous -> instanceManager.scheduleEmptyCheck(previous));
+        String currentName = event.getServer().getServerInfo().getName();
+        if (!instanceManager.isDynamicServer(currentName)) {
+            instanceManager.tryReconnect(event.getPlayer());
+        }
     }
 
     @Subscribe

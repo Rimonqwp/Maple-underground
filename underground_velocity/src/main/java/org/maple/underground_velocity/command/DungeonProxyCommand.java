@@ -40,18 +40,22 @@ public final class DungeonProxyCommand implements SimpleCommand {
             coordinator.leaveDungeon(player);
             return;
         }
+        if (args.length >= 1 && "queue".equalsIgnoreCase(args[0])) {
+            coordinator.sendQueueStatus(player);
+            return;
+        }
 
-        player.sendPlainMessage("用法：/dungeon start <F1|F2|F3>、/dungeon leave 或 /dungeon admin <status|add|restart|delete>");
+        player.sendPlainMessage("用法：/dungeon start <F1|F2|F3>、/dungeon leave、/dungeon queue 或 /dungeon admin <status|add|restart|delete>");
     }
 
     @Override
     public List<String> suggest(Invocation invocation) {
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            return List.of("start", "leave", "admin");
+            return List.of("start", "leave", "queue", "admin");
         }
         if (args.length == 1) {
-            return filter(List.of("start", "leave", "admin"), args[0]);
+            return filter(List.of("start", "leave", "queue", "admin"), args[0]);
         }
         if (args.length == 2 && "start".equalsIgnoreCase(args[0])) {
             return filter(List.of("F1", "F2", "F3"), args[1]);
@@ -77,7 +81,7 @@ public final class DungeonProxyCommand implements SimpleCommand {
             return;
         }
         if (args.length < 2 || "status".equalsIgnoreCase(args[1])) {
-            invocation.source().sendPlainMessage(instanceManager.describeStatus());
+            invocation.source().sendPlainMessage(instanceManager.describeStatus() + "\n" + coordinator.describeQueue());
             return;
         }
         String sub = args[1].toLowerCase(Locale.ROOT);

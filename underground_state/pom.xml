@@ -14,6 +14,9 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mockbukkit.version>4.110.0</mockbukkit.version>
+        <junit.jupiter.version>6.0.3</junit.jupiter.version>
+        <maven.surefire.version>3.5.4</maven.surefire.version>
 
         <!-- 集中数据库凭据默认值。build-all.cmd 会用 build-secrets.cmd 里的真实值通过 -D 覆盖。 -->
         <!-- 单库单账号：所有功能共用下面这一组，靠表名区分。 -->
@@ -52,6 +55,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -89,6 +100,18 @@
             <artifactId>CMI-API</artifactId>
             <version>9.7.14.3</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockbukkit.mockbukkit</groupId>
+            <artifactId>mockbukkit-v1.21</artifactId>
+            <version>${mockbukkit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

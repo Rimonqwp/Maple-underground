@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VanillaItemLoreListenerTest {
 
+    private static final String VANILLA_TAG_TEXT = "\u005b\u666e\u901a\u539f\u7248\u7269\u54c1\u005d";
+
     private ServerMock server;
     private WorldMock world;
     private PlayerMock player;
@@ -48,23 +50,33 @@ class VanillaItemLoreListenerTest {
     }
 
     @Test
-    void pickupPlainVanillaItemAddsLoreAndTag() {
-        Item item = drop(new ItemStack(Material.DIRT));
+    void pickupSamplePlainVanillaItemsAddsLoreAndTag() {
+        List<Material> samples = List.of(
+                Material.DIRT,
+                Material.COBBLESTONE,
+                Material.RAW_IRON,
+                Material.OAK_LOG,
+                Material.WHEAT_SEEDS,
+                Material.BONE,
+                Material.STRING,
+                Material.DIAMOND,
+                Material.APPLE,
+                Material.SAND
+        );
 
-        listener.onEntityPickupItem(new EntityPickupItemEvent(player, item, 0));
+        for (Material sample : samples) {
+            Item item = drop(new ItemStack(sample));
 
-        ItemMeta meta = item.getItemStack().getItemMeta();
-        assertNotNull(meta);
-        assertTrue(meta.getPersistentDataContainer().has(
-                VanillaItemLoreListener.vanillaOriginKey(plugin),
-                PersistentDataType.BYTE));
-        assertEquals("[普通原版物品]", plainLastLore(meta));
+            listener.onEntityPickupItem(new EntityPickupItemEvent(player, item, 0));
+
+            assertVanillaTagged(item);
+        }
     }
 
     @Test
     void pickupItemWithExistingLoreIsNotChanged() {
         ItemStack stack = new ItemStack(Material.DIRT);
-        stack.editMeta(meta -> meta.lore(List.of(Component.text("已有自定义 Lore"))));
+        stack.editMeta(meta -> meta.lore(List.of(Component.text("Existing custom lore"))));
         Item item = drop(stack);
 
         listener.onEntityPickupItem(new EntityPickupItemEvent(player, item, 0));
@@ -74,7 +86,16 @@ class VanillaItemLoreListenerTest {
         assertNull(meta.getPersistentDataContainer().get(
                 VanillaItemLoreListener.vanillaOriginKey(plugin),
                 PersistentDataType.BYTE));
-        assertEquals("已有自定义 Lore", plainLastLore(meta));
+        assertEquals("Existing custom lore", plainLastLore(meta));
+    }
+
+    private void assertVanillaTagged(Item item) {
+        ItemMeta meta = item.getItemStack().getItemMeta();
+        assertNotNull(meta);
+        assertTrue(meta.getPersistentDataContainer().has(
+                VanillaItemLoreListener.vanillaOriginKey(plugin),
+                PersistentDataType.BYTE));
+        assertEquals(VANILLA_TAG_TEXT, plainLastLore(meta));
     }
 
     private Item drop(ItemStack stack) {

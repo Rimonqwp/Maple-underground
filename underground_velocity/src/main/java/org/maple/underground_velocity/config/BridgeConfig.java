@@ -38,7 +38,8 @@ public record BridgeConfig(
         int mapsPerServer,
         String preloadFloor,
         List<String> onDemandFloors,
-        String adminPermission
+        String adminPermission,
+        String mainCityServer
 ) {
     private static final String DEFAULT_CONFIG = """
             dungeon-server: dungeon-server
@@ -68,6 +69,7 @@ public record BridgeConfig(
             preload-floor: F1
             on-demand-floors: F2,F3
             admin-permission: underground_velocity.admin
+            main-city-server: server1
             """;
 
     public BridgeConfig {
@@ -90,6 +92,7 @@ public record BridgeConfig(
         preloadFloor = normalizeFloor(stringOr(preloadFloor, "F1"));
         onDemandFloors = normalizeFloors(onDemandFloors);
         adminPermission = stringOr(adminPermission, "underground_velocity.admin");
+        mainCityServer = stringOr(mainCityServer, "server1");
         if (portMax < portMin) {
             int tmp = portMin;
             portMin = portMax;
@@ -132,7 +135,8 @@ public record BridgeConfig(
                     integer(values, "maps-per-server", 2, 1, 20),
                     string(values, "preload-floor", "F1"),
                     csv(values, "on-demand-floors", List.of("F2", "F3")),
-                    string(values, "admin-permission", "underground_velocity.admin")
+                    string(values, "admin-permission", "underground_velocity.admin"),
+                    string(values, "main-city-server", "server1")
             );
         } catch (IOException e) {
             logger.warn("Failed to load config.yml, using defaults.", e);
@@ -163,7 +167,8 @@ public record BridgeConfig(
                     2,
                     "F1",
                     List.of("F2", "F3"),
-                    "underground_velocity.admin"
+                    "underground_velocity.admin",
+                    "server1"
             );
         }
     }

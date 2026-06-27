@@ -118,6 +118,11 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
+if not exist "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" (
+    if exist "%ROOT%underground_state\target\underground_state-1.0.jar" (
+        copy /Y "%ROOT%underground_state\target\underground_state-1.0.jar" "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" >nul
+    )
+)
 echo [INFO] Finished underground_state.
 echo.
 
@@ -130,6 +135,11 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
+if not exist "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" (
+    if exist "%ROOT%underground_item\target\underground_item-1.0.jar" (
+        copy /Y "%ROOT%underground_item\target\underground_item-1.0.jar" "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" >nul
+    )
+)
 echo [INFO] Finished underground_item.
 echo.
 
@@ -142,7 +152,29 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
+if not exist "%ROOT%underground_collect\target\underground_collect-1.0-shaded.jar" (
+    if exist "%ROOT%underground_collect\target\underground_collect-1.0.jar" (
+        copy /Y "%ROOT%underground_collect\target\underground_collect-1.0.jar" "%ROOT%underground_collect\target\underground_collect-1.0-shaded.jar" >nul
+    )
+)
 echo [INFO] Finished underground_collect.
+echo.
+
+echo [INFO] Building underground_island...
+pushd "%ROOT%underground_island"
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+if errorlevel 1 (
+    popd
+    echo [ERROR] Build failed: underground_island
+    exit /b 1
+)
+popd
+if not exist "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" (
+    if exist "%ROOT%underground_island\target\underground_island-1.0.jar" (
+        copy /Y "%ROOT%underground_island\target\underground_island-1.0.jar" "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" >nul
+    )
+)
+echo [INFO] Finished underground_island.
 echo.
 
 echo [INFO] Building underground_caves...
@@ -154,6 +186,11 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
+if not exist "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" (
+    if exist "%ROOT%underground_caves\target\underground_caves-1.0.jar" (
+        copy /Y "%ROOT%underground_caves\target\underground_caves-1.0.jar" "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" >nul
+    )
+)
 echo [INFO] Finished underground_caves.
 echo.
 
@@ -166,6 +203,11 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
+if not exist "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" (
+    if exist "%ROOT%underground_mayor\target\underground_mayor-1.0.jar" (
+        copy /Y "%ROOT%underground_mayor\target\underground_mayor-1.0.jar" "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" >nul
+    )
+)
 echo [INFO] Finished underground_mayor.
 echo.
 
@@ -212,6 +254,13 @@ if exist "%ROOT%underground_collect\target\underground_collect-1.0-shaded.jar" (
     echo [INFO] Copied underground_collect-1.0-shaded.jar
 ) else (
     echo [WARN] Missing artifact: %ROOT%underground_collect\target\underground_collect-1.0-shaded.jar
+)
+
+if exist "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" (
+    copy /Y "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" "%DIST_DIR%\underground_island-1.0-shaded.jar" >nul
+    echo [INFO] Copied underground_island-1.0-shaded.jar
+) else (
+    echo [WARN] Missing artifact: %ROOT%underground_island\target\underground_island-1.0-shaded.jar
 )
 
 if exist "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" (

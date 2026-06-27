@@ -16,6 +16,7 @@ import org.maple.underground_velocity.command.PartyProxyCommand;
 import org.maple.underground_velocity.config.BridgeConfig;
 import org.maple.underground_velocity.dungeon.DungeonInstanceManager;
 import org.maple.underground_velocity.dungeon.DungeonStartCoordinator;
+import org.maple.underground_velocity.island.IslandBridgeHandler;
 import org.maple.underground_velocity.party.PartyService;
 import org.slf4j.Logger;
 
@@ -24,6 +25,8 @@ import java.nio.file.Path;
 public final class UndergroundVelocity {
     public static final MinecraftChannelIdentifier DUNGEON_BRIDGE_CHANNEL =
             MinecraftChannelIdentifier.create("maple", "dungeon_bridge");
+    public static final MinecraftChannelIdentifier ISLAND_BRIDGE_CHANNEL =
+            MinecraftChannelIdentifier.create("maple", "island_bridge");
 
     private final ProxyServer server;
     private final Logger logger;
@@ -33,6 +36,7 @@ public final class UndergroundVelocity {
     private PartyService partyService;
     private DungeonInstanceManager instanceManager;
     private DungeonStartCoordinator dungeonStartCoordinator;
+    private IslandBridgeHandler islandBridgeHandler;
 
     @Inject
     public UndergroundVelocity(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -55,8 +59,10 @@ public final class UndergroundVelocity {
                 DUNGEON_BRIDGE_CHANNEL,
                 instanceManager
         );
+        this.islandBridgeHandler = new IslandBridgeHandler(server, logger, config);
 
         server.getChannelRegistrar().register(DUNGEON_BRIDGE_CHANNEL);
+        server.getChannelRegistrar().register(ISLAND_BRIDGE_CHANNEL);
         server.getCommandManager().register(
                 server.getCommandManager().metaBuilder("p").aliases("party").plugin(this).build(),
                 new PartyProxyCommand(server, partyService)
@@ -69,16 +75,23 @@ public final class UndergroundVelocity {
 
         logger.info("Maple dungeon bridge enabled. instance-mode={} dungeon-server={} return-server={}",
                 config.instanceMode(), config.dungeonServer(), config.returnServer());
+        logger.info("Maple island bridge enabled. main-city-server={}", config.mainCityServer());
     }
 
     @Subscribe
     public void onPluginMessage(PluginMessageEvent event) {
-        if (!DUNGEON_BRIDGE_CHANNEL.equals(event.getIdentifier())) {
+        if (DUNGEON_BRIDGE_CHANNEL.equals(event.getIdentifier())) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
+            if (event.getSource() instanceof ServerConnection source) {
+                dungeonStartCoordinator.handlePluginMessage(source, event.getData());
+            }
             return;
         }
-        event.setResult(PluginMessageEvent.ForwardResult.handled());
-        if (event.getSource() instanceof ServerConnection source) {
-            dungeonStartCoordinator.handlePluginMessage(source, event.getData());
+        if (ISLAND_BRIDGE_CHANNEL.equals(event.getIdentifier())) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
+            if (event.getSource() instanceof ServerConnection source) {
+                islandBridgeHandler.handlePluginMessage(source, event.getData());
+            }
         }
     }
 

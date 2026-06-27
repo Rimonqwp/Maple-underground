@@ -1,0 +1,22 @@
+name: underground_island
+version: '1.0'
+main: maple.underground_island.UndergroundIsland
+api-version: '1.21.11'
+load: POSTWORLD
+depend: [underground_state]
+commands:
+  island:
+    description: 管理 OneBlock 岛屿
+    usage: /island [home|invite|accept|info]
+    permission: underground_island.use
+    aliases: [is]
+permissions:
+  underground_island.use:
+    description: 使用岛屿基础命令
+    default: true
+  underground_island.invite:
+    description: 邀请玩家加入岛屿 coop
+    default: true
+  underground_island.admin:
+    description: 岛屿管理权限
+    default: op

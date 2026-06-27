@@ -15,6 +15,7 @@ import maple.underground_state.bank.BankManager;
 import maple.underground_state.dungeon.panel.DungeonPanelDataProvider;
 import maple.underground_state.dungeon.panel.DungeonPanelManager;
 import maple.underground_state.guild.GuildDataDB;
+import maple.underground_state.items.VanillaItemLoreListener;
 import maple.underground_state.skills.SkillProgressDB;
 import maple.underground_state.skills.SkillProgressListener;
 import maple.underground_state.skills.SkillProgressManager;
@@ -167,6 +168,7 @@ public final class UndergroundState extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerCritListener(playerStatsManager, playerStatsRuntime), this);
         Bukkit.getPluginManager().registerEvents(new SkillProgressListener(skillProgressManager), this);
         Bukkit.getPluginManager().registerEvents(new CollectionProgressListener(this, collectionProgressManager), this);
+        Bukkit.getPluginManager().registerEvents(new VanillaItemLoreListener(this), this);
         Bukkit.getPluginManager().registerEvents(combatXpOverlayService, this);
         Bukkit.getPluginManager().registerEvents(miningXpService, this);
         Bukkit.getPluginManager().registerEvents(foragingXpService, this);

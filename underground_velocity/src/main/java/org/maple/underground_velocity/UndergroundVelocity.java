@@ -44,7 +44,7 @@ public final class UndergroundVelocity {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         this.config = BridgeConfig.load(dataDirectory, logger);
-        this.partyService = new PartyService(server, config.maxPartySize(), config.inviteTimeoutSeconds());
+        this.partyService = new PartyService(server, this, config.maxPartySize(), config.inviteTimeoutSeconds());
         this.instanceManager = new DungeonInstanceManager(server, this, logger, config, DUNGEON_BRIDGE_CHANNEL);
         this.dungeonStartCoordinator = new DungeonStartCoordinator(
                 server,

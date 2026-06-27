@@ -10,12 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * 組隊系統：邀請、接受、成員管理。
  */
 public final class PartyManager {
+    private static final long INVITE_TIMEOUT_MILLIS = 3L * 60L * 1000L;
+    private static final long LEADER_DISCONNECT_GRACE_MILLIS = 5L * 60L * 1000L;
+
     /** 隊長 -> 隊伍成員 (含隊長) */
     private final Map<UUID, Set<UUID>> partyByLeader = new ConcurrentHashMap<>();
     /** 玩家 -> 所屬隊伍的隊長 */
     private final Map<UUID, UUID> leaderByMember = new ConcurrentHashMap<>();
     /** 被邀請者 -> 邀請者 (pending) */
-    private final Map<UUID, UUID> pendingInvites = new ConcurrentHashMap<>();
+    private final Map<UUID, Invite> pendingInvites = new ConcurrentHashMap<>();
+    /** 離線隊長 -> 離線時間 */
+    private final Map<UUID, Long> disconnectedLeaders = new ConcurrentHashMap<>();
     /** 玩家 -> 職業 (HEALER, MAGE, WARRIOR, ARCHER, TANK) */
     private final Map<UUID, String> playerRole = new ConcurrentHashMap<>();
     /** 玩家 -> 是否準備 (用於職業選擇 GUI) */
@@ -33,7 +38,8 @@ public final class PartyManager {
     public static final String ROLE_TANK = "TANK";
 
     /** 邀請玩家加入隊伍。返回錯誤訊息或 null 表示成功 */
-    public String invite(Player inviter, Player target) {
+    public synchronized String invite(Player inviter, Player target) {
+        cleanupExpiredInvites();
         if (inviter == null || target == null) return "無效的目標";
         if (inviter.getUniqueId().equals(target.getUniqueId())) return "不能邀請自己";
 
@@ -57,26 +63,34 @@ public final class PartyManager {
         // 邀請者創建/取得隊伍
         Set<UUID> party = partyByLeader.get(inviterId);
         if (party == null) {
-            party = new HashSet<>();
+            party = new LinkedHashSet<>();
             party.add(inviterId);
             partyByLeader.put(inviterId, party);
             leaderByMember.put(inviterId, inviterId);
         }
 
-        if (party.size() >= 5) return "隊伍已滿 (最多 5 人)";
-
-        pendingInvites.put(targetId, inviterId);
+        pendingInvites.put(targetId, new Invite(inviterId, inviter.getName(), System.currentTimeMillis() + INVITE_TIMEOUT_MILLIS));
         return null;
     }
 
     /** 接受邀請。返回錯誤訊息或 null 表示成功 */
-    public String accept(Player accepter, Player leader) {
+    public synchronized String accept(Player accepter, Player leader) {
         if (accepter == null || leader == null) return "無效的目標";
-        UUID accepterId = accepter.getUniqueId();
-        UUID leaderId = leader.getUniqueId();
+        return accept(accepter, leader.getUniqueId(), leader.getName());
+    }
 
-        if (!leaderId.equals(pendingInvites.get(accepterId))) {
-            return "你沒有來自 " + leader.getName() + " 的邀請";
+    /** 接受邀請。允許隊長已離線，但隊伍仍在 5 分鐘保留期內。 */
+    public synchronized String accept(Player accepter, UUID leaderId, String leaderName) {
+        cleanupExpiredInvites();
+        if (accepter == null || leaderId == null) return "無效的目標";
+        UUID accepterId = accepter.getUniqueId();
+        Invite invite = pendingInvites.get(accepterId);
+
+        if (invite == null) {
+            return "你沒有待接受的邀請，或邀請已過期";
+        }
+        if (!leaderId.equals(invite.inviterId())) {
+            return "你沒有來自 " + leaderName + " 的邀請";
         }
 
         pendingInvites.remove(accepterId);
@@ -86,8 +100,8 @@ public final class PartyManager {
         }
 
         Set<UUID> party = partyByLeader.get(leaderId);
-        if (party == null || party.size() >= 5) {
-            return "該隊伍已滿或不存在";
+        if (party == null) {
+            return "該隊伍不存在";
         }
 
         party.add(accepterId);
@@ -96,16 +110,28 @@ public final class PartyManager {
     }
 
     /** 拒絕邀請 */
-    public void decline(Player decliner, UUID leaderId) {
-        if (decliner == null) return;
-        if (leaderId.equals(pendingInvites.get(decliner.getUniqueId()))) {
+    public synchronized boolean decline(Player decliner, UUID leaderId) {
+        cleanupExpiredInvites();
+        if (decliner == null) return false;
+        Invite invite = pendingInvites.get(decliner.getUniqueId());
+        if (invite != null && leaderId != null && leaderId.equals(invite.inviterId())) {
             pendingInvites.remove(decliner.getUniqueId());
+            return true;
         }
+        return false;
     }
 
     /** 取得待接受的邀請者 UUID */
-    public UUID getPendingInviter(Player player) {
-        return player == null ? null : pendingInvites.get(player.getUniqueId());
+    public synchronized UUID getPendingInviter(Player player) {
+        cleanupExpiredInvites();
+        Invite invite = player == null ? null : pendingInvites.get(player.getUniqueId());
+        return invite == null ? null : invite.inviterId();
+    }
+
+    public synchronized String getPendingInviterName(Player player) {
+        cleanupExpiredInvites();
+        Invite invite = player == null ? null : pendingInvites.get(player.getUniqueId());
+        return invite == null ? null : invite.inviterName();
     }
 
     /** 取得玩家的隊伍成員（含自己），若無則只含自己。隊長為第一個。 */
@@ -135,7 +161,7 @@ public final class PartyManager {
             pendingInvites.remove(memberId);
         }
 
-        Set<UUID> party = ConcurrentHashMap.newKeySet();
+        Set<UUID> party = new LinkedHashSet<>();
         party.addAll(normalized);
         partyByLeader.put(leaderId, party);
         for (UUID memberId : normalized) {
@@ -143,7 +169,8 @@ public final class PartyManager {
         }
     }
 
-    public List<UUID> getPartyMembers(Player player) {
+    public synchronized List<UUID> getPartyMembers(Player player) {
+        cleanupExpiredInvites();
         if (player == null) return List.of();
         UUID id = player.getUniqueId();
         UUID leaderId = leaderByMember.get(id);
@@ -158,7 +185,7 @@ public final class PartyManager {
     }
 
     /** 取得隊長，若無則回傳自己 */
-    public Player getLeader(Player player) {
+    public synchronized Player getLeader(Player player) {
         if (player == null) return null;
         UUID leaderId = leaderByMember.get(player.getUniqueId());
         if (leaderId == null) return player;
@@ -166,24 +193,116 @@ public final class PartyManager {
         return p != null ? p : player;
     }
 
+    public synchronized boolean isLeader(Player player) {
+        if (player == null) return false;
+        UUID playerId = player.getUniqueId();
+        return playerId.equals(leaderByMember.get(playerId));
+    }
+
+    public synchronized boolean isLeaderOrSolo(Player player) {
+        if (player == null) return false;
+        UUID leaderId = leaderByMember.get(player.getUniqueId());
+        return leaderId == null || leaderId.equals(player.getUniqueId());
+    }
+
     /** 離開隊伍 */
-    public void leave(Player player) {
-        if (player == null) return;
+    public synchronized LeaveResult leave(Player player) {
+        if (player == null) return new LeaveResult(false, false, List.of());
         UUID id = player.getUniqueId();
+        pendingInvites.remove(id);
+
         UUID leaderId = leaderByMember.remove(id);
-        if (leaderId == null) return;
+        if (leaderId == null) return new LeaveResult(false, false, List.of(id));
+
+        if (leaderId.equals(id)) {
+            return disbandParty(leaderId);
+        }
 
         Set<UUID> party = partyByLeader.get(leaderId);
+        List<UUID> oldMembers = party == null ? List.of(id) : new ArrayList<>(party);
         if (party != null) {
             party.remove(id);
             if (party.size() <= 1) {
-                partyByLeader.remove(leaderId);
-                if (!party.isEmpty()) leaderByMember.remove(party.iterator().next());
+                disbandParty(leaderId);
+            } else {
+                clearMemberState(id);
             }
+        } else {
+            clearMemberState(id);
         }
-        playerRole.remove(id);
-        readyByMember.remove(id);
-        explicitlyCancelled.remove(id);
+        return new LeaveResult(true, false, oldMembers);
+    }
+
+    public synchronized LeaveResult disband(Player leader) {
+        if (leader == null || !isLeader(leader)) {
+            return new LeaveResult(false, false, List.of());
+        }
+        return disbandParty(leader.getUniqueId());
+    }
+
+    public synchronized void markDisconnected(UUID playerId) {
+        cleanupExpiredInvites();
+        if (playerId == null) return;
+        UUID leaderId = leaderByMember.get(playerId);
+        if (playerId.equals(leaderId)) {
+            disconnectedLeaders.put(playerId, System.currentTimeMillis());
+        }
+    }
+
+    public synchronized void markOnline(UUID playerId) {
+        if (playerId != null) {
+            disconnectedLeaders.remove(playerId);
+        }
+    }
+
+    public synchronized void disbandIfLeaderStillDisconnected(UUID leaderId) {
+        if (leaderId == null) return;
+        Long disconnectedAt = disconnectedLeaders.get(leaderId);
+        if (disconnectedAt == null) return;
+        if (System.currentTimeMillis() - disconnectedAt < LEADER_DISCONNECT_GRACE_MILLIS) return;
+        Player leader = Bukkit.getPlayer(leaderId);
+        if (leader == null || !leader.isOnline()) {
+            disbandParty(leaderId);
+        }
+    }
+
+    public synchronized int maxDungeonPartySize() {
+        return 5;
+    }
+
+    private LeaveResult disbandParty(UUID leaderId) {
+        Set<UUID> party = partyByLeader.remove(leaderId);
+        if (party == null || party.isEmpty()) {
+            leaderByMember.remove(leaderId);
+            removeInvitesSentBy(leaderId);
+            disconnectedLeaders.remove(leaderId);
+            return new LeaveResult(false, true, List.of());
+        }
+        List<UUID> oldMembers = new ArrayList<>(party);
+        for (UUID memberId : oldMembers) {
+            leaderByMember.remove(memberId);
+            pendingInvites.remove(memberId);
+            removeInvitesSentBy(memberId);
+            disconnectedLeaders.remove(memberId);
+            clearMemberState(memberId);
+        }
+        removeInvitesSentBy(leaderId);
+        return new LeaveResult(true, true, oldMembers);
+    }
+
+    private void cleanupExpiredInvites() {
+        long now = System.currentTimeMillis();
+        pendingInvites.entrySet().removeIf(entry -> entry.getValue().expiresAtMillis() <= now);
+    }
+
+    private void removeInvitesSentBy(UUID inviterId) {
+        pendingInvites.entrySet().removeIf(entry -> inviterId.equals(entry.getValue().inviterId()));
+    }
+
+    private void clearMemberState(UUID playerId) {
+        playerRole.remove(playerId);
+        readyByMember.remove(playerId);
+        explicitlyCancelled.remove(playerId);
     }
 
     public void setPlayerAutoReadyDB(PlayerAutoReadyDB db) {
@@ -265,5 +384,11 @@ public final class PartyManager {
             if (role.equals(playerRole.get(id))) return true;
         }
         return false;
+    }
+
+    public record LeaveResult(boolean hadParty, boolean disbanded, List<UUID> oldMembers) {
+    }
+
+    private record Invite(UUID inviterId, String inviterName, long expiresAtMillis) {
     }
 }

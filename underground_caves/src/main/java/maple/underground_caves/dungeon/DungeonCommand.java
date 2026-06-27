@@ -157,6 +157,14 @@ public class DungeonCommand implements CommandExecutor, TabCompleter {
             if (player != null) player.sendMessage(Component.text("Usage: /gen_dungeon F1|F2|F3 [debug]", NamedTextColor.RED));
             return true;
         }
+        if (teleportPlayers && player != null && partyManager != null) {
+            List<UUID> partyMemberIds = partyManager.getPartyMembers(player);
+            int maxPartySize = partyManager.maxDungeonPartySize();
+            if (partyMemberIds.size() > maxPartySize) {
+                player.sendMessage(Component.text("隊伍人數超過 " + maxPartySize + " 人，無法開始地牢副本。", NamedTextColor.RED));
+                return true;
+            }
+        }
 
         int width;
         int height;

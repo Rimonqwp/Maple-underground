@@ -85,6 +85,7 @@ import maple.underground_caves.gear.SublimationWorkbenchManager;
 import maple.underground_caves.gear.UndergroundCaveHelmetManager;
 import maple.underground_caves.gear.UnifiedSkeletonGearDropListener;
 import maple.underground_caves.party.PartyCommand;
+import maple.underground_caves.party.PartyConnectionListener;
 import maple.underground_caves.party.PartyManager;
 import maple.underground_caves.party.PlayerAutoReadyDB;
 import maple.underground_caves.puzzle.PuzzleRoom01Couplet;
@@ -2298,6 +2299,7 @@ public final class Test_dungeons extends JavaPlugin {
          pCommand.setExecutor(partyCommand);
          pCommand.setTabCompleter(partyCommand);
       }
+      Bukkit.getPluginManager().registerEvents(new PartyConnectionListener(this, this.partyManager), this);
 
       Bukkit.getPluginManager().registerEvents(new DungeonWorldListener(), this);
       Bukkit.getPluginManager().registerEvents(this.dungeonSecrets, this);

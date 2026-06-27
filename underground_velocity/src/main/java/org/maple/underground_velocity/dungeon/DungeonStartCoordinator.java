@@ -76,6 +76,10 @@ public final class DungeonStartCoordinator {
             leader.sendPlainMessage("无法取得队伍成员。");
             return;
         }
+        if (members.size() > partyService.maxPartySize()) {
+            leader.sendPlainMessage("队伍人数超过 " + partyService.maxPartySize() + " 人，无法开始副本。");
+            return;
+        }
         if (hasPendingOrQueuedRun(members)) {
             leader.sendPlainMessage("你的队伍已经有副本开局或候补正在进行。");
             return;

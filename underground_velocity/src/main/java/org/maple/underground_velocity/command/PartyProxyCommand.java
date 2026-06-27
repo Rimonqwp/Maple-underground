@@ -42,6 +42,7 @@ public final class PartyProxyCommand implements SimpleCommand {
             case "accept", "a" -> handleAccept(player, args);
             case "decline", "d" -> handleDecline(player, args);
             case "leave", "l" -> handleLeave(player);
+            case "disband" -> handleDisband(player);
             case "list", "info" -> player.sendPlainMessage(partyService.describeParty(player.getUniqueId()));
             default -> sendUsage(player);
         }
@@ -54,10 +55,10 @@ public final class PartyProxyCommand implements SimpleCommand {
         }
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            return List.of("invite", "accept", "decline", "leave", "list");
+            return List.of("invite", "accept", "decline", "leave", "disband", "list");
         }
         if (args.length == 1) {
-            return filter(List.of("invite", "accept", "decline", "leave", "list"), args[0]);
+            return filter(List.of("invite", "accept", "decline", "leave", "disband", "list"), args[0]);
         }
         String sub = args[0].toLowerCase(Locale.ROOT);
         if (args.length == 2 && ("invite".equals(sub) || "i".equals(sub))) {
@@ -108,8 +109,11 @@ public final class PartyProxyCommand implements SimpleCommand {
         if (args.length >= 2) {
             requestedLeader = server.getPlayer(args[1]);
             if (requestedLeader.isEmpty()) {
-                accepter.sendPlainMessage("找不到在线玩家：" + args[1]);
-                return;
+                Optional<String> pendingName = partyService.getPendingInviterName(accepter.getUniqueId());
+                if (pendingName.isEmpty() || !pendingName.get().equalsIgnoreCase(args[1])) {
+                    accepter.sendPlainMessage("没有来自该玩家的待处理邀请。");
+                    return;
+                }
             }
         }
 
@@ -127,8 +131,11 @@ public final class PartyProxyCommand implements SimpleCommand {
         if (args.length >= 2) {
             requestedLeader = server.getPlayer(args[1]);
             if (requestedLeader.isEmpty()) {
-                decliner.sendPlainMessage("找不到在线玩家：" + args[1]);
-                return;
+                Optional<String> pendingName = partyService.getPendingInviterName(decliner.getUniqueId());
+                if (pendingName.isEmpty() || !pendingName.get().equalsIgnoreCase(args[1])) {
+                    decliner.sendPlainMessage("没有来自该玩家的待处理邀请。");
+                    return;
+                }
             }
         }
         PartyService.Result result = partyService.decline(decliner, requestedLeader);
@@ -137,13 +144,22 @@ public final class PartyProxyCommand implements SimpleCommand {
 
     private void handleLeave(Player player) {
         PartyService.LeaveResult result = partyService.leave(player.getUniqueId());
-        player.sendPlainMessage("你已离开队伍。");
+        boolean disbanded = result.hadParty() && result.removedMembers().containsAll(result.oldMembers());
+        if (disbanded) {
+            player.sendPlainMessage("队伍已解散。");
+        } else {
+            player.sendPlainMessage("你已离开队伍。");
+        }
         if (!result.hadParty()) {
             return;
         }
         List<UUID> notify = new ArrayList<>(result.oldMembers());
         notify.remove(player.getUniqueId());
         if (!notify.isEmpty()) {
+            if (disbanded) {
+                partyService.broadcast(notify, player.getUsername() + " 已解散队伍。");
+                return;
+            }
             String suffix = result.newLeaderId() != null
                     ? " 新队长是 " + server.getPlayer(result.newLeaderId()).map(Player::getUsername).orElse(result.newLeaderId().toString()) + "。"
                     : "";
@@ -151,8 +167,20 @@ public final class PartyProxyCommand implements SimpleCommand {
         }
     }
 
+    private void handleDisband(Player player) {
+        PartyService.LeaveResult result = partyService.disband(player.getUniqueId());
+        if (!result.hadParty()) {
+            player.sendPlainMessage("只有队长可以解散队伍。");
+            return;
+        }
+        player.sendPlainMessage("队伍已解散。");
+        List<UUID> notify = new ArrayList<>(result.oldMembers());
+        notify.remove(player.getUniqueId());
+        partyService.broadcast(notify, player.getUsername() + " 已解散队伍。");
+    }
+
     private void sendUsage(Player player) {
-        player.sendPlainMessage("用法：/p invite <玩家> | accept [玩家] | decline [玩家] | leave | list");
+        player.sendPlainMessage("用法：/p invite <玩家> | accept [玩家] | decline [玩家] | leave | disband | list");
     }
 
     private static List<String> filter(List<String> values, String prefix) {

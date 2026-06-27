@@ -45,7 +45,7 @@ public record BridgeConfig(
             instance-mode: dynamic
             return-server: lobby
             max-party-size: 5
-            invite-timeout-seconds: 60
+            invite-timeout-seconds: 180
             start-timeout-seconds: 30
             bridge-token: ""
             instance-template-dir: ../Maple_dungeon_template
@@ -110,7 +110,7 @@ public record BridgeConfig(
                     string(values, "instance-mode", "dynamic"),
                     string(values, "return-server", "lobby"),
                     integer(values, "max-party-size", 5, 1, 5),
-                    integer(values, "invite-timeout-seconds", 60, 5, 3600),
+                    integer(values, "invite-timeout-seconds", 180, 5, 3600),
                     integer(values, "start-timeout-seconds", 30, 5, 300),
                     string(values, "bridge-token", ""),
                     string(values, "instance-template-dir", "../Maple_dungeon_template"),
@@ -141,7 +141,7 @@ public record BridgeConfig(
                     "dynamic",
                     "lobby",
                     5,
-                    60,
+                    180,
                     30,
                     "",
                     "../Maple_dungeon_template",

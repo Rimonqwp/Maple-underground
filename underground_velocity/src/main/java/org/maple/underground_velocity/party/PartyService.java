@@ -14,21 +14,31 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public final class PartyService {
+    private static final long LEADER_DISCONNECT_GRACE_MILLIS = 5L * 60L * 1000L;
+
     private final ProxyServer server;
+    private final Object plugin;
     private final int maxPartySize;
     private final long inviteTimeoutMillis;
 
     private final Map<UUID, LinkedHashSet<UUID>> partyByLeader = new ConcurrentHashMap<>();
     private final Map<UUID, UUID> leaderByMember = new ConcurrentHashMap<>();
     private final Map<UUID, Invite> pendingInvites = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> disconnectedLeaders = new ConcurrentHashMap<>();
     private final Set<UUID> disconnectedMembers = ConcurrentHashMap.newKeySet();
 
     public PartyService(ProxyServer server, int maxPartySize, int inviteTimeoutSeconds) {
+        this(server, null, maxPartySize, inviteTimeoutSeconds);
+    }
+
+    public PartyService(ProxyServer server, Object plugin, int maxPartySize, int inviteTimeoutSeconds) {
         this.server = server;
-        this.maxPartySize = Math.max(1, Math.min(5, maxPartySize));
-        this.inviteTimeoutMillis = Math.max(5L, inviteTimeoutSeconds) * 1000L;
+        this.plugin = plugin;
+        this.maxPartySize = 5;
+        this.inviteTimeoutMillis = 3L * 60L * 1000L;
     }
 
     public synchronized Result invite(Player inviter, Player target) {
@@ -55,11 +65,7 @@ public final class PartyService {
             leaderByMember.put(inviterId, inviterId);
             return created;
         });
-        if (party.size() >= maxPartySize) {
-            return Result.fail("队伍已满，最多 " + maxPartySize + " 人。");
-        }
-
-        pendingInvites.put(targetId, new Invite(inviterId, targetId, System.currentTimeMillis() + inviteTimeoutMillis));
+        pendingInvites.put(targetId, new Invite(inviterId, inviter.getUsername(), targetId, System.currentTimeMillis() + inviteTimeoutMillis));
         return Result.ok("已邀请 " + target.getUsername() + " 加入队伍。");
     }
 
@@ -79,9 +85,9 @@ public final class PartyService {
         }
 
         LinkedHashSet<UUID> party = partyByLeader.get(invite.inviterId());
-        if (party == null || party.size() >= maxPartySize) {
+        if (party == null) {
             pendingInvites.remove(accepterId);
-            return Result.fail("该队伍不存在或已经满员。");
+            return Result.fail("该队伍不存在。");
         }
 
         pendingInvites.remove(accepterId);
@@ -119,6 +125,11 @@ public final class PartyService {
         }
 
         List<UUID> oldMembers = new ArrayList<>(party);
+        if (leaderId.equals(playerId)) {
+            disbandParty(leaderId);
+            return new LeaveResult(true, null, oldMembers, oldMembers);
+        }
+
         party.remove(playerId);
         leaderByMember.remove(playerId);
         disconnectedMembers.remove(playerId);
@@ -128,23 +139,24 @@ public final class PartyService {
             return new LeaveResult(true, null, oldMembers, List.of(playerId));
         }
 
-        if (leaderId.equals(playerId)) {
-            UUID newLeader = party.iterator().next();
-            partyByLeader.remove(leaderId);
-            partyByLeader.put(newLeader, party);
-            for (UUID member : party) {
-                leaderByMember.put(member, newLeader);
-            }
-            return new LeaveResult(true, newLeader, oldMembers, List.of(playerId));
-        }
-
         if (party.size() <= 1) {
-            for (UUID member : party) {
-                leaderByMember.remove(member);
-            }
-            partyByLeader.remove(leaderId);
+            List<UUID> removed = new ArrayList<>(party);
+            removed.add(playerId);
+            disbandParty(leaderId);
+            return new LeaveResult(true, null, oldMembers, removed);
         }
         return new LeaveResult(true, leaderId, oldMembers, List.of(playerId));
+    }
+
+    public synchronized LeaveResult disband(UUID playerId) {
+        UUID leaderId = leaderByMember.get(playerId);
+        if (leaderId == null || !leaderId.equals(playerId)) {
+            return new LeaveResult(false, null, List.of(), List.of());
+        }
+        LinkedHashSet<UUID> party = partyByLeader.get(leaderId);
+        List<UUID> oldMembers = party == null ? List.of(playerId) : new ArrayList<>(party);
+        disbandParty(leaderId);
+        return new LeaveResult(true, null, oldMembers, oldMembers);
     }
 
     public synchronized void removePlayer(UUID playerId) {
@@ -154,22 +166,30 @@ public final class PartyService {
     }
 
     public synchronized void markDisconnected(UUID playerId) {
+        cleanupExpiredInvites();
         pendingInvites.remove(playerId);
-        pendingInvites.entrySet().removeIf(entry -> entry.getValue().inviterId().equals(playerId));
+        UUID leaderId = leaderByMember.get(playerId);
         if (leaderByMember.containsKey(playerId)) {
             disconnectedMembers.add(playerId);
+        }
+        if (playerId.equals(leaderId)) {
+            disconnectedLeaders.put(playerId, System.currentTimeMillis());
+            scheduleLeaderDisband(playerId);
         }
     }
 
     public synchronized void markOnline(UUID playerId) {
         disconnectedMembers.remove(playerId);
+        disconnectedLeaders.remove(playerId);
     }
 
     public synchronized UUID getLeaderId(UUID playerId) {
+        cleanupExpiredInvites();
         return leaderByMember.get(playerId);
     }
 
     public synchronized List<UUID> getPartyMemberIds(UUID playerId) {
+        cleanupExpiredInvites();
         UUID leaderId = leaderByMember.get(playerId);
         if (leaderId == null) {
             return List.of(playerId);
@@ -196,9 +216,20 @@ public final class PartyService {
         return invite == null ? Optional.empty() : Optional.of(invite.inviterId());
     }
 
+    public synchronized Optional<String> getPendingInviterName(UUID playerId) {
+        cleanupExpiredInvites();
+        Invite invite = pendingInvites.get(playerId);
+        return invite == null ? Optional.empty() : Optional.of(invite.inviterName());
+    }
+
     public synchronized boolean isLeaderOrSolo(UUID playerId) {
+        cleanupExpiredInvites();
         UUID leaderId = leaderByMember.get(playerId);
         return leaderId == null || leaderId.equals(playerId);
+    }
+
+    public int maxPartySize() {
+        return maxPartySize;
     }
 
     public String describeParty(UUID playerId) {
@@ -250,6 +281,45 @@ public final class PartyService {
         pendingInvites.entrySet().removeIf(entry -> entry.getValue().expiresAtMillis() <= now);
     }
 
+    private void scheduleLeaderDisband(UUID leaderId) {
+        if (plugin == null) {
+            return;
+        }
+        server.getScheduler().buildTask(plugin, () -> disbandIfLeaderStillDisconnected(leaderId))
+                .delay(5, TimeUnit.MINUTES)
+                .schedule();
+    }
+
+    private synchronized void disbandIfLeaderStillDisconnected(UUID leaderId) {
+        Long disconnectedAt = disconnectedLeaders.get(leaderId);
+        if (disconnectedAt == null) {
+            return;
+        }
+        if (System.currentTimeMillis() - disconnectedAt < LEADER_DISCONNECT_GRACE_MILLIS) {
+            return;
+        }
+        if (server.getPlayer(leaderId).isEmpty()) {
+            disbandParty(leaderId);
+        }
+    }
+
+    private void disbandParty(UUID leaderId) {
+        LinkedHashSet<UUID> party = partyByLeader.remove(leaderId);
+        if (party == null) {
+            leaderByMember.remove(leaderId);
+            disconnectedLeaders.remove(leaderId);
+            pendingInvites.entrySet().removeIf(entry -> entry.getValue().inviterId().equals(leaderId));
+            return;
+        }
+        for (UUID member : party) {
+            leaderByMember.remove(member);
+            disconnectedMembers.remove(member);
+            disconnectedLeaders.remove(member);
+            pendingInvites.remove(member);
+        }
+        pendingInvites.entrySet().removeIf(entry -> party.contains(entry.getValue().inviterId()));
+    }
+
     private String nameOf(UUID playerId) {
         return server.getPlayer(playerId).map(Player::getUsername).orElse(playerId.toString());
     }
@@ -267,6 +337,6 @@ public final class PartyService {
     public record LeaveResult(boolean hadParty, UUID newLeaderId, List<UUID> oldMembers, List<UUID> removedMembers) {
     }
 
-    private record Invite(UUID inviterId, UUID targetId, long expiresAtMillis) {
+    private record Invite(UUID inviterId, String inviterName, UUID targetId, long expiresAtMillis) {
     }
 }

@@ -42,6 +42,7 @@ public final class PartyCommand implements CommandExecutor, TabCompleter {
             case "accept", "a" -> handleAccept(player, args);
             case "decline", "d" -> handleDecline(player, args);
             case "leave", "l" -> handleLeave(player);
+            case "disband" -> handleDisband(player);
             default -> sendUsage(player);
         }
         return true;
@@ -81,57 +82,106 @@ public final class PartyCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleAccept(Player accepter, String[] args) {
-        Player leader;
+        Player onlineLeader = null;
+        UUID leaderId;
+        String leaderName;
         if (args.length >= 2) {
-            leader = Bukkit.getPlayer(args[1]);
+            onlineLeader = Bukkit.getPlayer(args[1]);
+            UUID pendingInviter = partyManager.getPendingInviter(accepter);
+            String pendingName = partyManager.getPendingInviterName(accepter);
+            if (onlineLeader != null) {
+                leaderId = onlineLeader.getUniqueId();
+                leaderName = onlineLeader.getName();
+            } else if (pendingInviter != null && pendingName != null && pendingName.equalsIgnoreCase(args[1])) {
+                leaderId = pendingInviter;
+                leaderName = pendingName;
+            } else {
+                accepter.sendMessage(Component.text("沒有來自該玩家的待接受邀請。", NamedTextColor.RED));
+                return;
+            }
         } else {
-            UUID inviterId = partyManager.getPendingInviter(accepter);
-            leader = inviterId != null ? Bukkit.getPlayer(inviterId) : null;
+            leaderId = partyManager.getPendingInviter(accepter);
+            leaderName = partyManager.getPendingInviterName(accepter);
         }
-        if (leader == null || !leader.isOnline()) {
-            accepter.sendMessage(Component.text("沒有待接受的邀請，或找不到該玩家。", NamedTextColor.RED));
+        if (leaderId == null) {
+            accepter.sendMessage(Component.text("沒有待接受的邀請，或邀請已過期。", NamedTextColor.RED));
             return;
         }
+        if (leaderName == null || leaderName.isBlank()) leaderName = leaderId.toString();
 
-        String err = partyManager.accept(accepter, leader);
+        String err = partyManager.accept(accepter, leaderId, leaderName);
         if (err != null) {
             accepter.sendMessage(Component.text(err, NamedTextColor.RED));
             return;
         }
 
         accepter.sendMessage(Component.text("你已加入 ", NamedTextColor.GREEN)
-                .append(Component.text(leader.getName(), NamedTextColor.YELLOW))
+                .append(Component.text(leaderName, NamedTextColor.YELLOW))
                 .append(Component.text(" 的隊伍。", NamedTextColor.GREEN)));
-        leader.sendMessage(Component.text(accepter.getName(), NamedTextColor.YELLOW)
-                .append(Component.text(" 已加入隊伍。", NamedTextColor.GREEN)));
+        if (onlineLeader != null && onlineLeader.isOnline()) {
+            onlineLeader.sendMessage(Component.text(accepter.getName(), NamedTextColor.YELLOW)
+                    .append(Component.text(" 已加入隊伍。", NamedTextColor.GREEN)));
+        }
     }
 
     private void handleDecline(Player decliner, String[] args) {
-        if (args.length < 2) {
-            decliner.sendMessage(Component.text("用法: /p decline <玩家ID>", NamedTextColor.RED));
+        UUID leaderId;
+        if (args.length >= 2) {
+            Player leader = Bukkit.getPlayer(args[1]);
+            UUID pendingInviter = partyManager.getPendingInviter(decliner);
+            String pendingName = partyManager.getPendingInviterName(decliner);
+            if (leader != null) {
+                leaderId = leader.getUniqueId();
+            } else if (pendingInviter != null && pendingName != null && pendingName.equalsIgnoreCase(args[1])) {
+                leaderId = pendingInviter;
+            } else {
+                decliner.sendMessage(Component.text("沒有來自該玩家的待拒絕邀請。", NamedTextColor.RED));
+                return;
+            }
+        } else {
+            leaderId = partyManager.getPendingInviter(decliner);
+        }
+        if (leaderId == null) {
+            decliner.sendMessage(Component.text("沒有待拒絕的邀請，或邀請已過期。", NamedTextColor.RED));
             return;
         }
-        Player leader = Bukkit.getPlayer(args[1]);
-        if (leader != null) {
-            partyManager.decline(decliner, leader.getUniqueId());
+        if (partyManager.decline(decliner, leaderId)) {
+            decliner.sendMessage(Component.text("已拒絕邀請。", NamedTextColor.GRAY));
+        } else {
+            decliner.sendMessage(Component.text("沒有符合的待拒絕邀請。", NamedTextColor.RED));
         }
-        decliner.sendMessage(Component.text("已拒絕邀請。", NamedTextColor.GRAY));
     }
 
     private void handleLeave(Player player) {
-        partyManager.leave(player);
-        player.sendMessage(Component.text("你已離開隊伍。", NamedTextColor.GRAY));
+        PartyManager.LeaveResult result = partyManager.leave(player);
+        if (result.disbanded()) {
+            player.sendMessage(Component.text("隊伍已解散。", NamedTextColor.GRAY));
+            notifyOldMembers(player, result.oldMembers(), player.getName() + " 已解散隊伍。");
+        } else {
+            player.sendMessage(Component.text("你已離開隊伍。", NamedTextColor.GRAY));
+            notifyOldMembers(player, result.oldMembers(), player.getName() + " 已離開隊伍。");
+        }
+    }
+
+    private void handleDisband(Player player) {
+        PartyManager.LeaveResult result = partyManager.disband(player);
+        if (!result.hadParty()) {
+            player.sendMessage(Component.text("只有隊長可以解散隊伍。", NamedTextColor.RED));
+            return;
+        }
+        player.sendMessage(Component.text("隊伍已解散。", NamedTextColor.GRAY));
+        notifyOldMembers(player, result.oldMembers(), player.getName() + " 已解散隊伍。");
     }
 
     private void sendUsage(Player player) {
-        player.sendMessage(Component.text("用法: /p invite <ID> | accept [ID] | decline <ID> | leave", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("用法: /p invite <ID> | accept [ID] | decline [ID] | leave | disband", NamedTextColor.GRAY));
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
-            return filterPrefix(List.of("invite", "accept", "decline", "leave"), args[0]);
+            return filterPrefix(List.of("invite", "accept", "decline", "leave", "disband"), args[0]);
         }
         if (args.length == 2) {
             String sub = args[0].toLowerCase(Locale.ROOT);
@@ -153,5 +203,15 @@ public final class PartyCommand implements CommandExecutor, TabCompleter {
         return list.stream()
                 .filter(s -> s.toLowerCase(Locale.ROOT).startsWith(low))
                 .collect(Collectors.toList());
+    }
+
+    private static void notifyOldMembers(Player actor, List<UUID> oldMembers, String message) {
+        for (UUID memberId : oldMembers) {
+            if (memberId.equals(actor.getUniqueId())) continue;
+            Player member = Bukkit.getPlayer(memberId);
+            if (member != null && member.isOnline()) {
+                member.sendMessage(Component.text(message, NamedTextColor.GRAY));
+            }
+        }
     }
 }

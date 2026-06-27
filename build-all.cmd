@@ -26,8 +26,6 @@ if defined DB_USER set "DB_PROPS=%DB_PROPS% "-Ddb.user=%DB_USER%""
 if defined DB_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.password=%DB_PASSWORD%""
 
 set "JAVA_HOME_FALLBACK=C:\Program Files\Zulu\zulu-21"
-set "MAVEN_CMD_FALLBACK=C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\plugins\maven\lib\maven3\bin\mvn.cmd"
-set "JETBRAINS_DIR=C:\Program Files\JetBrains"
 
 set "JAVA_BIN="
 set "MVN_CMD="
@@ -58,19 +56,35 @@ if defined MAVEN_HOME (
 )
 
 if not defined MVN_CMD (
-    if exist "%MAVEN_CMD_FALLBACK%" (
-        set "MVN_CMD=%MAVEN_CMD_FALLBACK%"
-    )
+    call :FindMavenInRoot "%ProgramFiles%\JetBrains"
 )
 
 if not defined MVN_CMD (
-    for /f "delims=" %%I in ('dir /b /ad /o-n "%JETBRAINS_DIR%\IntelliJ IDEA *" 2^>nul') do (
-        if not defined MVN_CMD (
-            if exist "%JETBRAINS_DIR%\%%I\plugins\maven\lib\maven3\bin\mvn.cmd" (
-                set "MVN_CMD=%JETBRAINS_DIR%\%%I\plugins\maven\lib\maven3\bin\mvn.cmd"
-            )
-        )
-    )
+    call :FindMavenInRoot "%ProgramFiles(x86)%\JetBrains"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%LOCALAPPDATA%\JetBrains"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%LOCALAPPDATA%\Programs\JetBrains"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%TEMP%"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%LOCALAPPDATA%\Temp"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%ProgramFiles%\Apache"
+)
+
+if not defined MVN_CMD (
+    call :FindMavenInRoot "%ProgramFiles(x86)%\Apache"
 )
 
 if not defined MVN_CMD (
@@ -212,4 +226,10 @@ if exist "%ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.ja
 echo.
 echo [INFO] Build completed successfully.
 echo [INFO] Output directory: %DIST_DIR%
+exit /b 0
+
+:FindMavenInRoot
+for /f "delims=" %%I in ('where /r "%~1" mvn.cmd 2^>nul') do (
+    if not defined MVN_CMD set "MVN_CMD=%%I"
+)
 exit /b 0

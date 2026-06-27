@@ -4,3 +4,15 @@ main: maple.underground_collect.UndergroundCollect
 api-version: '1.21.11'
 load: POSTWORLD
 depend: [underground_state]
+commands:
+  collect:
+    description: 打开收集中心、领取奖励或查看榜单
+    usage: /collect [open|claim|leaderboard|missing|guide] [category]
+    permission: underground_collect.use
+permissions:
+  underground_collect.use:
+    description: 使用收集中心相关命令
+    default: true
+  underground_collect.admin:
+    description: 收集中心管理权限
+    default: op

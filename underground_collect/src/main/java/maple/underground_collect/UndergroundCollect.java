@@ -2,7 +2,7 @@ package maple.underground_collect;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class UndergroundCollect extends JavaPlugin {
+public class UndergroundCollect extends JavaPlugin {
 
     @Override
     public void onEnable() {

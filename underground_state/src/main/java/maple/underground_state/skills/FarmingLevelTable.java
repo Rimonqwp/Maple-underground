@@ -65,9 +65,9 @@ public final class FarmingLevelTable {
 
         for (int level = 1; level <= CombatLevelTable.maxLevel(); level++) {
             CombatLevelDefinition base = CombatLevelTable.definitionForLevel(level);
-            long coinReward = 100L;
+            long coinReward = maple.underground_state.professions.ProfessionMath.coins(level);
             int healthReward = level <= 14 ? 1 : level <= 19 ? 2 : level <= 25 ? 3 : 4;
-            int farmingFortuneReward = 4;
+            int farmingFortuneReward = 2;
             int mapleXpReward = 5;
 
             totalCoins += coinReward;

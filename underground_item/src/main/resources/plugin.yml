@@ -5,6 +5,9 @@ api-version: '26.3'
 load: POSTWORLD
 depend: [underground_state]
 commands:
+  profession:
+    description: 主世界职业装备图鉴与配方
+    usage: /profession [farming|mining|register]
   weapon:
     description: Reload weapon configs
     usage: /weapon reload
@@ -30,6 +33,9 @@ commands:
     usage: /iteminfo
     permission: test_dungeons.iteminfo
 permissions:
+  underground_item.profession.admin:
+    description: 发放职业测试物品
+    default: op
   test_dungeons.iteminfo:
     description: Use /iteminfo to inspect held items
     default: op

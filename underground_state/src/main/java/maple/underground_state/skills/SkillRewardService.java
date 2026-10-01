@@ -29,6 +29,7 @@ public final class SkillRewardService {
         if (uuid == null) {
             return 0L;
         }
+        ensureProfessionLoaded(uuid, skillType);
         long previousXp = skillProgressManager.getXp(uuid, skillType);
         long updatedXp = Math.max(0L, xp);
         skillProgressManager.setXp(uuid, skillType, updatedXp);
@@ -40,6 +41,7 @@ public final class SkillRewardService {
         if (uuid == null) {
             return 0L;
         }
+        ensureProfessionLoaded(uuid, skillType);
         long previousXp = skillProgressManager.getXp(uuid, skillType);
         long updatedXp = Math.max(0L, previousXp + delta);
         skillProgressManager.setXp(uuid, skillType, updatedXp);
@@ -47,13 +49,30 @@ public final class SkillRewardService {
         return updatedXp;
     }
 
+    private void ensureProfessionLoaded(UUID uuid, SkillType skill) {
+        if (maple.underground_state.professions.ProfessionMath.isProfession(skill) && plugin != null && plugin.getProfessionService() != null) {
+            var store = plugin.getProfessionService().store();
+            if (!store.ready(uuid)) store.load(uuid);
+            if (!store.ready(uuid)) throw new IllegalStateException("职业存档加载失败，未修改经验");
+        }
+    }
     private void applyRewardsForNewLevels(UUID uuid,
                                           @NotNull SkillType skillType,
                                           long previousXp,
                                           long updatedXp) {
         int previousLevel = SkillLevelTables.levelForXp(skillType, previousXp);
         int updatedLevel = SkillLevelTables.levelForXp(skillType, updatedXp);
+        boolean ledgerChanged = false;
+        if (maple.underground_state.professions.ProfessionMath.isProfession(skillType) && plugin != null && plugin.getProfessionService() != null) {
+            var store = plugin.getProfessionService().store();
+            if (!store.ready(uuid)) throw new IllegalStateException("职业存档尚未加载");
+            String key = skillType.name() + ":highest_rewarded";
+            previousLevel = Math.max(previousLevel, (int) store.get(uuid, key));
+            ledgerChanged = store.get(uuid,key) != Math.max(previousLevel,updatedLevel);
+            store.set(uuid, key, Math.max(previousLevel, updatedLevel));
+        }
         if (updatedLevel <= previousLevel) {
+            if(ledgerChanged)plugin.getProfessionService().store().save(uuid);
             return;
         }
 
@@ -62,6 +81,7 @@ public final class SkillRewardService {
             accumulateRewards(skillType, level, bundle);
         }
         applyBundle(uuid, bundle);
+        if (maple.underground_state.professions.ProfessionMath.isProfession(skillType) && plugin != null && plugin.getProfessionService() != null) plugin.getProfessionService().store().save(uuid);
     }
 
     private void accumulateRewards(@NotNull SkillType skillType, int level, @NotNull RewardBundle bundle) {

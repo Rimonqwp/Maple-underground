@@ -6,6 +6,16 @@ final class CollectionMath {
             50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000, 50_000
     };
 
+    static boolean extended(maple.underground_state.gui.CollectionInfoGui.Category category) {
+        return category == maple.underground_state.gui.CollectionInfoGui.Category.FARMING || category == maple.underground_state.gui.CollectionInfoGui.Category.MINING;
+    }
+    static int maxTier(maple.underground_state.gui.CollectionInfoGui.Category category) { return extended(category) ? 12 : 9; }
+    static int currentTier(long amount, maple.underground_state.gui.CollectionInfoGui.Category category) {
+        return maple.underground_state.professions.ProfessionMath.collectionTier(amount, extended(category));
+    }
+    static int tierXpReward(int tier, maple.underground_state.gui.CollectionInfoGui.Category category) {
+        return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category));
+    }
     private CollectionMath() {
     }
 
@@ -53,6 +63,9 @@ final class CollectionMath {
             case 7 -> "VII";
             case 8 -> "VIII";
             case 9 -> "IX";
+            case 10 -> "X";
+            case 11 -> "XI";
+            case 12 -> "XII";
             default -> String.valueOf(number);
         };
     }

@@ -11,6 +11,7 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class UndergroundCollectTest {
 
@@ -29,10 +30,10 @@ class UndergroundCollectTest {
     }
 
     @Test
-    void pluginLoadsAndRegistersWithServer() {
+    void missingMainPluginDisablesCollectionPlugin() {
         Plugin registeredPlugin = server.getPluginManager().getPlugin("underground_collect");
 
-        assertTrue(plugin.isEnabled());
+        assertFalse(plugin.isEnabled());
         assertSame(plugin, registeredPlugin);
         assertEquals("underground_collect", plugin.getDescription().getName());
     }

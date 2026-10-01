@@ -42,6 +42,7 @@ public final class UndergroundItem extends JavaPlugin {
             "zombie_knight_iron.yml"
     };
 
+    private maple.underground_item.professions.ProfessionModule professions;
     private static UndergroundItem instance;
 
     private PlayerStatsManager playerStatsManager;
@@ -316,11 +317,13 @@ public final class UndergroundItem extends JavaPlugin {
         registerStatsExtension();
         registerEvents();
         registerCommands();
+        professions = new maple.underground_item.professions.ProfessionModule(this, undergroundState);
         getLogger().info("underground_item enabled.");
     }
 
     @Override
     public void onDisable() {
+        if (professions != null) { professions.close(); professions = null; }
         if (gearStatsApplyTask != null) {
             gearStatsApplyTask.cancel();
             gearStatsApplyTask = null;

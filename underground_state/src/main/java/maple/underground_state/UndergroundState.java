@@ -49,6 +49,9 @@ import java.util.UUID;
 public final class UndergroundState extends JavaPlugin {
 
     private static UndergroundState instance;
+    private maple.underground_state.professions.ProfessionService professionService;
+    public maple.underground_state.professions.ProfessionService getProfessionService() { return professionService; }
+    public CombatXpOverlayService getCombatXpOverlayService() { return combatXpOverlayService; }
 
     private PlayerStatsDB playerStatsDB;
     private PlayerStatsManager playerStatsManager;
@@ -162,6 +165,8 @@ public final class UndergroundState extends JavaPlugin {
         socialXpService = new SocialXpService(this, skillProgressManager, skillRewardService, combatXpOverlayService);
         craftingXpService = new CraftingXpService(skillProgressManager, skillRewardService, combatXpOverlayService);
         dungeonPanelManager = new DungeonPanelManager(this);
+        professionService = new maple.underground_state.professions.ProfessionService(this);
+        Bukkit.getPluginManager().registerEvents(professionService, this);
 
         Bukkit.getPluginManager().registerEvents(new PlayerStatsListener(this, playerStatsManager), this);
         Bukkit.getPluginManager().registerEvents(new PlayerStatsRuntimeListener(this, playerStatsRuntime), this);
@@ -243,6 +248,7 @@ public final class UndergroundState extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (professionService != null) { professionService.shutdown(); professionService = null; }
         if (playerStatsRuntime != null) {
             playerStatsRuntime.unregisterExtension(this, "combat-xp-overlay");
         }

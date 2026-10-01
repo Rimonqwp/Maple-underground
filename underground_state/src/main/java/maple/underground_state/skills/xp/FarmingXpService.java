@@ -41,6 +41,8 @@ public final class FarmingXpService implements Listener {
     private static final Map<Material, Integer> HARVEST_XP_TENTHS_BY_BLOCK = buildHarvestXpTenthsByBlock();
     private static final Map<EntityType, Integer> KILL_XP_TENTHS_BY_ENTITY = buildKillXpTenthsByEntity();
 
+    public static int baseXpTenths(Material material) { return HARVEST_XP_TENTHS_BY_BLOCK.getOrDefault(material, 0); }
+
     private final SkillProgressManager skillProgressManager;
     private final SkillRewardService skillRewardService;
     private final CombatXpOverlayService xpOverlayService;
@@ -63,6 +65,8 @@ public final class FarmingXpService implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+        var active = maple.underground_state.UndergroundState.getInstance();
+        if (active != null && active.getProfessionService() != null && active.getProfessionService().enabled(event.getPlayer().getWorld())) return;
         Player player = event.getPlayer();
         if (!canGainXp(player)) {
             return;
@@ -90,6 +94,8 @@ public final class FarmingXpService implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockHarvest(PlayerHarvestBlockEvent event) {
+        var active = maple.underground_state.UndergroundState.getInstance();
+        if (active != null && active.getProfessionService() != null && active.getProfessionService().enabled(event.getPlayer().getWorld())) return;
         Player player = event.getPlayer();
         if (!canGainXp(player)) {
             return;
@@ -121,7 +127,15 @@ public final class FarmingXpService implements Listener {
             return;
         }
 
-        grantFarmingXp(killer, awardTenths);
+        var active = maple.underground_state.UndergroundState.getInstance();
+        if (entity.getPersistentDataContainer().has(maple.underground_state.professions.ProfessionService.MOB_KEY)) return;
+        if (active != null && active.getProfessionService() != null) {
+            var service = active.getProfessionService();
+            if (service.enabled(killer.getWorld()) && service.store().ready(killer.getUniqueId())) {
+                service.grantXp(killer, SkillType.FARMING, awardTenths, service.level(killer, SkillType.FARMING), service.bonuses(killer, SkillType.FARMING).xpPercent());
+                for (var drop : event.getDrops()) active.getCollectionProgressManager().addMaterial(killer.getUniqueId(), drop.getType(), drop.getAmount());
+            } else if(!service.enabled(killer.getWorld())) grantFarmingXp(killer,awardTenths);
+        } else grantFarmingXp(killer, awardTenths);
     }
 
     private void grantFarmingXp(@NotNull Player player, int awardTenths) {

@@ -54,6 +54,24 @@ public final class PlayerStatsRuntime {
         extensions.removeIf(registered -> registered.owner.equals(owner));
     }
 
+    public maple.underground_state.professions.ProfessionBonuses getProfessionBonuses(Player player, maple.underground_state.skills.SkillType skill) {
+        if(!maple.underground_state.professions.ProfessionMath.isProfession(skill))return maple.underground_state.professions.ProfessionBonuses.ZERO;
+        var data = manager.get(player);
+        double fortune = skill == maple.underground_state.skills.SkillType.FARMING ? data.getFarmingFortune() : data.getMiningFortune();
+        var core = maple.underground_state.UndergroundState.getInstance();
+        if (core != null && core.getProfessionService() != null) fortune += core.getProfessionService().collectionFortune(player, skill);
+        var bonuses = new maple.underground_state.professions.ProfessionBonuses(fortune, 0, 0, 0, 0);
+        for (PlayerStatsRuntimeExtension extension : extensions()) bonuses = extension.modifyProfessionBonuses(player, skill, bonuses);
+        return bonuses.bounded();
+    }
+
+    public double getEffectiveMiningFortune(Player player) { return getProfessionBonuses(player, maple.underground_state.skills.SkillType.MINING).fortune(); }
+    public double getEffectiveFarmingFortune(Player player) { return getProfessionBonuses(player, maple.underground_state.skills.SkillType.FARMING).fortune(); }
+    public boolean canUseProfessionItem(Player player, org.bukkit.inventory.ItemStack item) {
+        for (PlayerStatsRuntimeExtension extension : extensions()) if (!extension.canUseProfessionItem(player, item)) return false;
+        return true;
+    }
+
     public double getEffectiveMaxHealth(Player player) {
         if (player == null) return PlayerStatsData.DEFAULT_HEALTH;
         PlayerStatsData data = manager.get(player);

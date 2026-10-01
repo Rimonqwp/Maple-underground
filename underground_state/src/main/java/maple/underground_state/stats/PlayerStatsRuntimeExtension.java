@@ -8,6 +8,13 @@ import org.jetbrains.annotations.Nullable;
 
 public interface PlayerStatsRuntimeExtension {
 
+    default maple.underground_state.professions.ProfessionBonuses modifyProfessionBonuses(
+            Player player, maple.underground_state.skills.SkillType skill,
+            maple.underground_state.professions.ProfessionBonuses base) { return base; }
+
+    default boolean canUseProfessionItem(Player player, org.bukkit.inventory.ItemStack item) { return true; }
+
+
     default double modifyMaxHealth(@NotNull Player player, @NotNull PlayerStatsData data, double base) {
         return base;
     }

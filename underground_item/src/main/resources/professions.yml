@@ -1,0 +1,3516 @@
+{
+  "schema_version": 1,
+  "sets": {
+    "farming_main_1": {
+      "name": "田野",
+      "job": "farming",
+      "branch": "main",
+      "tier": 1,
+      "level": 0,
+      "fortune": 20,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 0,
+      "reduction": 0,
+      "health": 40,
+      "defense": 8,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_main_2": {
+      "name": "丰苗",
+      "job": "farming",
+      "branch": "main",
+      "tier": 2,
+      "level": 8,
+      "fortune": 40,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 0,
+      "reduction": 0,
+      "health": 60,
+      "defense": 12,
+      "requirements": {
+        "collections": {
+          "WHEAT": 250,
+          "CARROT": 250
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_main_3": {
+      "name": "沃土",
+      "job": "farming",
+      "branch": "main",
+      "tier": 3,
+      "level": 18,
+      "fortune": 80,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 20,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0,
+        "diverse_count": 2,
+        "diverse_amount": 2500
+      }
+    },
+    "farming_main_4": {
+      "name": "丰穰",
+      "job": "farming",
+      "branch": "main",
+      "tier": 4,
+      "level": 30,
+      "fortune": 120,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 10,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0,
+        "diverse_count": 3,
+        "diverse_amount": 10000
+      }
+    },
+    "farming_main_5": {
+      "name": "灵穗",
+      "job": "farming",
+      "branch": "main",
+      "tier": 5,
+      "level": 42,
+      "fortune": 180,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 15,
+      "health": 160,
+      "defense": 40,
+      "requirements": {
+        "collections": {},
+        "normal": 50,
+        "elite": 0,
+        "diverse_count": 3,
+        "diverse_amount": 100000
+      }
+    },
+    "farming_main_6": {
+      "name": "丰收圣约",
+      "job": "farming",
+      "branch": "main",
+      "tier": 6,
+      "level": 55,
+      "fortune": 240,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 20,
+      "health": 200,
+      "defense": 60,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 30,
+        "diverse_count": 4,
+        "diverse_amount": 250000
+      }
+    },
+    "farming_yield_1": {
+      "name": "聚穗",
+      "job": "farming",
+      "branch": "yield",
+      "tier": 1,
+      "level": 22,
+      "fortune": 130,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 16,
+      "requirements": {
+        "collections": {
+          "WHEAT": 5000,
+          "CARROT": 5000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_yield_2": {
+      "name": "金穗",
+      "job": "farming",
+      "branch": "yield",
+      "tier": 2,
+      "level": 48,
+      "fortune": 320,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {
+          "WHEAT": 250000,
+          "CARROT": 250000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_experience_1": {
+      "name": "农学研习",
+      "job": "farming",
+      "branch": "experience",
+      "tier": 1,
+      "level": 18,
+      "fortune": 20,
+      "xp": 15,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 16,
+      "requirements": {
+        "collections": {
+          "WHEAT": 2500,
+          "POTATO": 2500
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_experience_2": {
+      "name": "农学贤者",
+      "job": "farming",
+      "branch": "experience",
+      "tier": 2,
+      "level": 45,
+      "fortune": 60,
+      "xp": 25,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {
+          "WHEAT": 100000,
+          "POTATO": 100000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_balanced_1": {
+      "name": "田园匠心",
+      "job": "farming",
+      "branch": "balanced",
+      "tier": 1,
+      "level": 25,
+      "fortune": 80,
+      "xp": 8,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 16,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0,
+        "diverse_count": 3,
+        "diverse_amount": 5000
+      }
+    },
+    "farming_balanced_2": {
+      "name": "百谷协奏",
+      "job": "farming",
+      "branch": "balanced",
+      "tier": 2,
+      "level": 50,
+      "fortune": 180,
+      "xp": 12,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0,
+        "diverse_count": 4,
+        "diverse_amount": 100000
+      }
+    },
+    "farming_rare_1": {
+      "name": "寻珍",
+      "job": "farming",
+      "branch": "rare",
+      "tier": 1,
+      "level": 30,
+      "fortune": 40,
+      "xp": 0,
+      "rare": 35,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 16,
+      "requirements": {
+        "collections": {
+          "PUMPKIN": 10000,
+          "COCOA_BEANS": 10000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_rare_2": {
+      "name": "天赐穗晶",
+      "job": "farming",
+      "branch": "rare",
+      "tier": 2,
+      "level": 50,
+      "fortune": 90,
+      "xp": 0,
+      "rare": 75,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {
+          "PUMPKIN": 250000,
+          "COCOA_BEANS": 250000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "farming_event_1": {
+      "name": "巡田",
+      "job": "farming",
+      "branch": "event",
+      "tier": 1,
+      "level": 30,
+      "fortune": 30,
+      "xp": 0,
+      "rare": 0,
+      "event": 50,
+      "event_tier": 1,
+      "reduction": 5,
+      "health": 80,
+      "defense": 16,
+      "requirements": {
+        "collections": {
+          "PUMPKIN": 10000,
+          "COCOA_BEANS": 5000
+        },
+        "normal": 10,
+        "elite": 0
+      }
+    },
+    "farming_event_2": {
+      "name": "镇田守望",
+      "job": "farming",
+      "branch": "event",
+      "tier": 2,
+      "level": 48,
+      "fortune": 80,
+      "xp": 0,
+      "rare": 0,
+      "event": 100,
+      "event_tier": 2,
+      "reduction": 15,
+      "health": 120,
+      "defense": 28,
+      "requirements": {
+        "collections": {
+          "PUMPKIN": 250000,
+          "COCOA_BEANS": 100000
+        },
+        "normal": 100,
+        "elite": 10
+      }
+    },
+    "mining_main_1": {
+      "name": "勘矿",
+      "job": "mining",
+      "branch": "main",
+      "tier": 1,
+      "level": 0,
+      "fortune": 20,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 0,
+      "reduction": 0,
+      "health": 40,
+      "defense": 20,
+      "requirements": {
+        "collections": {},
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_main_2": {
+      "name": "铁脉",
+      "job": "mining",
+      "branch": "main",
+      "tier": 2,
+      "level": 8,
+      "fortune": 40,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 0,
+      "reduction": 0,
+      "health": 60,
+      "defense": 40,
+      "requirements": {
+        "collections": {
+          "COAL": 250,
+          "RAW_IRON": 250
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_main_3": {
+      "name": "深岩",
+      "job": "mining",
+      "branch": "main",
+      "tier": 3,
+      "level": 18,
+      "fortune": 80,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 80,
+      "defense": 60,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 2500,
+          "RAW_COPPER": 1000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_main_4": {
+      "name": "晶脉",
+      "job": "mining",
+      "branch": "main",
+      "tier": 4,
+      "level": 30,
+      "fortune": 120,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 10,
+      "health": 100,
+      "defense": 100,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 10000,
+          "REDSTONE": 5000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_main_5": {
+      "name": "地心",
+      "job": "mining",
+      "branch": "main",
+      "tier": 5,
+      "level": 42,
+      "fortune": 180,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 15,
+      "health": 120,
+      "defense": 160,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 100000,
+          "REDSTONE": 50000,
+          "DIAMOND": 5000
+        },
+        "normal": 50,
+        "elite": 0
+      }
+    },
+    "mining_main_6": {
+      "name": "星核",
+      "job": "mining",
+      "branch": "main",
+      "tier": 6,
+      "level": 55,
+      "fortune": 240,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 20,
+      "health": 160,
+      "defense": 240,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 250000,
+          "REDSTONE": 100000,
+          "LAPIS_LAZULI": 100000,
+          "DIAMOND": 50000
+        },
+        "normal": 0,
+        "elite": 30
+      }
+    },
+    "mining_yield_1": {
+      "name": "富矿",
+      "job": "mining",
+      "branch": "yield",
+      "tier": 1,
+      "level": 22,
+      "fortune": 130,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 60,
+      "defense": 80,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 5000,
+          "RAW_COPPER": 5000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_yield_2": {
+      "name": "聚晶",
+      "job": "mining",
+      "branch": "yield",
+      "tier": 2,
+      "level": 48,
+      "fortune": 320,
+      "xp": 0,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 100,
+      "defense": 140,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 250000,
+          "RAW_COPPER": 100000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_experience_1": {
+      "name": "矿研",
+      "job": "mining",
+      "branch": "experience",
+      "tier": 1,
+      "level": 18,
+      "fortune": 20,
+      "xp": 15,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 60,
+      "defense": 80,
+      "requirements": {
+        "collections": {
+          "COAL": 2500,
+          "RAW_IRON": 2500
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_experience_2": {
+      "name": "地质贤者",
+      "job": "mining",
+      "branch": "experience",
+      "tier": 2,
+      "level": 45,
+      "fortune": 60,
+      "xp": 25,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 100,
+      "defense": 140,
+      "requirements": {
+        "collections": {
+          "COAL": 100000,
+          "RAW_IRON": 100000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_balanced_1": {
+      "name": "探岩",
+      "job": "mining",
+      "branch": "balanced",
+      "tier": 1,
+      "level": 25,
+      "fortune": 80,
+      "xp": 8,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 60,
+      "defense": 80,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 5000,
+          "RAW_COPPER": 2500,
+          "REDSTONE": 2500
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_balanced_2": {
+      "name": "万矿协奏",
+      "job": "mining",
+      "branch": "balanced",
+      "tier": 2,
+      "level": 50,
+      "fortune": 180,
+      "xp": 12,
+      "rare": 0,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 100,
+      "defense": 140,
+      "requirements": {
+        "collections": {
+          "RAW_IRON": 250000,
+          "RAW_COPPER": 100000,
+          "REDSTONE": 100000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_rare_1": {
+      "name": "淘珍",
+      "job": "mining",
+      "branch": "rare",
+      "tier": 1,
+      "level": 30,
+      "fortune": 40,
+      "xp": 0,
+      "rare": 35,
+      "event": 0,
+      "event_tier": 1,
+      "reduction": 0,
+      "health": 60,
+      "defense": 80,
+      "requirements": {
+        "collections": {
+          "LAPIS_LAZULI": 10000,
+          "DIAMOND": 2500
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_rare_2": {
+      "name": "星痕寻宝",
+      "job": "mining",
+      "branch": "rare",
+      "tier": 2,
+      "level": 50,
+      "fortune": 90,
+      "xp": 0,
+      "rare": 75,
+      "event": 0,
+      "event_tier": 2,
+      "reduction": 0,
+      "health": 100,
+      "defense": 140,
+      "requirements": {
+        "collections": {
+          "LAPIS_LAZULI": 250000,
+          "DIAMOND": 50000
+        },
+        "normal": 0,
+        "elite": 0
+      }
+    },
+    "mining_event_1": {
+      "name": "唤矿",
+      "job": "mining",
+      "branch": "event",
+      "tier": 1,
+      "level": 30,
+      "fortune": 30,
+      "xp": 0,
+      "rare": 0,
+      "event": 50,
+      "event_tier": 1,
+      "reduction": 5,
+      "health": 60,
+      "defense": 80,
+      "requirements": {
+        "collections": {
+          "REDSTONE": 10000,
+          "LAPIS_LAZULI": 5000
+        },
+        "normal": 10,
+        "elite": 0
+      }
+    },
+    "mining_event_2": {
+      "name": "地脉共鸣",
+      "job": "mining",
+      "branch": "event",
+      "tier": 2,
+      "level": 48,
+      "fortune": 80,
+      "xp": 0,
+      "rare": 0,
+      "event": 100,
+      "event_tier": 2,
+      "reduction": 15,
+      "health": 100,
+      "defense": 140,
+      "requirements": {
+        "collections": {
+          "REDSTONE": 250000,
+          "LAPIS_LAZULI": 100000
+        },
+        "normal": 100,
+        "elite": 10
+      }
+    }
+  },
+  "items": {
+    "wheat_compressed_1": {
+      "name": "压缩小麦",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:WHEAT",
+      "raw_value": 9
+    },
+    "wheat_compressed_2": {
+      "name": "精炼小麦",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "wheat_compressed_1",
+      "raw_value": 81
+    },
+    "wheat_compressed_3": {
+      "name": "致密小麦",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "wheat_compressed_2",
+      "raw_value": 729
+    },
+    "wheat_compressed_4": {
+      "name": "极致小麦",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "wheat_compressed_3",
+      "raw_value": 6561
+    },
+    "carrot_compressed_1": {
+      "name": "压缩胡萝卜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CARROT",
+      "raw_value": 9
+    },
+    "carrot_compressed_2": {
+      "name": "精炼胡萝卜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "carrot_compressed_1",
+      "raw_value": 81
+    },
+    "carrot_compressed_3": {
+      "name": "致密胡萝卜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "carrot_compressed_2",
+      "raw_value": 729
+    },
+    "carrot_compressed_4": {
+      "name": "极致胡萝卜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "carrot_compressed_3",
+      "raw_value": 6561
+    },
+    "potato_compressed_1": {
+      "name": "压缩土豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:POTATO",
+      "raw_value": 9
+    },
+    "potato_compressed_2": {
+      "name": "精炼土豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "potato_compressed_1",
+      "raw_value": 81
+    },
+    "potato_compressed_3": {
+      "name": "致密土豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "potato_compressed_2",
+      "raw_value": 729
+    },
+    "potato_compressed_4": {
+      "name": "极致土豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "potato_compressed_3",
+      "raw_value": 6561
+    },
+    "sugar_cane_compressed_1": {
+      "name": "压缩甘蔗",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SUGAR_CANE",
+      "raw_value": 9
+    },
+    "sugar_cane_compressed_2": {
+      "name": "精炼甘蔗",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "sugar_cane_compressed_1",
+      "raw_value": 81
+    },
+    "sugar_cane_compressed_3": {
+      "name": "致密甘蔗",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "sugar_cane_compressed_2",
+      "raw_value": 729
+    },
+    "sugar_cane_compressed_4": {
+      "name": "极致甘蔗",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "sugar_cane_compressed_3",
+      "raw_value": 6561
+    },
+    "pumpkin_compressed_1": {
+      "name": "压缩南瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:PUMPKIN",
+      "raw_value": 9
+    },
+    "pumpkin_compressed_2": {
+      "name": "精炼南瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "pumpkin_compressed_1",
+      "raw_value": 81
+    },
+    "pumpkin_compressed_3": {
+      "name": "致密南瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "pumpkin_compressed_2",
+      "raw_value": 729
+    },
+    "pumpkin_compressed_4": {
+      "name": "极致南瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "pumpkin_compressed_3",
+      "raw_value": 6561
+    },
+    "cocoa_beans_compressed_1": {
+      "name": "压缩可可豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COCOA_BEANS",
+      "raw_value": 9
+    },
+    "cocoa_beans_compressed_2": {
+      "name": "精炼可可豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cocoa_beans_compressed_1",
+      "raw_value": 81
+    },
+    "cocoa_beans_compressed_3": {
+      "name": "致密可可豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cocoa_beans_compressed_2",
+      "raw_value": 729
+    },
+    "cocoa_beans_compressed_4": {
+      "name": "极致可可豆",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cocoa_beans_compressed_3",
+      "raw_value": 6561
+    },
+    "coal_compressed_1": {
+      "name": "压缩煤炭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COAL",
+      "raw_value": 9
+    },
+    "coal_compressed_2": {
+      "name": "精炼煤炭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "coal_compressed_1",
+      "raw_value": 81
+    },
+    "coal_compressed_3": {
+      "name": "致密煤炭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "coal_compressed_2",
+      "raw_value": 729
+    },
+    "coal_compressed_4": {
+      "name": "极致煤炭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "coal_compressed_3",
+      "raw_value": 6561
+    },
+    "raw_iron_compressed_1": {
+      "name": "压缩粗铁",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RAW_IRON",
+      "raw_value": 9
+    },
+    "raw_iron_compressed_2": {
+      "name": "精炼粗铁",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_iron_compressed_1",
+      "raw_value": 81
+    },
+    "raw_iron_compressed_3": {
+      "name": "致密粗铁",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_iron_compressed_2",
+      "raw_value": 729
+    },
+    "raw_iron_compressed_4": {
+      "name": "极致粗铁",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_iron_compressed_3",
+      "raw_value": 6561
+    },
+    "raw_copper_compressed_1": {
+      "name": "压缩粗铜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RAW_COPPER",
+      "raw_value": 9
+    },
+    "raw_copper_compressed_2": {
+      "name": "精炼粗铜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_copper_compressed_1",
+      "raw_value": 81
+    },
+    "raw_copper_compressed_3": {
+      "name": "致密粗铜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_copper_compressed_2",
+      "raw_value": 729
+    },
+    "raw_copper_compressed_4": {
+      "name": "极致粗铜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_copper_compressed_3",
+      "raw_value": 6561
+    },
+    "redstone_compressed_1": {
+      "name": "压缩红石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:REDSTONE",
+      "raw_value": 9
+    },
+    "redstone_compressed_2": {
+      "name": "精炼红石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "redstone_compressed_1",
+      "raw_value": 81
+    },
+    "redstone_compressed_3": {
+      "name": "致密红石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "redstone_compressed_2",
+      "raw_value": 729
+    },
+    "redstone_compressed_4": {
+      "name": "极致红石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "redstone_compressed_3",
+      "raw_value": 6561
+    },
+    "lapis_lazuli_compressed_1": {
+      "name": "压缩青金石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:LAPIS_LAZULI",
+      "raw_value": 9
+    },
+    "lapis_lazuli_compressed_2": {
+      "name": "精炼青金石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "lapis_lazuli_compressed_1",
+      "raw_value": 81
+    },
+    "lapis_lazuli_compressed_3": {
+      "name": "致密青金石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "lapis_lazuli_compressed_2",
+      "raw_value": 729
+    },
+    "lapis_lazuli_compressed_4": {
+      "name": "极致青金石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "lapis_lazuli_compressed_3",
+      "raw_value": 6561
+    },
+    "diamond_compressed_1": {
+      "name": "压缩钻石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:DIAMOND",
+      "raw_value": 9
+    },
+    "diamond_compressed_2": {
+      "name": "精炼钻石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "diamond_compressed_1",
+      "raw_value": 81
+    },
+    "diamond_compressed_3": {
+      "name": "致密钻石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "diamond_compressed_2",
+      "raw_value": 729
+    },
+    "diamond_compressed_4": {
+      "name": "极致钻石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "diamond_compressed_3",
+      "raw_value": 6561
+    },
+    "farming_rare_fragment": {
+      "name": "穗晶碎片",
+      "material": "PRISMARINE_SHARD",
+      "kind": "material",
+      "job": "farming"
+    },
+    "farming_rare_bundle": {
+      "name": "精炼穗晶碎片",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "farming",
+      "compression": "farming_rare_fragment"
+    },
+    "farming_normal_core": {
+      "name": "活性穗核",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "farming"
+    },
+    "farming_normal_bundle": {
+      "name": "精炼活性穗核",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "farming",
+      "compression": "farming_normal_core"
+    },
+    "farming_elite_fragment": {
+      "name": "丰收核心碎片",
+      "material": "PRISMARINE_SHARD",
+      "kind": "material",
+      "job": "farming"
+    },
+    "farming_elite_core": {
+      "name": "丰收核心",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "farming",
+      "compression": "farming_elite_fragment"
+    },
+    "farming_main_1_helmet": {
+      "name": "田野头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_1",
+      "part": "helmet",
+      "level": 0,
+      "color": 5996598,
+      "recipe": {
+        "a": "vanilla:WHEAT",
+        "b": "vanilla:CARROT",
+        "n": "vanilla:WHEAT_SEEDS",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_main_1_chestplate": {
+      "name": "田野胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_1",
+      "part": "chestplate",
+      "level": 0,
+      "color": 5996598,
+      "recipe": {
+        "a": "vanilla:WHEAT",
+        "b": "vanilla:CARROT",
+        "n": "vanilla:WHEAT_SEEDS",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_main_1_leggings": {
+      "name": "田野护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_1",
+      "part": "leggings",
+      "level": 0,
+      "color": 5996598,
+      "recipe": {
+        "a": "vanilla:WHEAT",
+        "b": "vanilla:CARROT",
+        "n": "vanilla:WHEAT_SEEDS",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_main_1_boots": {
+      "name": "田野靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_1",
+      "part": "boots",
+      "level": 0,
+      "color": 5996598,
+      "recipe": {
+        "a": "vanilla:WHEAT",
+        "b": "vanilla:CARROT",
+        "n": "vanilla:WHEAT_SEEDS",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_tool_1": {
+      "name": "田野锄",
+      "material": "IRON_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 0,
+      "fortune": 10,
+      "xp": 0,
+      "replant": false,
+      "efficiency": 0,
+      "gate": "farming_main_1",
+      "recipe": {
+        "a": "vanilla:WHEAT",
+        "b": "vanilla:CARROT",
+        "n": "vanilla:WHEAT_SEEDS",
+        "p": "vanilla:IRON_HOE"
+      }
+    },
+    "farming_main_2_helmet": {
+      "name": "丰苗头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_2",
+      "part": "helmet",
+      "level": 8,
+      "color": 6522941,
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "farming_main_1_helmet"
+      }
+    },
+    "farming_main_2_chestplate": {
+      "name": "丰苗胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_2",
+      "part": "chestplate",
+      "level": 8,
+      "color": 6522941,
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "farming_main_1_chestplate"
+      }
+    },
+    "farming_main_2_leggings": {
+      "name": "丰苗护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_2",
+      "part": "leggings",
+      "level": 8,
+      "color": 6522941,
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "farming_main_1_leggings"
+      }
+    },
+    "farming_main_2_boots": {
+      "name": "丰苗靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_2",
+      "part": "boots",
+      "level": 8,
+      "color": 6522941,
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "farming_main_1_boots"
+      }
+    },
+    "farming_tool_2": {
+      "name": "丰苗锄",
+      "material": "IRON_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 8,
+      "fortune": 20,
+      "xp": 0,
+      "replant": false,
+      "efficiency": 0,
+      "gate": "farming_main_2",
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "farming_tool_1"
+      }
+    },
+    "farming_weapon_1": {
+      "name": "驱虫短刃",
+      "material": "IRON_SWORD",
+      "kind": "weapon",
+      "job": "farming",
+      "level": 8,
+      "damage": 35,
+      "strength": 10,
+      "mob_bonus": 50,
+      "gate": "farming_main_2",
+      "recipe": {
+        "a": "wheat_compressed_1",
+        "b": "potato_compressed_1",
+        "n": "farming_rare_fragment",
+        "p": "vanilla:IRON_SWORD"
+      }
+    },
+    "farming_main_3_helmet": {
+      "name": "沃土头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_3",
+      "part": "helmet",
+      "level": 18,
+      "color": 7049284,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "farming_main_2_helmet"
+      }
+    },
+    "farming_main_3_chestplate": {
+      "name": "沃土胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_3",
+      "part": "chestplate",
+      "level": 18,
+      "color": 7049284,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "farming_main_2_chestplate"
+      }
+    },
+    "farming_main_3_leggings": {
+      "name": "沃土护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_3",
+      "part": "leggings",
+      "level": 18,
+      "color": 7049284,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "farming_main_2_leggings"
+      }
+    },
+    "farming_main_3_boots": {
+      "name": "沃土靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_3",
+      "part": "boots",
+      "level": 18,
+      "color": 7049284,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "farming_main_2_boots"
+      }
+    },
+    "farming_tool_3": {
+      "name": "沃土锄",
+      "material": "DIAMOND_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 18,
+      "fortune": 40,
+      "xp": 0,
+      "replant": true,
+      "efficiency": 0,
+      "gate": "farming_main_3",
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "farming_tool_2"
+      }
+    },
+    "farming_main_4_helmet": {
+      "name": "丰穰头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_4",
+      "part": "helmet",
+      "level": 30,
+      "color": 7575627,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_main_3_helmet"
+      }
+    },
+    "farming_main_4_chestplate": {
+      "name": "丰穰胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_4",
+      "part": "chestplate",
+      "level": 30,
+      "color": 7575627,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_main_3_chestplate"
+      }
+    },
+    "farming_main_4_leggings": {
+      "name": "丰穰护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_4",
+      "part": "leggings",
+      "level": 30,
+      "color": 7575627,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_main_3_leggings"
+      }
+    },
+    "farming_main_4_boots": {
+      "name": "丰穰靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_4",
+      "part": "boots",
+      "level": 30,
+      "color": 7575627,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_main_3_boots"
+      }
+    },
+    "farming_tool_4": {
+      "name": "丰穰锄",
+      "material": "DIAMOND_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 30,
+      "fortune": 60,
+      "xp": 5,
+      "replant": true,
+      "efficiency": 0,
+      "gate": "farming_main_4",
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_tool_3"
+      }
+    },
+    "farming_weapon_2": {
+      "name": "护田镰刃",
+      "material": "DIAMOND_SWORD",
+      "kind": "weapon",
+      "job": "farming",
+      "level": 30,
+      "damage": 70,
+      "strength": 20,
+      "mob_bonus": 75,
+      "gate": "farming_main_4",
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "farming_weapon_1"
+      }
+    },
+    "farming_main_5_helmet": {
+      "name": "灵穗头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_5",
+      "part": "helmet",
+      "level": 42,
+      "color": 8101970,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_main_4_helmet"
+      }
+    },
+    "farming_main_5_chestplate": {
+      "name": "灵穗胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_5",
+      "part": "chestplate",
+      "level": 42,
+      "color": 8101970,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_main_4_chestplate"
+      }
+    },
+    "farming_main_5_leggings": {
+      "name": "灵穗护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_5",
+      "part": "leggings",
+      "level": 42,
+      "color": 8101970,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_main_4_leggings"
+      }
+    },
+    "farming_main_5_boots": {
+      "name": "灵穗靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_5",
+      "part": "boots",
+      "level": 42,
+      "color": 8101970,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_main_4_boots"
+      }
+    },
+    "farming_tool_5": {
+      "name": "灵穗锄",
+      "material": "NETHERITE_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 42,
+      "fortune": 90,
+      "xp": 10,
+      "replant": true,
+      "efficiency": 0,
+      "gate": "farming_main_5",
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_tool_4"
+      }
+    },
+    "farming_main_6_helmet": {
+      "name": "丰收圣约头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_6",
+      "part": "helmet",
+      "level": 55,
+      "color": 8628313,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_main_5_helmet"
+      }
+    },
+    "farming_main_6_chestplate": {
+      "name": "丰收圣约胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_6",
+      "part": "chestplate",
+      "level": 55,
+      "color": 8628313,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_main_5_chestplate"
+      }
+    },
+    "farming_main_6_leggings": {
+      "name": "丰收圣约护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_6",
+      "part": "leggings",
+      "level": 55,
+      "color": 8628313,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_main_5_leggings"
+      }
+    },
+    "farming_main_6_boots": {
+      "name": "丰收圣约靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_main_6",
+      "part": "boots",
+      "level": 55,
+      "color": 8628313,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_main_5_boots"
+      }
+    },
+    "farming_tool_6": {
+      "name": "丰收圣约锄",
+      "material": "NETHERITE_HOE",
+      "kind": "tool",
+      "job": "farming",
+      "level": 55,
+      "fortune": 130,
+      "xp": 15,
+      "replant": true,
+      "efficiency": 0,
+      "gate": "farming_main_6",
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_tool_5"
+      }
+    },
+    "farming_weapon_3": {
+      "name": "丰收裁决",
+      "material": "NETHERITE_SWORD",
+      "kind": "weapon",
+      "job": "farming",
+      "level": 55,
+      "damage": 110,
+      "strength": 35,
+      "mob_bonus": 100,
+      "gate": "farming_main_6",
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_weapon_2"
+      }
+    },
+    "farming_yield_1_helmet": {
+      "name": "聚穗头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_1",
+      "part": "helmet",
+      "level": 22,
+      "color": 6521913,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_yield_1_chestplate": {
+      "name": "聚穗胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_1",
+      "part": "chestplate",
+      "level": 22,
+      "color": 6521913,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_yield_1_leggings": {
+      "name": "聚穗护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_1",
+      "part": "leggings",
+      "level": 22,
+      "color": 6521913,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_yield_1_boots": {
+      "name": "聚穗靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_1",
+      "part": "boots",
+      "level": 22,
+      "color": 6521913,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_yield_2_helmet": {
+      "name": "金穗头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_2",
+      "part": "helmet",
+      "level": 48,
+      "color": 7048256,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_yield_1_helmet"
+      }
+    },
+    "farming_yield_2_chestplate": {
+      "name": "金穗胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_2",
+      "part": "chestplate",
+      "level": 48,
+      "color": 7048256,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_yield_1_chestplate"
+      }
+    },
+    "farming_yield_2_leggings": {
+      "name": "金穗护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_2",
+      "part": "leggings",
+      "level": 48,
+      "color": 7048256,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_yield_1_leggings"
+      }
+    },
+    "farming_yield_2_boots": {
+      "name": "金穗靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_yield_2",
+      "part": "boots",
+      "level": 48,
+      "color": 7048256,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_yield_1_boots"
+      }
+    },
+    "farming_experience_1_helmet": {
+      "name": "农学研习头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_1",
+      "part": "helmet",
+      "level": 18,
+      "color": 7047228,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_fragment",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_experience_1_chestplate": {
+      "name": "农学研习胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_1",
+      "part": "chestplate",
+      "level": 18,
+      "color": 7047228,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_fragment",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_experience_1_leggings": {
+      "name": "农学研习护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_1",
+      "part": "leggings",
+      "level": 18,
+      "color": 7047228,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_fragment",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_experience_1_boots": {
+      "name": "农学研习靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_1",
+      "part": "boots",
+      "level": 18,
+      "color": 7047228,
+      "recipe": {
+        "a": "potato_compressed_2",
+        "b": "sugar_cane_compressed_2",
+        "n": "farming_rare_fragment",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_experience_2_helmet": {
+      "name": "农学贤者头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_2",
+      "part": "helmet",
+      "level": 45,
+      "color": 7573571,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_experience_1_helmet"
+      }
+    },
+    "farming_experience_2_chestplate": {
+      "name": "农学贤者胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_2",
+      "part": "chestplate",
+      "level": 45,
+      "color": 7573571,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_experience_1_chestplate"
+      }
+    },
+    "farming_experience_2_leggings": {
+      "name": "农学贤者护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_2",
+      "part": "leggings",
+      "level": 45,
+      "color": 7573571,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_experience_1_leggings"
+      }
+    },
+    "farming_experience_2_boots": {
+      "name": "农学贤者靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_experience_2",
+      "part": "boots",
+      "level": 45,
+      "color": 7573571,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_experience_1_boots"
+      }
+    },
+    "farming_balanced_1_helmet": {
+      "name": "田园匠心头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_1",
+      "part": "helmet",
+      "level": 25,
+      "color": 7572543,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_balanced_1_chestplate": {
+      "name": "田园匠心胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_1",
+      "part": "chestplate",
+      "level": 25,
+      "color": 7572543,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_balanced_1_leggings": {
+      "name": "田园匠心护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_1",
+      "part": "leggings",
+      "level": 25,
+      "color": 7572543,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_balanced_1_boots": {
+      "name": "田园匠心靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_1",
+      "part": "boots",
+      "level": 25,
+      "color": 7572543,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_rare_bundle",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_balanced_2_helmet": {
+      "name": "百谷协奏头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_2",
+      "part": "helmet",
+      "level": 50,
+      "color": 8098886,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_balanced_1_helmet"
+      }
+    },
+    "farming_balanced_2_chestplate": {
+      "name": "百谷协奏胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_2",
+      "part": "chestplate",
+      "level": 50,
+      "color": 8098886,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_balanced_1_chestplate"
+      }
+    },
+    "farming_balanced_2_leggings": {
+      "name": "百谷协奏护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_2",
+      "part": "leggings",
+      "level": 50,
+      "color": 8098886,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_balanced_1_leggings"
+      }
+    },
+    "farming_balanced_2_boots": {
+      "name": "百谷协奏靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_balanced_2",
+      "part": "boots",
+      "level": 50,
+      "color": 8098886,
+      "recipe": {
+        "a": "wheat_compressed_4",
+        "b": "sugar_cane_compressed_4",
+        "n": "farming_normal_bundle",
+        "p": "farming_balanced_1_boots"
+      }
+    },
+    "farming_rare_1_helmet": {
+      "name": "寻珍头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_1",
+      "part": "helmet",
+      "level": 30,
+      "color": 8097858,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_rare_1_chestplate": {
+      "name": "寻珍胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_1",
+      "part": "chestplate",
+      "level": 30,
+      "color": 8097858,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_rare_1_leggings": {
+      "name": "寻珍护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_1",
+      "part": "leggings",
+      "level": 30,
+      "color": 8097858,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_rare_1_boots": {
+      "name": "寻珍靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_1",
+      "part": "boots",
+      "level": 30,
+      "color": 8097858,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_rare_2_helmet": {
+      "name": "天赐穗晶头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_2",
+      "part": "helmet",
+      "level": 50,
+      "color": 8624201,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_rare_1_helmet"
+      }
+    },
+    "farming_rare_2_chestplate": {
+      "name": "天赐穗晶胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_2",
+      "part": "chestplate",
+      "level": 50,
+      "color": 8624201,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_rare_1_chestplate"
+      }
+    },
+    "farming_rare_2_leggings": {
+      "name": "天赐穗晶护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_2",
+      "part": "leggings",
+      "level": 50,
+      "color": 8624201,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_rare_1_leggings"
+      }
+    },
+    "farming_rare_2_boots": {
+      "name": "天赐穗晶靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_rare_2",
+      "part": "boots",
+      "level": 50,
+      "color": 8624201,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_rare_1_boots"
+      }
+    },
+    "farming_event_1_helmet": {
+      "name": "巡田头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_1",
+      "part": "helmet",
+      "level": 30,
+      "color": 8623173,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "farming_event_1_chestplate": {
+      "name": "巡田胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_1",
+      "part": "chestplate",
+      "level": 30,
+      "color": 8623173,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "farming_event_1_leggings": {
+      "name": "巡田护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_1",
+      "part": "leggings",
+      "level": 30,
+      "color": 8623173,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "farming_event_1_boots": {
+      "name": "巡田靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_1",
+      "part": "boots",
+      "level": 30,
+      "color": 8623173,
+      "recipe": {
+        "a": "pumpkin_compressed_3",
+        "b": "cocoa_beans_compressed_3",
+        "n": "farming_normal_core",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "farming_event_2_helmet": {
+      "name": "镇田守望头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_2",
+      "part": "helmet",
+      "level": 48,
+      "color": 9149516,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_event_1_helmet"
+      }
+    },
+    "farming_event_2_chestplate": {
+      "name": "镇田守望胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_2",
+      "part": "chestplate",
+      "level": 48,
+      "color": 9149516,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_event_1_chestplate"
+      }
+    },
+    "farming_event_2_leggings": {
+      "name": "镇田守望护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_2",
+      "part": "leggings",
+      "level": 48,
+      "color": 9149516,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_event_1_leggings"
+      }
+    },
+    "farming_event_2_boots": {
+      "name": "镇田守望靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "farming",
+      "set": "farming_event_2",
+      "part": "boots",
+      "level": 48,
+      "color": 9149516,
+      "recipe": {
+        "a": "pumpkin_compressed_4",
+        "b": "cocoa_beans_compressed_4",
+        "n": "farming_elite_core",
+        "p": "farming_event_1_boots"
+      }
+    },
+    "mining_rare_fragment": {
+      "name": "矿晶碎片",
+      "material": "PRISMARINE_SHARD",
+      "kind": "material",
+      "job": "mining"
+    },
+    "mining_rare_bundle": {
+      "name": "精炼矿晶碎片",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "mining",
+      "compression": "mining_rare_fragment"
+    },
+    "mining_normal_core": {
+      "name": "活性矿核",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "mining"
+    },
+    "mining_normal_bundle": {
+      "name": "精炼活性矿核",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "mining",
+      "compression": "mining_normal_core"
+    },
+    "mining_elite_fragment": {
+      "name": "星核核心碎片",
+      "material": "PRISMARINE_SHARD",
+      "kind": "material",
+      "job": "mining"
+    },
+    "mining_elite_core": {
+      "name": "星核核心",
+      "material": "AMETHYST_SHARD",
+      "kind": "material",
+      "job": "mining",
+      "compression": "mining_elite_fragment"
+    },
+    "mining_main_1_helmet": {
+      "name": "勘矿头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_1",
+      "part": "helmet",
+      "level": 0,
+      "color": 5992323,
+      "recipe": {
+        "a": "vanilla:COAL",
+        "b": "vanilla:RAW_IRON",
+        "n": "vanilla:RAW_COPPER",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_main_1_chestplate": {
+      "name": "勘矿胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_1",
+      "part": "chestplate",
+      "level": 0,
+      "color": 5992323,
+      "recipe": {
+        "a": "vanilla:COAL",
+        "b": "vanilla:RAW_IRON",
+        "n": "vanilla:RAW_COPPER",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_main_1_leggings": {
+      "name": "勘矿护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_1",
+      "part": "leggings",
+      "level": 0,
+      "color": 5992323,
+      "recipe": {
+        "a": "vanilla:COAL",
+        "b": "vanilla:RAW_IRON",
+        "n": "vanilla:RAW_COPPER",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_main_1_boots": {
+      "name": "勘矿靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_1",
+      "part": "boots",
+      "level": 0,
+      "color": 5992323,
+      "recipe": {
+        "a": "vanilla:COAL",
+        "b": "vanilla:RAW_IRON",
+        "n": "vanilla:RAW_COPPER",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_tool_1": {
+      "name": "勘矿镐",
+      "material": "IRON_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 0,
+      "fortune": 10,
+      "xp": 0,
+      "replant": false,
+      "efficiency": 1,
+      "gate": "mining_main_1",
+      "recipe": {
+        "a": "vanilla:COAL",
+        "b": "vanilla:RAW_IRON",
+        "n": "vanilla:RAW_COPPER",
+        "p": "vanilla:IRON_PICKAXE"
+      }
+    },
+    "mining_main_2_helmet": {
+      "name": "铁脉头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_2",
+      "part": "helmet",
+      "level": 8,
+      "color": 6518666,
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "mining_main_1_helmet"
+      }
+    },
+    "mining_main_2_chestplate": {
+      "name": "铁脉胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_2",
+      "part": "chestplate",
+      "level": 8,
+      "color": 6518666,
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "mining_main_1_chestplate"
+      }
+    },
+    "mining_main_2_leggings": {
+      "name": "铁脉护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_2",
+      "part": "leggings",
+      "level": 8,
+      "color": 6518666,
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "mining_main_1_leggings"
+      }
+    },
+    "mining_main_2_boots": {
+      "name": "铁脉靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_2",
+      "part": "boots",
+      "level": 8,
+      "color": 6518666,
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "mining_main_1_boots"
+      }
+    },
+    "mining_tool_2": {
+      "name": "铁脉镐",
+      "material": "IRON_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 8,
+      "fortune": 20,
+      "xp": 0,
+      "replant": false,
+      "efficiency": 2,
+      "gate": "mining_main_2",
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "mining_tool_1"
+      }
+    },
+    "mining_weapon_1": {
+      "name": "碎岩短剑",
+      "material": "IRON_SWORD",
+      "kind": "weapon",
+      "job": "mining",
+      "level": 8,
+      "damage": 35,
+      "strength": 10,
+      "mob_bonus": 50,
+      "gate": "mining_main_2",
+      "recipe": {
+        "a": "raw_iron_compressed_1",
+        "b": "raw_copper_compressed_1",
+        "n": "mining_rare_fragment",
+        "p": "vanilla:IRON_SWORD"
+      }
+    },
+    "mining_main_3_helmet": {
+      "name": "深岩头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_3",
+      "part": "helmet",
+      "level": 18,
+      "color": 7045009,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "mining_main_2_helmet"
+      }
+    },
+    "mining_main_3_chestplate": {
+      "name": "深岩胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_3",
+      "part": "chestplate",
+      "level": 18,
+      "color": 7045009,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "mining_main_2_chestplate"
+      }
+    },
+    "mining_main_3_leggings": {
+      "name": "深岩护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_3",
+      "part": "leggings",
+      "level": 18,
+      "color": 7045009,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "mining_main_2_leggings"
+      }
+    },
+    "mining_main_3_boots": {
+      "name": "深岩靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_3",
+      "part": "boots",
+      "level": 18,
+      "color": 7045009,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "mining_main_2_boots"
+      }
+    },
+    "mining_tool_3": {
+      "name": "深岩镐",
+      "material": "DIAMOND_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 18,
+      "fortune": 40,
+      "xp": 0,
+      "replant": false,
+      "efficiency": 3,
+      "gate": "mining_main_3",
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "mining_tool_2"
+      }
+    },
+    "mining_main_4_helmet": {
+      "name": "晶脉头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_4",
+      "part": "helmet",
+      "level": 30,
+      "color": 7571352,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_main_3_helmet"
+      }
+    },
+    "mining_main_4_chestplate": {
+      "name": "晶脉胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_4",
+      "part": "chestplate",
+      "level": 30,
+      "color": 7571352,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_main_3_chestplate"
+      }
+    },
+    "mining_main_4_leggings": {
+      "name": "晶脉护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_4",
+      "part": "leggings",
+      "level": 30,
+      "color": 7571352,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_main_3_leggings"
+      }
+    },
+    "mining_main_4_boots": {
+      "name": "晶脉靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_4",
+      "part": "boots",
+      "level": 30,
+      "color": 7571352,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_main_3_boots"
+      }
+    },
+    "mining_tool_4": {
+      "name": "晶脉镐",
+      "material": "DIAMOND_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 30,
+      "fortune": 60,
+      "xp": 5,
+      "replant": false,
+      "efficiency": 4,
+      "gate": "mining_main_4",
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_tool_3"
+      }
+    },
+    "mining_weapon_2": {
+      "name": "裂晶战锤",
+      "material": "DIAMOND_SWORD",
+      "kind": "weapon",
+      "job": "mining",
+      "level": 30,
+      "damage": 70,
+      "strength": 20,
+      "mob_bonus": 75,
+      "gate": "mining_main_4",
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "mining_weapon_1"
+      }
+    },
+    "mining_main_5_helmet": {
+      "name": "地心头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_5",
+      "part": "helmet",
+      "level": 42,
+      "color": 8097695,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_main_4_helmet"
+      }
+    },
+    "mining_main_5_chestplate": {
+      "name": "地心胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_5",
+      "part": "chestplate",
+      "level": 42,
+      "color": 8097695,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_main_4_chestplate"
+      }
+    },
+    "mining_main_5_leggings": {
+      "name": "地心护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_5",
+      "part": "leggings",
+      "level": 42,
+      "color": 8097695,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_main_4_leggings"
+      }
+    },
+    "mining_main_5_boots": {
+      "name": "地心靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_5",
+      "part": "boots",
+      "level": 42,
+      "color": 8097695,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_main_4_boots"
+      }
+    },
+    "mining_tool_5": {
+      "name": "地心镐",
+      "material": "NETHERITE_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 42,
+      "fortune": 90,
+      "xp": 10,
+      "replant": false,
+      "efficiency": 5,
+      "gate": "mining_main_5",
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_tool_4"
+      }
+    },
+    "mining_main_6_helmet": {
+      "name": "星核头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_6",
+      "part": "helmet",
+      "level": 55,
+      "color": 8624038,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_main_5_helmet"
+      }
+    },
+    "mining_main_6_chestplate": {
+      "name": "星核胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_6",
+      "part": "chestplate",
+      "level": 55,
+      "color": 8624038,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_main_5_chestplate"
+      }
+    },
+    "mining_main_6_leggings": {
+      "name": "星核护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_6",
+      "part": "leggings",
+      "level": 55,
+      "color": 8624038,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_main_5_leggings"
+      }
+    },
+    "mining_main_6_boots": {
+      "name": "星核靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_main_6",
+      "part": "boots",
+      "level": 55,
+      "color": 8624038,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_main_5_boots"
+      }
+    },
+    "mining_tool_6": {
+      "name": "星核镐",
+      "material": "NETHERITE_PICKAXE",
+      "kind": "tool",
+      "job": "mining",
+      "level": 55,
+      "fortune": 130,
+      "xp": 15,
+      "replant": false,
+      "efficiency": 5,
+      "gate": "mining_main_6",
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_tool_5"
+      }
+    },
+    "mining_weapon_3": {
+      "name": "地心裁决",
+      "material": "NETHERITE_SWORD",
+      "kind": "weapon",
+      "job": "mining",
+      "level": 55,
+      "damage": 110,
+      "strength": 35,
+      "mob_bonus": 100,
+      "gate": "mining_main_6",
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_weapon_2"
+      }
+    },
+    "mining_yield_1_helmet": {
+      "name": "富矿头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_1",
+      "part": "helmet",
+      "level": 22,
+      "color": 6517638,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_yield_1_chestplate": {
+      "name": "富矿胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_1",
+      "part": "chestplate",
+      "level": 22,
+      "color": 6517638,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_yield_1_leggings": {
+      "name": "富矿护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_1",
+      "part": "leggings",
+      "level": 22,
+      "color": 6517638,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_yield_1_boots": {
+      "name": "富矿靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_1",
+      "part": "boots",
+      "level": 22,
+      "color": 6517638,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_yield_2_helmet": {
+      "name": "聚晶头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_2",
+      "part": "helmet",
+      "level": 48,
+      "color": 7043981,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_yield_1_helmet"
+      }
+    },
+    "mining_yield_2_chestplate": {
+      "name": "聚晶胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_2",
+      "part": "chestplate",
+      "level": 48,
+      "color": 7043981,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_yield_1_chestplate"
+      }
+    },
+    "mining_yield_2_leggings": {
+      "name": "聚晶护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_2",
+      "part": "leggings",
+      "level": 48,
+      "color": 7043981,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_yield_1_leggings"
+      }
+    },
+    "mining_yield_2_boots": {
+      "name": "聚晶靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_yield_2",
+      "part": "boots",
+      "level": 48,
+      "color": 7043981,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_yield_1_boots"
+      }
+    },
+    "mining_experience_1_helmet": {
+      "name": "矿研头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_1",
+      "part": "helmet",
+      "level": 18,
+      "color": 7042953,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_fragment",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_experience_1_chestplate": {
+      "name": "矿研胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_1",
+      "part": "chestplate",
+      "level": 18,
+      "color": 7042953,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_fragment",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_experience_1_leggings": {
+      "name": "矿研护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_1",
+      "part": "leggings",
+      "level": 18,
+      "color": 7042953,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_fragment",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_experience_1_boots": {
+      "name": "矿研靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_1",
+      "part": "boots",
+      "level": 18,
+      "color": 7042953,
+      "recipe": {
+        "a": "raw_iron_compressed_2",
+        "b": "redstone_compressed_2",
+        "n": "mining_rare_fragment",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_experience_2_helmet": {
+      "name": "地质贤者头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_2",
+      "part": "helmet",
+      "level": 45,
+      "color": 7569296,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_experience_1_helmet"
+      }
+    },
+    "mining_experience_2_chestplate": {
+      "name": "地质贤者胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_2",
+      "part": "chestplate",
+      "level": 45,
+      "color": 7569296,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_experience_1_chestplate"
+      }
+    },
+    "mining_experience_2_leggings": {
+      "name": "地质贤者护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_2",
+      "part": "leggings",
+      "level": 45,
+      "color": 7569296,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_experience_1_leggings"
+      }
+    },
+    "mining_experience_2_boots": {
+      "name": "地质贤者靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_experience_2",
+      "part": "boots",
+      "level": 45,
+      "color": 7569296,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_experience_1_boots"
+      }
+    },
+    "mining_balanced_1_helmet": {
+      "name": "探岩头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_1",
+      "part": "helmet",
+      "level": 25,
+      "color": 7568268,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_balanced_1_chestplate": {
+      "name": "探岩胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_1",
+      "part": "chestplate",
+      "level": 25,
+      "color": 7568268,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_balanced_1_leggings": {
+      "name": "探岩护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_1",
+      "part": "leggings",
+      "level": 25,
+      "color": 7568268,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_balanced_1_boots": {
+      "name": "探岩靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_1",
+      "part": "boots",
+      "level": 25,
+      "color": 7568268,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_rare_bundle",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_balanced_2_helmet": {
+      "name": "万矿协奏头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_2",
+      "part": "helmet",
+      "level": 50,
+      "color": 8094611,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_balanced_1_helmet"
+      }
+    },
+    "mining_balanced_2_chestplate": {
+      "name": "万矿协奏胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_2",
+      "part": "chestplate",
+      "level": 50,
+      "color": 8094611,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_balanced_1_chestplate"
+      }
+    },
+    "mining_balanced_2_leggings": {
+      "name": "万矿协奏护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_2",
+      "part": "leggings",
+      "level": 50,
+      "color": 8094611,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_balanced_1_leggings"
+      }
+    },
+    "mining_balanced_2_boots": {
+      "name": "万矿协奏靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_balanced_2",
+      "part": "boots",
+      "level": 50,
+      "color": 8094611,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_2",
+        "n": "mining_normal_bundle",
+        "p": "mining_balanced_1_boots"
+      }
+    },
+    "mining_rare_1_helmet": {
+      "name": "淘珍头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_1",
+      "part": "helmet",
+      "level": 30,
+      "color": 8093583,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_rare_1_chestplate": {
+      "name": "淘珍胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_1",
+      "part": "chestplate",
+      "level": 30,
+      "color": 8093583,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_rare_1_leggings": {
+      "name": "淘珍护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_1",
+      "part": "leggings",
+      "level": 30,
+      "color": 8093583,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_rare_1_boots": {
+      "name": "淘珍靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_1",
+      "part": "boots",
+      "level": 30,
+      "color": 8093583,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_rare_2_helmet": {
+      "name": "星痕寻宝头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_2",
+      "part": "helmet",
+      "level": 50,
+      "color": 8619926,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_rare_1_helmet"
+      }
+    },
+    "mining_rare_2_chestplate": {
+      "name": "星痕寻宝胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_2",
+      "part": "chestplate",
+      "level": 50,
+      "color": 8619926,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_rare_1_chestplate"
+      }
+    },
+    "mining_rare_2_leggings": {
+      "name": "星痕寻宝护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_2",
+      "part": "leggings",
+      "level": 50,
+      "color": 8619926,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_rare_1_leggings"
+      }
+    },
+    "mining_rare_2_boots": {
+      "name": "星痕寻宝靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_rare_2",
+      "part": "boots",
+      "level": 50,
+      "color": 8619926,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_rare_1_boots"
+      }
+    },
+    "mining_event_1_helmet": {
+      "name": "唤矿头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_1",
+      "part": "helmet",
+      "level": 30,
+      "color": 8618898,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_HELMET"
+      }
+    },
+    "mining_event_1_chestplate": {
+      "name": "唤矿胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_1",
+      "part": "chestplate",
+      "level": 30,
+      "color": 8618898,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_CHESTPLATE"
+      }
+    },
+    "mining_event_1_leggings": {
+      "name": "唤矿护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_1",
+      "part": "leggings",
+      "level": 30,
+      "color": 8618898,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_LEGGINGS"
+      }
+    },
+    "mining_event_1_boots": {
+      "name": "唤矿靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_1",
+      "part": "boots",
+      "level": 30,
+      "color": 8618898,
+      "recipe": {
+        "a": "raw_iron_compressed_3",
+        "b": "lapis_lazuli_compressed_2",
+        "n": "mining_normal_core",
+        "p": "vanilla:LEATHER_BOOTS"
+      }
+    },
+    "mining_event_2_helmet": {
+      "name": "地脉共鸣头盔",
+      "material": "LEATHER_HELMET",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_2",
+      "part": "helmet",
+      "level": 48,
+      "color": 9145241,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_event_1_helmet"
+      }
+    },
+    "mining_event_2_chestplate": {
+      "name": "地脉共鸣胸甲",
+      "material": "LEATHER_CHESTPLATE",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_2",
+      "part": "chestplate",
+      "level": 48,
+      "color": 9145241,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_event_1_chestplate"
+      }
+    },
+    "mining_event_2_leggings": {
+      "name": "地脉共鸣护腿",
+      "material": "LEATHER_LEGGINGS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_2",
+      "part": "leggings",
+      "level": 48,
+      "color": 9145241,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_event_1_leggings"
+      }
+    },
+    "mining_event_2_boots": {
+      "name": "地脉共鸣靴子",
+      "material": "LEATHER_BOOTS",
+      "kind": "armor",
+      "job": "mining",
+      "set": "mining_event_2",
+      "part": "boots",
+      "level": 48,
+      "color": 9145241,
+      "recipe": {
+        "a": "raw_iron_compressed_4",
+        "b": "diamond_compressed_3",
+        "n": "mining_elite_core",
+        "p": "mining_event_1_boots"
+      }
+    }
+  }
+}

@@ -65,9 +65,9 @@ public final class MiningLevelTable {
 
         for (int level = 1; level <= CombatLevelTable.maxLevel(); level++) {
             CombatLevelDefinition base = CombatLevelTable.definitionForLevel(level);
-            long coinReward = 100L;
+            long coinReward = maple.underground_state.professions.ProfessionMath.coins(level);
             int defenseReward = level <= 14 ? 1 : 2;
-            int miningFortuneReward = 4;
+            int miningFortuneReward = 2;
             int mapleXpReward = 5;
 
             totalCoins += coinReward;

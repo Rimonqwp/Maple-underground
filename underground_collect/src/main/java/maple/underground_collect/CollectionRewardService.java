@@ -37,6 +37,11 @@ final class CollectionRewardService {
 
     @NotNull
     ClaimSummary claim(@NotNull UUID uuid, @Nullable CollectionInfoGui.Category category) {
+        if(state.getProfessionService()!=null && (category==null || CollectionMath.extended(category))) {
+            var store=state.getProfessionService().store();
+            if(!store.ready(uuid))store.load(uuid);
+            if(!store.ready(uuid))throw new IllegalStateException("职业存档加载失败，未领取任何收藏奖励");
+        }
         CollectionProgressManager progressManager = state.getCollectionProgressManager();
         SkillRewardService rewardService = state.getSkillRewardService();
         SkillProgressManager skillProgressManager = state.getSkillProgressManager();
@@ -57,7 +62,7 @@ final class CollectionRewardService {
             for (CollectionInfoGui.CollectionItem item : currentCategory.items()) {
                 String key = CollectionInfoGui.collectionKey(currentCategory, item.material());
                 long collected = progress.getOrDefault(key, 0L);
-                int currentTier = CollectionMath.currentTier(collected);
+                int currentTier = CollectionMath.currentTier(collected, currentCategory);
                 int previousClaimedTier = claimed.getOrDefault(key, 0);
                 if (currentTier <= previousClaimedTier) {
                     continue;
@@ -66,7 +71,7 @@ final class CollectionRewardService {
                 newClaimStates.put(key, currentTier);
                 for (int tier = previousClaimedTier + 1; tier <= currentTier; tier++) {
                     tiersClaimed++;
-                    skillXpByType.merge(skillType, (long) CollectionMath.tierXpReward(tier), Long::sum);
+                    skillXpByType.merge(skillType, (long) CollectionMath.tierXpReward(tier, currentCategory), Long::sum);
                     mapleXp += CollectionMath.mapleXpReward(tier);
                 }
             }
@@ -101,7 +106,7 @@ final class CollectionRewardService {
             for (CollectionInfoGui.CollectionItem item : currentCategory.items()) {
                 String key = CollectionInfoGui.collectionKey(currentCategory, item.material());
                 long collected = progress.getOrDefault(key, 0L);
-                int currentTier = CollectionMath.currentTier(collected);
+                int currentTier = CollectionMath.currentTier(collected, currentCategory);
                 int previousClaimedTier = claimed.getOrDefault(key, 0);
                 if (currentTier > previousClaimedTier) {
                     result.put(currentCategory.title() + " - " + item.name(), collected);

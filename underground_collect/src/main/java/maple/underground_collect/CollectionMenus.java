@@ -457,7 +457,7 @@ final class CollectionMenus {
             long total = 0L;
             for (CollectionInfoGui.Category category : CollectionInfoGui.Category.values()) {
                 for (CollectionInfoGui.CollectionItem item : category.items()) {
-                    total += CollectionMath.currentTier(progress.getOrDefault(CollectionInfoGui.collectionKey(category, item.material()), 0L));
+                    total += CollectionMath.currentTier(progress.getOrDefault(CollectionInfoGui.collectionKey(category, item.material()), 0L), category);
                 }
             }
             return total;
@@ -466,7 +466,7 @@ final class CollectionMenus {
         long maxTiers() {
             long total = 0L;
             for (CollectionInfoGui.Category category : CollectionInfoGui.Category.values()) {
-                total += (long) category.items().size() * CollectionMath.maxTier();
+                total += (long) category.items().size() * CollectionMath.maxTier(category);
             }
             return total;
         }
@@ -476,7 +476,7 @@ final class CollectionMenus {
             for (CollectionInfoGui.Category category : CollectionInfoGui.Category.values()) {
                 for (CollectionInfoGui.CollectionItem item : category.items()) {
                     String key = CollectionInfoGui.collectionKey(category, item.material());
-                    int currentTier = CollectionMath.currentTier(progress.getOrDefault(key, 0L));
+                    int currentTier = CollectionMath.currentTier(progress.getOrDefault(key, 0L), category);
                     int claimedTier = claims.getOrDefault(key, 0);
                     total += Math.max(0, currentTier - claimedTier);
                 }
@@ -489,7 +489,7 @@ final class CollectionMenus {
             for (CollectionInfoGui.Category category : CollectionInfoGui.Category.values()) {
                 for (CollectionInfoGui.CollectionItem item : category.items()) {
                     String key = CollectionInfoGui.collectionKey(category, item.material());
-                    if (CollectionMath.currentTier(progress.getOrDefault(key, 0L)) >= CollectionMath.maxTier()) {
+                    if (CollectionMath.currentTier(progress.getOrDefault(key, 0L), category) >= CollectionMath.maxTier(category)) {
                         completed++;
                     }
                 }
@@ -513,17 +513,17 @@ final class CollectionMenus {
             String firstMissing = "全部满级";
             for (CollectionInfoGui.CollectionItem item : category.items()) {
                 String key = CollectionInfoGui.collectionKey(category, item.material());
-                int currentTier = CollectionMath.currentTier(progress.getOrDefault(key, 0L));
+                int currentTier = CollectionMath.currentTier(progress.getOrDefault(key, 0L), category);
                 int claimedTier = claims.getOrDefault(key, 0);
                 currentTiers += currentTier;
                 claimableTiers += Math.max(0, currentTier - claimedTier);
-                if (currentTier >= CollectionMath.maxTier()) {
+                if (currentTier >= CollectionMath.maxTier(category)) {
                     completedItems++;
                 } else if ("全部满级".equals(firstMissing)) {
                     firstMissing = item.name() + " " + CollectionMath.roman(currentTier + 1);
                 }
             }
-            return new CategoryView(category.items().size(), completedItems, currentTiers, (long) category.items().size() * CollectionMath.maxTier(), claimableTiers, firstMissing);
+            return new CategoryView(category.items().size(), completedItems, currentTiers, (long) category.items().size() * CollectionMath.maxTier(category), claimableTiers, firstMissing);
         }
     }
 

@@ -85,11 +85,13 @@ public final class PickaxeInfoGui {
                 List.of(text("點擊返回技能總覽", NamedTextColor.GRAY))
         ));
         inventory.setItem(CLOSE_SLOT, InfoGuiItems.createCloseItem());
+        inventory.setItem(47, InfoGuiItems.createNamedItem(Material.BOOK, title("职业装备图鉴"), List.of(text("查看主线、副线装备及制作条件", NamedTextColor.GRAY))));
 
         player.openInventory(inventory);
     }
 
     public static void handleClick(@NotNull Player player, int rawSlot) {
+        if (rawSlot == 47) { UndergroundState.getInstance().getProfessionService().openMenu(player, SkillType.MINING); return; }
         int currentPage = currentPage(player);
         if (rawSlot == PREVIOUS_PAGE_SLOT && currentPage > 0) {
             open(player, currentPage - 1);

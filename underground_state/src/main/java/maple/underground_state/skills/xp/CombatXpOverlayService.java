@@ -72,6 +72,7 @@ public final class CombatXpOverlayService implements Listener, PlayerStatsRuntim
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getEntity().getPersistentDataContainer().has(maple.underground_state.professions.ProfessionService.MOB_KEY)) return;
         LivingEntity entity = event.getEntity();
         Player killer = entity.getKiller();
         if (!canGainXp(killer)) {

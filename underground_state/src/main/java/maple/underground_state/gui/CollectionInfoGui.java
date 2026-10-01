@@ -46,7 +46,7 @@ public final class CollectionInfoGui {
     };
 
     private static final int[] DETAIL_TIER_SLOTS = {
-            18, 19, 20, 21, 22, 23, 24, 25, 26
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30
     };
 
     private static final int[] DETAIL_STATUS_BAR_SLOTS = {
@@ -126,7 +126,7 @@ public final class CollectionInfoGui {
         inventory.setItem(DETAIL_ITEM_SLOT, createCollectionListItem(player, category, item));
 
         long collected = collectedAmount(player, category, item);
-        for (int index = 0; index < DETAIL_TIER_SLOTS.length; index++) {
+        for (int index = 0; index < requirements(category).length; index++) {
             int tier = index + 1;
             inventory.setItem(DETAIL_TIER_SLOTS[index], createTierPane(category, item, tier, collected));
         }
@@ -202,8 +202,8 @@ public final class CollectionInfoGui {
                                                                @NotNull Category category,
                                                                @NotNull CollectionItem item) {
         long collected = collectedAmount(player, category, item);
-        int nextTier = Math.min(TIER_REQUIREMENTS.length, tierFor(collected) + 1);
-        int required = TIER_REQUIREMENTS[nextTier - 1];
+        int nextTier = Math.min(requirements(category).length, tierFor(collected, category) + 1);
+        int required = requirements(category)[nextTier - 1];
         int percent = percent(collected, required);
 
         List<Component> lore = new ArrayList<>();
@@ -216,7 +216,7 @@ public final class CollectionInfoGui {
         lore.add(Component.empty());
         lore.add(text("下一个等级会解锁:", NamedTextColor.GRAY));
         lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
-                .append(Component.text(formatNumber(TIER_XP_REWARDS[nextTier - 1]) + " " + category.experienceName(), NamedTextColor.AQUA))
+                .append(Component.text(formatNumber(xpReward(category, nextTier)) + " " + category.experienceName(), NamedTextColor.AQUA))
                 .decoration(TextDecoration.ITALIC, false));
         lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
                 .append(Component.text(mapleXpReward(nextTier) + " Maple XP", NamedTextColor.AQUA))
@@ -231,8 +231,8 @@ public final class CollectionInfoGui {
                                                      @NotNull CollectionItem item,
                                                      int tier,
                                                      long collected) {
-        int required = TIER_REQUIREMENTS[tier - 1];
-        int previousRequired = tier <= 1 ? 0 : TIER_REQUIREMENTS[tier - 2];
+        int required = requirements(category)[tier - 1];
+        int previousRequired = tier <= 1 ? 0 : requirements(category)[tier - 2];
         Material material;
         NamedTextColor nameColor;
         if (collected >= required) {
@@ -255,7 +255,7 @@ public final class CollectionInfoGui {
         lore.add(Component.empty());
         lore.add(text("Rewards:", NamedTextColor.GRAY));
         lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
-                .append(Component.text(formatNumber(TIER_XP_REWARDS[tier - 1]) + " " + category.experienceName(), NamedTextColor.AQUA))
+                .append(Component.text(formatNumber(xpReward(category, tier)) + " " + category.experienceName(), NamedTextColor.AQUA))
                 .decoration(TextDecoration.ITALIC, false));
         lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
                 .append(Component.text(mapleXpReward(tier) + " Maple XP", NamedTextColor.AQUA))
@@ -316,9 +316,12 @@ public final class CollectionInfoGui {
         return category.items().stream().anyMatch(item -> item.material() == material);
     }
 
-    private static int tierFor(long collected) {
+    private static boolean extended(Category category) { return category == Category.FARMING || category == Category.MINING; }
+    private static int[] requirements(Category category) { return extended(category) ? maple.underground_state.professions.ProfessionMath.COLLECTION_REQUIREMENTS : TIER_REQUIREMENTS; }
+    private static int xpReward(Category category, int tier) { return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category)); }
+    private static int tierFor(long collected, Category category) {
         int tier = 0;
-        for (int requirement : TIER_REQUIREMENTS) {
+        for (int requirement : requirements(category)) {
             if (collected < requirement) {
                 break;
             }
@@ -385,6 +388,9 @@ public final class CollectionInfoGui {
             case 7 -> "VII";
             case 8 -> "VIII";
             case 9 -> "IX";
+            case 10 -> "X";
+            case 11 -> "XI";
+            case 12 -> "XII";
             default -> String.valueOf(number);
         };
     }

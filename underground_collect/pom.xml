@@ -51,6 +51,18 @@
                 <version>${maven.surefire.version}</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
+                    <!-- MockBukkit 4.116.1 declares Paper 26.2 in its manifest.
+                         Only the mock test runtime uses that API; production compilation stays on 26.3. -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>io.papermc.paper:paper-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                    <additionalClasspathDependencies>
+                        <additionalClasspathDependency>
+                            <groupId>io.papermc.paper</groupId>
+                            <artifactId>paper-api</artifactId>
+                            <version>26.2.build.111-stable</version>
+                        </additionalClasspathDependency>
+                    </additionalClasspathDependencies>
                 </configuration>
             </plugin>
         </plugins>

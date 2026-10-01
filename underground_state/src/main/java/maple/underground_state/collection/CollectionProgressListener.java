@@ -74,14 +74,20 @@ public final class CollectionProgressListener implements Listener {
         Material countedMaterial = null;
         if (sourceCollectionType != null) {
             countedMaterial = sourceCollectionType;
-            manager.addMaterial(playerId, sourceCollectionType, pickedUp);
+            addPickup(playerId, sourceCollectionType, pickedUp);
         } else if (sourceType != null) {
             countedMaterial = normalizeCollectionMaterial(sourceType);
-            manager.addMaterial(playerId, sourceType, pickedUp);
+            addPickup(playerId, sourceType, pickedUp);
         }
         if (countedMaterial == null || countedMaterial != normalizeCollectionMaterial(stackType)) {
-            manager.addMaterial(playerId, stackType, pickedUp);
+            addPickup(playerId, stackType, pickedUp);
         }
+    }
+
+    private void addPickup(UUID uuid, Material material, int amount) {
+        if (CollectionInfoGui.hasCollectionMaterial(CollectionInfoGui.Category.FARMING, material)
+                || CollectionInfoGui.hasCollectionMaterial(CollectionInfoGui.Category.MINING, material)) return;
+        manager.addMaterial(uuid, material, amount);
     }
 
     private boolean shouldTrackSourceBlock(@NotNull Material material) {

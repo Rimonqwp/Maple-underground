@@ -33,6 +33,8 @@ public final class MiningXpService implements Listener {
             new NamespacedKey("underground_state", "placed_mining_blocks");
     private static final Map<Material, Integer> XP_TENTHS_BY_BLOCK = buildXpTenthsByBlock();
 
+    public static int baseXpTenths(Material material) { return XP_TENTHS_BY_BLOCK.getOrDefault(material, 0); }
+
     private final SkillProgressManager skillProgressManager;
     private final SkillRewardService skillRewardService;
     private final CombatXpOverlayService xpOverlayService;
@@ -56,6 +58,8 @@ public final class MiningXpService implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+        var active = maple.underground_state.UndergroundState.getInstance();
+        if (active != null && active.getProfessionService() != null && active.getProfessionService().enabled(event.getPlayer().getWorld())) return;
         Player player = event.getPlayer();
         if (player == null || !player.isOnline()) {
             return;

@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class PlayerCritListener implements Listener {
 
     private static final ThreadLocal<Boolean> FEROCITY_CHAIN_DAMAGE = new ThreadLocal<>();
+    public static boolean isFerocityChainDamage() { return Boolean.TRUE.equals(FEROCITY_CHAIN_DAMAGE.get()); }
     private static final NamespacedKey UNDERGROUND_ITEM_WEAPON_ID_KEY =
             new NamespacedKey("underground_item", "weapon_id");
 
@@ -36,6 +37,7 @@ public final class PlayerCritListener implements Listener {
         if (player == null) return;
         if (PlayerStatsRuntimeListener.isClientDamagePulse()) return;
         if (Boolean.TRUE.equals(FEROCITY_CHAIN_DAMAGE.get())) return;
+        if (!runtime.canUseProfessionItem(player,player.getInventory().getItemInMainHand())) { event.setCancelled(true);return; }
 
         PlayerStatsData data = statsManager.get(player);
         boolean meleeHit = event.getDamager() instanceof Player;

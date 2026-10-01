@@ -24,7 +24,7 @@
 
 ## 1. Project overview
 
-A single series of **5 Spigot/Paper plugins** (Java 21, Maven, shaded jars) sharing one MySQL backend.
+A single series of **7 Paper 26.3 plugins + 1 Velocity bridge** (Java 25, Maven, shaded jars) sharing one MySQL backend.
 
 | Plugin | Role | Notes |
 |---|---|---|
@@ -33,6 +33,9 @@ A single series of **5 Spigot/Paper plugins** (Java 21, Maven, shaded jars) shar
 | `underground_item` | sub-plugin | Custom items/gear/weapons. `depend: [underground_state]` |
 | `underground_mayor` | sub-plugin | Mayor NPCs (Citizens). `depend: [Citizens, underground_state]` |
 | `underground_collect` | sub-plugin | Collections. `depend: [underground_state]` |
+| `underground_island` | sub-plugin | OneBlock islands and coop. `depend: [underground_state]` |
+| `underground_quest` | sub-plugin | Quests. `depend: [underground_state, underground_caves]` |
+| `underground_velocity` | proxy plugin | Cross-server parties, dungeon instances, and island bridge. Install on Velocity. |
 
 **Rule:** every sub-plugin MUST `depend` on `underground_state` in its `plugin.yml` 鈥?the main
 plugin must be installed for any sub-plugin to load. Sub-plugins compile against the main plugin's
@@ -82,8 +85,8 @@ MySqlConnectionFactory.connect("skyblock");  // named data source
 
 ## 3. Build process
 
-- **Build everything with `build-all.cmd`** (Windows, IntelliJ-bundled Maven + Zulu JDK 21).
-  It builds all 5 plugins in dependency order and copies shaded jars to `dist/`.
+- **Build everything with `build-all.cmd`** (Windows, Maven + JDK 25 or newer).
+  It builds all 8 modules in dependency order and copies shaded jars to `dist/`.
 - Real secrets: copy `build-secrets.cmd.example` 鈫?`build-secrets.cmd` (git-ignored) and fill in
   passwords. `build-all.cmd` loads it and injects values into the `underground_state` build only.
 - If `build-secrets.cmd` is missing, the build still succeeds using `pom.xml` defaults (blank

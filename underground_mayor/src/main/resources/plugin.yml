@@ -2,7 +2,7 @@ name: underground_mayor
 version: '$version'
 
 main: maple.underground_mayor.UndergroundMayor
-api-version: '1.21.11'
+api-version: '26.3'
 load: POSTWORLD
 depend:
   - Citizens

@@ -1,7 +1,7 @@
 name: underground_quest
 version: '1.0'
 main: maple.underground_quest.UndergroundQuest
-api-version: '1.21.11'
+api-version: '26.3'
 load: POSTWORLD
 depend: [underground_state, underground_caves]
 commands:

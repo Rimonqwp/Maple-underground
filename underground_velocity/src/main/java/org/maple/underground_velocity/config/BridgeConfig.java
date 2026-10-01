@@ -53,8 +53,8 @@ public record BridgeConfig(
             instance-work-dir: ../Maple_dungeon_instances
             port-min: 20010
             port-max: 20049
-            java-command: C:\\Program Files\\Zulu\\zulu-21\\bin\\java.exe
-            paper-jar: paper-1.21.11-127.jar
+            java-command: C:\\Program Files\\Zulu\\zulu-25\\bin\\java.exe
+            paper-jar: paper-26.3.jar
             instance-xms: 512M
             instance-xmx: 4G
             instance-startup-timeout-seconds: 90
@@ -79,7 +79,7 @@ public record BridgeConfig(
         instanceTemplateDir = stringOr(instanceTemplateDir, "../Maple_dungeon_template");
         instanceWorkDir = stringOr(instanceWorkDir, "../Maple_dungeon_instances");
         javaCommand = stringOr(javaCommand, "java");
-        paperJar = stringOr(paperJar, "paper-1.21.11-127.jar");
+        paperJar = stringOr(paperJar, "paper-26.3.jar");
         instanceXms = stringOr(instanceXms, "512M");
         instanceXmx = stringOr(instanceXmx, "4G");
         forwardingSecretFile = stringOr(forwardingSecretFile, "forwarding.secret");
@@ -121,7 +121,7 @@ public record BridgeConfig(
                     integer(values, "port-min", 20010, 1, 65535),
                     integer(values, "port-max", 20049, 1, 65535),
                     string(values, "java-command", "java"),
-                    string(values, "paper-jar", "paper-1.21.11-127.jar"),
+                    string(values, "paper-jar", "paper-26.3.jar"),
                     string(values, "instance-xms", "512M"),
                     string(values, "instance-xmx", "4G"),
                     integer(values, "instance-startup-timeout-seconds", 90, 5, 600),
@@ -153,7 +153,7 @@ public record BridgeConfig(
                     20010,
                     20049,
                     "java",
-                    "paper-1.21.11-127.jar",
+                    "paper-26.3.jar",
                     "512M",
                     "4G",
                     90,

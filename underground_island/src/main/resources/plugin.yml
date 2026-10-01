@@ -1,7 +1,7 @@
 name: underground_island
 version: '1.0'
 main: maple.underground_island.UndergroundIsland
-api-version: '1.21.11'
+api-version: '26.3'
 load: POSTWORLD
 depend: [underground_state]
 commands:

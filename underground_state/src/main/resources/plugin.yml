@@ -1,7 +1,7 @@
 name: underground_state
 version: '1.0'
 main: maple.underground_state.UndergroundState
-api-version: '1.21.11'
+api-version: '26.3'
 load: POSTWORLD
 softdepend: [CMI, CMILib, LuckPerms]
 commands:

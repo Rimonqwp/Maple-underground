@@ -25,33 +25,33 @@ if defined DB_DATABASE set "DB_PROPS=%DB_PROPS% "-Ddb.database=%DB_DATABASE%""
 if defined DB_USER set "DB_PROPS=%DB_PROPS% "-Ddb.user=%DB_USER%""
 if defined DB_PASSWORD set "DB_PROPS=%DB_PROPS% "-Ddb.password=%DB_PASSWORD%""
 
-set "JAVA_HOME_FALLBACK=C:\Program Files\Zulu\zulu-21"
+set "JAVA_HOME_FALLBACK=C:\Program Files\Zulu\zulu-25"
 
 set "JAVA_BIN="
 set "MVN_CMD="
 
-if exist "%JAVA_HOME_FALLBACK%\bin\java.exe" (
-    set "JAVA_HOME=%JAVA_HOME_FALLBACK%"
-    set "JAVA_BIN=%JAVA_HOME%\bin\java.exe"
+if defined JAVA_HOME (
+    call :UseJavaHome "%JAVA_HOME%"
+)
+if not defined JAVA_BIN (
+    call :UseJavaHome "%JAVA_HOME_FALLBACK%"
 )
 
 if not defined JAVA_BIN (
-    if defined JAVA_HOME (
-        if exist "%JAVA_HOME%\bin\java.exe" (
-            set "JAVA_BIN=%JAVA_HOME%\bin\java.exe"
-        )
-    )
-)
-
-if not defined JAVA_BIN (
-    echo [ERROR] Could not find a Java 21 runtime.
-    echo         Please install JDK 21 or set JAVA_HOME to a JDK 21 directory.
+    echo [ERROR] Could not find a JDK 25 or newer.
+    echo         Paper 26.3 requires Java 25. Set JAVA_HOME to a JDK 25 or newer directory.
     exit /b 1
 )
 
 if defined MAVEN_HOME (
     if exist "%MAVEN_HOME%\bin\mvn.cmd" (
         set "MVN_CMD=%MAVEN_HOME%\bin\mvn.cmd"
+    )
+)
+
+if not defined MVN_CMD (
+    if exist "%MAVEN_REPO%\tools\apache-maven-3.9.11\bin\mvn.cmd" (
+        set "MVN_CMD=%MAVEN_REPO%\tools\apache-maven-3.9.11\bin\mvn.cmd"
     )
 )
 
@@ -111,7 +111,7 @@ if not exist "%MAVEN_REPO%" mkdir "%MAVEN_REPO%"
 
 echo [INFO] Building underground_state...
 pushd "%ROOT%underground_state"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests%DB_PROPS% package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests%DB_PROPS% clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_state
@@ -128,7 +128,7 @@ echo.
 
 echo [INFO] Building underground_item...
 pushd "%ROOT%underground_item"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_item
@@ -145,7 +145,7 @@ echo.
 
 echo [INFO] Building underground_collect...
 pushd "%ROOT%underground_collect"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_collect
@@ -162,7 +162,7 @@ echo.
 
 echo [INFO] Building underground_island...
 pushd "%ROOT%underground_island"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_island
@@ -179,7 +179,7 @@ echo.
 
 echo [INFO] Building underground_caves...
 pushd "%ROOT%underground_caves"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_caves
@@ -196,7 +196,7 @@ echo.
 
 echo [INFO] Building underground_mayor...
 pushd "%ROOT%underground_mayor"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_mayor
@@ -214,7 +214,7 @@ echo.
 
 echo [INFO] Building underground_quest...
 pushd "%ROOT%underground_quest"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_quest
@@ -225,7 +225,7 @@ echo [INFO] Finished underground_quest.
 
 echo [INFO] Building underground_velocity Velocity bridge...
 pushd "%ROOT%underground_velocity"
-call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests package
+call "%MVN_CMD%" -Dmaven.repo.local="%MAVEN_REPO%" -DskipTests clean package
 if errorlevel 1 (
     popd
     echo [ERROR] Build failed: underground_velocity
@@ -299,5 +299,17 @@ exit /b 0
 :FindMavenInRoot
 for /f "delims=" %%I in ('where /r "%~1" mvn.cmd 2^>nul') do (
     if not defined MVN_CMD set "MVN_CMD=%%I"
+)
+exit /b 0
+
+:UseJavaHome
+if not exist "%~1\bin\javac.exe" exit /b 0
+set "JAVA_CANDIDATE_VERSION="
+for /f "tokens=2 delims==" %%V in ('findstr /B "JAVA_VERSION=" "%~1\release" 2^>nul') do set "JAVA_CANDIDATE_VERSION=%%~V"
+for /f "tokens=1 delims=.-+" %%V in ("%JAVA_CANDIDATE_VERSION%") do (
+    if %%V GEQ 25 (
+        set "JAVA_HOME=%~1"
+        set "JAVA_BIN=%~1\bin\java.exe"
+    )
 )
 exit /b 0

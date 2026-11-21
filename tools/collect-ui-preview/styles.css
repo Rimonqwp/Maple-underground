@@ -472,10 +472,15 @@ body {
   font-weight: 800;
   padding: 1px 3px;
   border-radius: 3px;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.78);
   color: #ffe066;
   pointer-events: none;
 }
+
+.slot-badge.badge-c1 { color: #7dff7d; border: 1px solid rgba(125, 255, 125, 0.5); }
+.slot-badge.badge-c2 { color: #66f0ff; border: 1px solid rgba(102, 240, 255, 0.55); }
+.slot-badge.badge-c3 { color: #e28cff; border: 1px solid rgba(226, 140, 255, 0.6); }
+.slot-badge.badge-c4 { color: #ffcc44; border: 1px solid rgba(255, 204, 68, 0.7); }
 
 /* Actionbar */
 .mc-actionbar {

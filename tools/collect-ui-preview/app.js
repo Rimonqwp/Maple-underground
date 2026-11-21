@@ -574,6 +574,7 @@
       glow: !!opts.glow,
       count: opts.count || null,
       badge: opts.badge || null,
+      badgeClass: opts.badgeClass || "",
       colorHex: opts.colorHex || null,
       extraClass: opts.extraClass || "",
       onClick: opts.onClick || null,
@@ -606,15 +607,49 @@
     };
   }
 
+  function resolveCompressionBaseMaterial(token, depth = 0) {
+    if (!token || depth > 8) return null;
+    if (token.startsWith("vanilla:")) return token.slice(8);
+    const pi = PROF_ITEMS[token];
+    if (!pi) return null;
+    if (pi.compression) return resolveCompressionBaseMaterial(pi.compression, depth + 1);
+    return pi.material || null;
+  }
+
+  function compressionTierOf(pi) {
+    if (!pi || !pi.compression) return 0;
+    const rv = pi.rawValue || 0;
+    if (rv >= 6561) return 4;
+    if (rv >= 729) return 3;
+    if (rv >= 81) return 2;
+    return 1;
+  }
+
+  function resolveProfessionVisual(pi) {
+    if (!pi) return { material: "PAPER", glow: false, badge: null, badgeClass: "" };
+    if (pi.material === "PAPER" && pi.compression) {
+      const baseMat = resolveCompressionBaseMaterial(pi.compression) || "PAPER";
+      const cTier = compressionTierOf(pi);
+      return {
+        material: baseMat,
+        glow: true,
+        badge: `压${roman(cTier)}`,
+        badgeClass: `badge-c${cTier}`
+      };
+    }
+    return { material: pi.material, glow: false, badge: null, badgeClass: "" };
+  }
+
   function tokenDisplay(token) {
-    if (!token) return { name: "空气", material: "AIR", profItem: null };
+    if (!token) return { name: "空气", material: "AIR", profItem: null, visual: null };
     if (token.startsWith("vanilla:")) {
       const mat = token.slice(8);
-      return { name: VANILLA_NAMES[mat] || mat, material: mat, profItem: null };
+      return { name: VANILLA_NAMES[mat] || mat, material: mat, profItem: null, visual: null };
     }
     const pi = PROF_ITEMS[token];
-    if (!pi) return { name: token, material: "PAPER", profItem: null };
-    return { name: pi.name, material: pi.material, profItem: pi };
+    if (!pi) return { name: token, material: "PAPER", profItem: null, visual: null };
+    const visual = resolveProfessionVisual(pi);
+    return { name: pi.name, material: visual.material, profItem: pi, visual };
   }
 
   function buildProfessionItemLore(pi) {
@@ -1161,6 +1196,9 @@
             ];
 
         slots[craftSlots[idx]] = makeIcon(info.material, `<span class="c-yellow bold">${info.name}</span>`, lore, {
+          glow: info.visual ? info.visual.glow : false,
+          badge: info.visual ? info.visual.badge : null,
+          badgeClass: info.visual ? info.visual.badgeClass : "",
           colorHex: info.profItem ? rgbIntToHex(info.profItem.color) : null,
           extraClass: "craft-grid",
           onClick: info.profItem && (info.profItem.compression || info.profItem.recipe) ? () => {
@@ -1181,12 +1219,15 @@
       ]);
 
       // 右侧：合成成品槽
-      slots[24] = makeIcon(pi.material, `<span class="c-gold bold">${pi.name}</span>`, [
+      const outVisual = resolveProfessionVisual(pi);
+      slots[24] = makeIcon(outVisual.material, `<span class="c-gold bold">${pi.name}</span>`, [
         `<span class="c-gray">成品类型：<span class="c-yellow">${kindLabel(pi.kind)}</span>${pi.setName ? ` · 套装「${pi.setName}」` : ""}</span>`,
         "",
         ...buildProfessionItemLore(pi)
       ], {
         glow: true,
+        badge: outVisual.badge,
+        badgeClass: outVisual.badgeClass,
         colorHex: rgbIntToHex(pi.color),
         extraClass: "craft-output"
       });
@@ -1195,16 +1236,19 @@
       const switcherSlots = [37, 38, 39, 40, 41, 42, 43];
       tierRecipes.slice(0, switcherSlots.length).forEach((ref, idx) => {
         const subPi = PROF_ITEMS[ref.itemId];
+        const subVisual = resolveProfessionVisual(subPi);
         const selected = idx === recipeIdx;
         slots[switcherSlots[idx]] = makeIcon(
-          subPi.material,
+          subVisual.material,
           `<span class="${selected ? "c-green" : "c-gold"} bold">${subPi.name}</span>`,
           [
             `<span class="c-gray">${ref.reason}</span>`,
             `<span class="${selected ? "c-green" : "c-yellow"}">${selected ? "✔ 当前正在预览" : "点击切换预览此合成配方"}</span>`
           ],
           {
-            glow: selected,
+            glow: selected || subVisual.glow,
+            badge: subVisual.badge,
+            badgeClass: subVisual.badgeClass,
             colorHex: rgbIntToHex(subPi.color),
             onClick: () => {
               state.view.recipeIdx = idx;
@@ -1676,7 +1720,7 @@
       }
       if (s.badge) {
         const b = document.createElement("span");
-        b.className = "slot-badge";
+        b.className = "slot-badge" + (s.badgeClass ? ` ${s.badgeClass}` : "");
         b.textContent = s.badge;
         cell.appendChild(b);
       }

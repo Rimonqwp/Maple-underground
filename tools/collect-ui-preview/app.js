@@ -1144,20 +1144,22 @@
       count: tier
     });
 
-    // 顶部右侧：领取本层奖励按钮
-    slots[6] = makeIcon(
-      "AMETHYST_SHARD",
-      `<span class="c-gold bold">${isClaimed ? "本层奖励已领取" : (unlocked ? "点击领取本层奖励" : "尚未达到解锁门槛")}</span>`,
-      [
-        unlocked && !isClaimed
-          ? `<span class="c-green">点击将领取至 ${item.name} ${roman(tier)} 的全部未领奖励！</span>`
-          : (isClaimed ? `<span class="c-gray">你已经领取过本层的枫叶经验。</span>` : `<span class="c-red">还差 ${formatNumber(req - collected)} 个 ${item.name}。</span>`)
-      ],
-      {
-        glow: unlocked && !isClaimed,
-        onClick: () => { claimItemUpToTier(cat, item, tier); render(); }
-      }
-    );
+    // 顶部右侧：领取本层奖励按钮（已领取后不再显示）
+    if (!isClaimed) {
+      slots[6] = makeIcon(
+        "AMETHYST_SHARD",
+        `<span class="c-gold bold">${unlocked ? "点击领取本层奖励" : "尚未达到解锁门槛"}</span>`,
+        [
+          unlocked
+            ? `<span class="c-green">点击将领取至 ${item.name} ${roman(tier)} 的全部未领奖励！</span>`
+            : `<span class="c-red">还差 ${formatNumber(req - collected)} 个 ${item.name}。</span>`
+        ],
+        {
+          glow: unlocked,
+          onClick: () => { claimItemUpToTier(cat, item, tier); render(); }
+        }
+      );
+    }
 
     // 3x3 合成工作台网格：slots [10,11,12, 19,20,21, 28,29,30]
     const craftSlots = [10, 11, 12, 19, 20, 21, 28, 29, 30];

@@ -1,22 +1,22 @@
-﻿# Project Rules 鈥?Maple Underground Series
+# Project Rules - Maple Underground Series
 
-> These rules are read automatically at the start of every session by Claude / Codex / OpenCode.
+> These rules are read automatically at the start of every session by Claude / Codex / OpenCode / Antigravity.
 > Follow them without being asked. `CLAUDE.md` and `AGENTS.md` are kept identical.
 
 ---
 
 ## 0. Non-negotiable session rules
 
-1. **Reply to the user in Chinese (涓枃).** All explanations, summaries, and questions you send to
-   the user must be written in Chinese, regardless of the language of code or comments.
-2. **Commit after every conversation's changes 鈥?in Chinese, and do NOT push.**
-   When you finish a unit of work that changed files, run:
+1. **Reply to the user in Chinese.** All explanations, summaries, and questions sent to the user
+   MUST be written in Chinese, regardless of the language of code, comments, or documentation.
+2. **Commit after every conversation's changes - in Chinese, and do NOT push.**
+   When you finish a unit of work that changed files, stage your changes and run:
    ```bash
-   git add -A
-   git commit -m "<绠€浣撴垨绻佷綋涓枃锛岀畝杩版湰娆℃敼鍔?"
+   git add <changed files>
+   git commit -m "<Chinese summary of what changed>"
    ```
-   - The commit message MUST be in Chinese and briefly describe what changed.
-   - **Never** `git push`. Committing locally is the whole intent; pushing is the user's decision.
+   - The commit message MUST be in Chinese (Simplified or Traditional) and briefly describe what changed.
+   - **Never** run `git push`. Committing locally is the whole intent; pushing is the user's decision.
 3. **Never commit real database secrets.** Real credentials live only in `build-secrets.cmd`,
    which is git-ignored. Only the template `build-secrets.cmd.example` is tracked.
 4. **Sync preview website changes with actual Minecraft plugin code (MUST).**
@@ -28,7 +28,7 @@
      code / YAML configs / generator scripts (`underground_state`, `underground_collect`,
      `underground_item`, `tools/generate_professions.py`, etc.) FIRST or simultaneously, and keep
      the preview website in sync with the plugin.
-   - The only exception is a purely web-only visual/tooling tweak (e.g. simulator debug panel,
+   - The only exception is a purely web-only visual/tooling tweak (e.g., simulator debug panel,
      CSS layout, or texture loader) that does not change game behavior or data. When in doubt,
      update the real plugin code too.
 
@@ -40,23 +40,23 @@ A single series of **7 Paper 26.3 plugins + 1 Velocity bridge** (Java 25, Maven,
 
 | Plugin | Role | Notes |
 |---|---|---|
-| `underground_state` | **MAIN plugin** | Owns player stats/skills/bank/etc. **Owns ALL database credentials.** |
-| `underground_caves` | sub-plugin | Dungeons, parties, professions. `depend: [underground_state, underground_item]` |
-| `underground_item` | sub-plugin | Custom items/gear/weapons. `depend: [underground_state]` |
+| `underground_state` | **MAIN plugin** | Owns player stats/skills/bank/collections/professions. **Owns ALL database credentials.** |
+| `underground_caves` | sub-plugin | Dungeons, parties, custom enchants. `depend: [underground_state, underground_item]` |
+| `underground_item` | sub-plugin | Custom items/gear/weapons/profession recipes. `depend: [underground_state]` |
 | `underground_mayor` | sub-plugin | Mayor NPCs (Citizens). `depend: [Citizens, underground_state]` |
-| `underground_collect` | sub-plugin | Collections. `depend: [underground_state]` |
+| `underground_collect` | sub-plugin | Collection center, claims, leaderboards, admin commands. `depend: [underground_state]` |
 | `underground_island` | sub-plugin | OneBlock islands and coop. `depend: [underground_state]` |
 | `underground_quest` | sub-plugin | Quests. `depend: [underground_state, underground_caves]` |
 | `underground_velocity` | proxy plugin | Cross-server parties, dungeon instances, and island bridge. Install on Velocity. |
 
-**Rule:** every sub-plugin MUST `depend` on `underground_state` in its `plugin.yml` 鈥?the main
+**Rule:** every sub-plugin MUST `depend` on `underground_state` in its `plugin.yml` - the main
 plugin must be installed for any sub-plugin to load. Sub-plugins compile against the main plugin's
 jar via Maven `system` scope (see each sub-plugin `pom.xml`), and at runtime access its classes
 through the Bukkit `depend` relationship.
 
 ---
 
-## 2. Database architecture (CORE RULE 鈥?read before touching any DB code)
+## 2. Database architecture (CORE RULE - read before touching any DB code)
 
 **All MySQL access goes through the main plugin's central factory:**
 `underground_state/src/main/java/maple/underground_state/db/MySqlConnectionFactory.java`
@@ -71,26 +71,26 @@ MySqlConnectionFactory.connect("skyblock");  // named data source
   plugin jar at build time** via Maven resource filtering of
   `underground_state/src/main/resources/database.properties`, fed from `build-secrets.cmd`.
 - All data sources share ONE host (`DB_HOST`); each schema has its own user/password.
-- There is also a local **SQLite** store (`DungeonRoomRewardDB`, `jdbc:sqlite:`) 鈥?that one is a
+- There is also a local **SQLite** store (`DungeonRoomRewardDB`, `jdbc:sqlite:`) - that one is a
   local file and is intentionally NOT part of the central MySQL factory.
 
 ### Hard prohibitions
-- 鉂?Do **not** add `DriverManager.getConnection(...)` for MySQL anywhere outside the factory.
-- 鉂?Do **not** hardcode hosts, usernames, or passwords in any `.java` file.
-- 鉂?Do **not** create a user-editable `database.yml` / config folder for DB credentials.
+- [FORBIDDEN] Do **not** add `DriverManager.getConnection(...)` for MySQL anywhere outside the factory.
+- [FORBIDDEN] Do **not** hardcode hosts, usernames, or passwords in any `.java` file.
+- [FORBIDDEN] Do **not** create a user-editable `database.yml` / config folder for DB credentials.
 
-### Recipe 鈥?adding a feature that needs the database
-1. **Reuse an existing data source** (`state` / `caves` / `skyblock`) when possible 鈥?just call
+### Recipe - adding a feature that needs the database
+1. **Reuse an existing data source** (`state` / `caves` / `skyblock`) when possible - just call
    `MySqlConnectionFactory.connect("<name>")` and write your `CREATE TABLE IF NOT EXISTS` + queries.
    Put the DB logic in the main plugin when the data is cross-plugin; otherwise in the sub-plugin,
    but still go through the factory.
 2. **Only if a genuinely new schema is required**, register a new named data source by editing
    FOUR places consistently (keyword `<name>`):
-   - `underground_state/src/main/resources/database.properties` 鈫?add `db.<name>.database/user/password`
-   - `underground_state/pom.xml` `<properties>` 鈫?add matching defaults
-   - `MySqlConnectionFactory.loadSources()` 鈫?add one `putSource(..., "<name>", "<db>", "<user>")` line
+   - `underground_state/src/main/resources/database.properties` -> add `db.<name>.database/user/password`
+   - `underground_state/pom.xml` `<properties>` -> add matching defaults
+   - `MySqlConnectionFactory.loadSources()` -> add one `putSource(..., "<name>", "<db>", "<user>")` line
    - `build-secrets.cmd.example` (and your local `build-secrets.cmd`) + `build-all.cmd` `DB_PROPS`
-     block 鈫?add `DB_<NAME>_*` variables and their `-D` pass-through
+     block -> add `DB_<NAME>_*` variables and their `-D` pass-through
    Then call `MySqlConnectionFactory.connect("<name>")`.
 
 ---
@@ -99,7 +99,7 @@ MySqlConnectionFactory.connect("skyblock");  // named data source
 
 - **Build everything with `build-all.cmd`** (Windows, Maven + JDK 25 or newer).
   It builds all 8 modules in dependency order and copies shaded jars to `dist/`.
-- Real secrets: copy `build-secrets.cmd.example` 鈫?`build-secrets.cmd` (git-ignored) and fill in
+- Real secrets: copy `build-secrets.cmd.example` -> `build-secrets.cmd` (git-ignored) and fill in
   passwords. `build-all.cmd` loads it and injects values into the `underground_state` build only.
 - If `build-secrets.cmd` is missing, the build still succeeds using `pom.xml` defaults (blank
   passwords; at runtime the factory falls back to `UNDERGROUND_<KEY>_MYSQL_PASSWORD` env vars).
@@ -110,12 +110,11 @@ MySqlConnectionFactory.connect("skyblock");  // named data source
 
 ## 4. Conventions
 
-- Keep changes minimal and match surrounding code style (existing comments are often Traditional
-  Chinese 鈥?that's fine; keep them).
+- Keep changes minimal and match surrounding code style (existing code comments may be in Chinese - that is fine).
 - Preserve public method signatures of DB classes (constructors like `(File dataFolder, Logger)`
   are kept for caller compatibility even when the folder is no longer used).
 - After finishing work: verify it compiles (`build-all.cmd` or per-module Maven), then commit in
-  Chinese per rule 搂0.2.
+  Chinese per section 0.2.
 
 ---
 
@@ -128,6 +127,6 @@ When the user points at an element or requests a change from the browser preview
 |---|---|
 | Collection categories, items, tier thresholds, Lore text, detail pane | `underground_state/src/main/java/maple/underground_state/gui/CollectionInfoGui.java` (and `MainInfoGui.java` / `BookshelfInfoGui.java`) |
 | Collection center hub, leaderboard, missing list, guide, commands | `underground_collect/src/main/java/maple/underground_collect/CollectionMenus.java`, `CollectCommand.java` |
-| Collection rewards (Maple XP, skill XP, claims, upgrade notifications) | `underground_collect/src/main/java/maple/underground_collect/CollectionRewardService.java`, `CollectionMath.java`, `underground_state/src/main/java/maple/underground_state/collection/CollectionProgressManager.java` |
+| Collection rewards (Maple XP, claims, upgrade notifications) | `underground_collect/src/main/java/maple/underground_collect/CollectionRewardService.java`, `CollectionMath.java`, `underground_state/src/main/java/maple/underground_state/collection/CollectionProgressManager.java` |
 | Compressed materials, profession gear, 3x3 crafting recipes | `tools/generate_professions.py` -> regenerate `underground_item/src/main/resources/professions.yml` (and check `ProfessionCatalog.java` / `ProfessionCrafting.java` / `ProfessionBook.java`) |
 | Preview site data & UI | Regenerate `tools/collect-ui-preview/data.js` and update `tools/collect-ui-preview/app.js` / `index.html` / `styles.css` |

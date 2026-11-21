@@ -19,6 +19,18 @@
    - **Never** `git push`. Committing locally is the whole intent; pushing is the user's decision.
 3. **Never commit real database secrets.** Real credentials live only in `build-secrets.cmd`,
    which is git-ignored. Only the template `build-secrets.cmd.example` is tracked.
+4. **Sync preview website changes with actual Minecraft plugin code (MUST).**
+   The web preview simulators under `tools/*-preview/` (such as `tools/collect-ui-preview/`) exist
+   ONLY to mirror the real in-game GUIs, rewards, items, and recipes without launching Minecraft.
+   When the user asks for any gameplay, UI, text, reward, item, or recipe change while viewing or
+   commenting on the preview website:
+   - **NEVER edit only the website.** Always update the corresponding real Minecraft plugin Java
+     code / YAML configs / generator scripts (`underground_state`, `underground_collect`,
+     `underground_item`, `tools/generate_professions.py`, etc.) FIRST or simultaneously, and keep
+     the preview website in sync with the plugin.
+   - The only exception is a purely web-only visual/tooling tweak (e.g. simulator debug panel,
+     CSS layout, or texture loader) that does not change game behavior or data. When in doubt,
+     update the real plugin code too.
 
 ---
 
@@ -104,3 +116,18 @@ MySqlConnectionFactory.connect("skyblock");  // named data source
   are kept for caller compatibility even when the folder is no longer used).
 - After finishing work: verify it compiles (`build-all.cmd` or per-module Maven), then commit in
   Chinese per rule 搂0.2.
+
+---
+
+## 5. Web UI preview simulator sync map
+
+When the user points at an element or requests a change from the browser preview
+(`tools/collect-ui-preview/`), always sync the real plugin source files below:
+
+| Change requested on the website | Real plugin files that MUST also be updated |
+|---|---|
+| Collection categories, items, tier thresholds, Lore text, detail pane | `underground_state/src/main/java/maple/underground_state/gui/CollectionInfoGui.java` (and `MainInfoGui.java` / `BookshelfInfoGui.java`) |
+| Collection center hub, leaderboard, missing list, guide, commands | `underground_collect/src/main/java/maple/underground_collect/CollectionMenus.java`, `CollectCommand.java` |
+| Collection rewards (Maple XP, skill XP, claims, upgrade notifications) | `underground_collect/src/main/java/maple/underground_collect/CollectionRewardService.java`, `CollectionMath.java`, `underground_state/src/main/java/maple/underground_state/collection/CollectionProgressManager.java` |
+| Compressed materials, profession gear, 3x3 crafting recipes | `tools/generate_professions.py` -> regenerate `underground_item/src/main/resources/professions.yml` (and check `ProfessionCatalog.java` / `ProfessionCrafting.java` / `ProfessionBook.java`) |
+| Preview site data & UI | Regenerate `tools/collect-ui-preview/data.js` and update `tools/collect-ui-preview/app.js` / `index.html` / `styles.css` |

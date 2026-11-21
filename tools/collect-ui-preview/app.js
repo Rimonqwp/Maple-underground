@@ -1315,38 +1315,15 @@
         slots[s] = makeFiller("pane-black");
       });
       slots[20] = makeIcon("CRAFTING_TABLE", `<span class="c-yellow bold">本层级暂无专属合成配方</span>`, [
-        `<span class="c-gray">${item.name} ${roman(tier)} 当前版本发放固定经验奖励${isFortuneMilestone(cat, req) ? "与职业采集幸运" : ""}。</span>`,
+        `<span class="c-gray">${item.name} ${roman(tier)} 当前版本发放固定枫叶经验奖励${isFortuneMilestone(cat, req) ? "与职业采集幸运" : ""}。</span>`,
         "",
-        `<span class="c-aqua">你可以在下方快捷切换到该物品含配方的层级，</span>`,
-        `<span class="c-aqua">或从右侧「含真实配方的推荐物品」体验 3×3 合成预览！</span>`
+        `<span class="c-gray">仅在包含合成配方的层级才会展示对应配方。</span>`
       ], { extraClass: "craft-grid" });
 
       slots[24] = makeIcon("EXPERIENCE_BOTTLE", `<span class="c-aqua bold">本层奖励预览</span>`, [
         `<span class="c-gray">• <span class="c-aqua">+${mapleXpReward(tier)} 枫叶经验</span></span>`,
         isFortuneMilestone(cat, req) ? `<span class="c-gray">• <span class="c-green">+1 职业采集幸运（自动生效）</span></span>` : ""
       ].filter(Boolean), { glow: unlocked && !isClaimed, extraClass: "craft-output" });
-
-      // 如果该物品的其他层级有配方，在第 5 行给出快捷按钮
-      const otherTiers = getAllRecipeTiersForMaterial(item.material);
-      const jumpSlots = [37, 38, 39, 40, 41, 42, 43];
-      otherTiers.slice(0, jumpSlots.length).forEach((tNum, idx) => {
-        const cnt = getRecipesForTier(item.material, tNum).length;
-        slots[jumpSlots[idx]] = makePane(
-          "pane-blue",
-          roman(tNum),
-          `<span class="c-light_purple bold">跳转到 ${item.name} ${roman(tNum)}</span>`,
-          [`<span class="c-gray">该层级包含 <span class="c-yellow">${cnt}</span> 个真实合成配方！</span>`, `<span class="c-yellow">点击直达查看 3×3 合成表。</span>`],
-          {
-            badge: `⚒${cnt}`,
-            onClick: () => {
-              state.view.tier = tNum;
-              state.view.recipeIdx = 0;
-              playTone("click");
-              render();
-            }
-          }
-        );
-      });
     }
 
     // 底部导航：下钻时优先提供「返回上一层配方」，否则返回物品详情 / 上一级 / 关闭 / 下一级

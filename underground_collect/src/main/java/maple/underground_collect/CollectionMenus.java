@@ -710,7 +710,7 @@ final class CollectionMenus {
                             text(item.name() + " " + CollectionMath.roman(tier) + " 当前发放固定枫叶经验奖励"
                                     + (CollectionInfoGui.isFortuneMilestone(category, required) ? "与职业采集幸运" : "") + "。", NamedTextColor.GRAY),
                             Component.empty(),
-                            text("可点击下方按钮快速跳转到该物品含配方的层级。", NamedTextColor.AQUA)
+                            text("仅在包含合成配方的层级才会展示对应配方。", NamedTextColor.GRAY)
                     )
             ));
 
@@ -731,27 +731,6 @@ final class CollectionMenus {
                     unlocked && !isClaimed,
                     null
             ));
-
-            if (recipeBridge != null) {
-                List<Integer> otherTiers = recipeBridge.recipeTiersForMaterial(item.material());
-                for (int i = 0; i < TIER_RECIPE_SWITCHER_SLOTS.length && i < otherTiers.size(); i++) {
-                    int targetTier = otherTiers.get(i);
-                    List<CollectionInfoGui.RecipeEntry> targetRecipes = recipeBridge.recipesForTier(item.material(), targetTier);
-                    ItemStack jumpPane = createCountedItem(
-                            Material.LIGHT_BLUE_STAINED_GLASS_PANE,
-                            Math.max(1, Math.min(64, targetTier)),
-                            Component.text("跳转到 " + item.name() + " " + CollectionMath.roman(targetTier), NamedTextColor.AQUA, TextDecoration.BOLD)
-                                    .decoration(TextDecoration.ITALIC, false),
-                            List.of(
-                                    text("该层级包含 " + targetRecipes.size() + " 个合成配方。", NamedTextColor.GRAY),
-                                    text("点击直接切换查看！", NamedTextColor.YELLOW)
-                            ),
-                            false,
-                            null
-                    );
-                    inventory.setItem(TIER_RECIPE_SWITCHER_SLOTS[i], jumpPane);
-                }
-            }
         }
 
         // 底部导航栏
@@ -1056,11 +1035,6 @@ final class CollectionMenus {
             } else if (!tierRecipes.isEmpty()) {
                 if (switchIdx < tierRecipes.size() && switchIdx != safeRecipeIndex) {
                     renderTierRecipe(player, category, itemIndex, tier, switchIdx, List.of());
-                }
-            } else {
-                List<Integer> otherTiers = recipeBridge.recipeTiersForMaterial(item.material());
-                if (switchIdx < otherTiers.size()) {
-                    renderTierRecipe(player, category, itemIndex, otherTiers.get(switchIdx), 0, List.of());
                 }
             }
         }

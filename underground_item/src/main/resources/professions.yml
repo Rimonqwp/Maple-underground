@@ -1068,6 +1068,958 @@
       "compression": "diamond_compressed_3",
       "raw_value": 6561
     },
+    "torchflower_seeds_compressed_1": {
+      "name": "压缩火把花种子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:TORCHFLOWER_SEEDS",
+      "raw_value": 9
+    },
+    "torchflower_seeds_compressed_2": {
+      "name": "精炼火把花种子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "torchflower_seeds_compressed_1",
+      "raw_value": 81
+    },
+    "pitcher_pod_compressed_1": {
+      "name": "压缩瓶子草荚果",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:PITCHER_POD",
+      "raw_value": 9
+    },
+    "pitcher_pod_compressed_2": {
+      "name": "精炼瓶子草荚果",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "pitcher_pod_compressed_1",
+      "raw_value": 81
+    },
+    "wheat_seeds_compressed_1": {
+      "name": "压缩小麦种子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:WHEAT_SEEDS",
+      "raw_value": 9
+    },
+    "wheat_seeds_compressed_2": {
+      "name": "精炼小麦种子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "wheat_seeds_compressed_1",
+      "raw_value": 81
+    },
+    "beetroot_compressed_1": {
+      "name": "压缩甜菜根",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BEETROOT",
+      "raw_value": 9
+    },
+    "beetroot_compressed_2": {
+      "name": "精炼甜菜根",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "beetroot_compressed_1",
+      "raw_value": 81
+    },
+    "melon_compressed_1": {
+      "name": "压缩西瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:MELON",
+      "raw_value": 9
+    },
+    "melon_compressed_2": {
+      "name": "精炼西瓜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "melon_compressed_1",
+      "raw_value": 81
+    },
+    "bamboo_compressed_1": {
+      "name": "压缩竹子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BAMBOO",
+      "raw_value": 9
+    },
+    "bamboo_compressed_2": {
+      "name": "精炼竹子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "bamboo_compressed_1",
+      "raw_value": 81
+    },
+    "cactus_compressed_1": {
+      "name": "压缩仙人掌",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CACTUS",
+      "raw_value": 9
+    },
+    "cactus_compressed_2": {
+      "name": "精炼仙人掌",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cactus_compressed_1",
+      "raw_value": 81
+    },
+    "sweet_berries_compressed_1": {
+      "name": "压缩甜浆果",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SWEET_BERRIES",
+      "raw_value": 9
+    },
+    "sweet_berries_compressed_2": {
+      "name": "精炼甜浆果",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "sweet_berries_compressed_1",
+      "raw_value": 81
+    },
+    "brown_mushroom_compressed_1": {
+      "name": "压缩棕色蘑菇",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BROWN_MUSHROOM",
+      "raw_value": 9
+    },
+    "brown_mushroom_compressed_2": {
+      "name": "精炼棕色蘑菇",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "brown_mushroom_compressed_1",
+      "raw_value": 81
+    },
+    "red_mushroom_compressed_1": {
+      "name": "压缩红色蘑菇",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RED_MUSHROOM",
+      "raw_value": 9
+    },
+    "red_mushroom_compressed_2": {
+      "name": "精炼红色蘑菇",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "red_mushroom_compressed_1",
+      "raw_value": 81
+    },
+    "nether_wart_compressed_1": {
+      "name": "压缩地狱疣",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:NETHER_WART",
+      "raw_value": 9
+    },
+    "nether_wart_compressed_2": {
+      "name": "精炼地狱疣",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "nether_wart_compressed_1",
+      "raw_value": 81
+    },
+    "kelp_compressed_1": {
+      "name": "压缩海带",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:KELP",
+      "raw_value": 9
+    },
+    "kelp_compressed_2": {
+      "name": "精炼海带",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "kelp_compressed_1",
+      "raw_value": 81
+    },
+    "leather_compressed_1": {
+      "name": "压缩皮革",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:LEATHER",
+      "raw_value": 9
+    },
+    "leather_compressed_2": {
+      "name": "精炼皮革",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "leather_compressed_1",
+      "raw_value": 81
+    },
+    "rabbit_hide_compressed_1": {
+      "name": "压缩兔子皮",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RABBIT_HIDE",
+      "raw_value": 9
+    },
+    "rabbit_hide_compressed_2": {
+      "name": "精炼兔子皮",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "rabbit_hide_compressed_1",
+      "raw_value": 81
+    },
+    "rabbit_foot_compressed_1": {
+      "name": "压缩兔子脚",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RABBIT_FOOT",
+      "raw_value": 9
+    },
+    "rabbit_foot_compressed_2": {
+      "name": "精炼兔子脚",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "rabbit_foot_compressed_1",
+      "raw_value": 81
+    },
+    "beef_compressed_1": {
+      "name": "压缩生牛肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BEEF",
+      "raw_value": 9
+    },
+    "beef_compressed_2": {
+      "name": "精炼生牛肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "beef_compressed_1",
+      "raw_value": 81
+    },
+    "porkchop_compressed_1": {
+      "name": "压缩生猪排",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:PORKCHOP",
+      "raw_value": 9
+    },
+    "porkchop_compressed_2": {
+      "name": "精炼生猪排",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "porkchop_compressed_1",
+      "raw_value": 81
+    },
+    "mutton_compressed_1": {
+      "name": "压缩生羊肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:MUTTON",
+      "raw_value": 9
+    },
+    "mutton_compressed_2": {
+      "name": "精炼生羊肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "mutton_compressed_1",
+      "raw_value": 81
+    },
+    "chicken_compressed_1": {
+      "name": "压缩生鸡肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CHICKEN",
+      "raw_value": 9
+    },
+    "chicken_compressed_2": {
+      "name": "精炼生鸡肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "chicken_compressed_1",
+      "raw_value": 81
+    },
+    "rabbit_compressed_1": {
+      "name": "压缩生兔肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RABBIT",
+      "raw_value": 9
+    },
+    "rabbit_compressed_2": {
+      "name": "精炼生兔肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "rabbit_compressed_1",
+      "raw_value": 81
+    },
+    "feather_compressed_1": {
+      "name": "压缩羽毛",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:FEATHER",
+      "raw_value": 9
+    },
+    "feather_compressed_2": {
+      "name": "精炼羽毛",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "feather_compressed_1",
+      "raw_value": 81
+    },
+    "sand_compressed_1": {
+      "name": "压缩沙子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SAND",
+      "raw_value": 9
+    },
+    "sand_compressed_2": {
+      "name": "精炼沙子",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "sand_compressed_1",
+      "raw_value": 81
+    },
+    "gravel_compressed_1": {
+      "name": "压缩砂砾",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:GRAVEL",
+      "raw_value": 9
+    },
+    "gravel_compressed_2": {
+      "name": "精炼砂砾",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "gravel_compressed_1",
+      "raw_value": 81
+    },
+    "dirt_compressed_1": {
+      "name": "压缩泥土",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:DIRT",
+      "raw_value": 9
+    },
+    "dirt_compressed_2": {
+      "name": "精炼泥土",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "dirt_compressed_1",
+      "raw_value": 81
+    },
+    "clay_compressed_1": {
+      "name": "压缩黏土",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CLAY",
+      "raw_value": 9
+    },
+    "clay_compressed_2": {
+      "name": "精炼黏土",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "clay_compressed_1",
+      "raw_value": 81
+    },
+    "stone_compressed_1": {
+      "name": "压缩石头",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:STONE",
+      "raw_value": 9
+    },
+    "stone_compressed_2": {
+      "name": "精炼石头",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "stone_compressed_1",
+      "raw_value": 81
+    },
+    "obsidian_compressed_1": {
+      "name": "压缩黑曜石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:OBSIDIAN",
+      "raw_value": 9
+    },
+    "obsidian_compressed_2": {
+      "name": "精炼黑曜石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "obsidian_compressed_1",
+      "raw_value": 81
+    },
+    "glowstone_compressed_1": {
+      "name": "压缩荧石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:GLOWSTONE",
+      "raw_value": 9
+    },
+    "glowstone_compressed_2": {
+      "name": "精炼荧石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "glowstone_compressed_1",
+      "raw_value": 81
+    },
+    "copper_ingot_compressed_1": {
+      "name": "压缩铜锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COPPER_INGOT",
+      "raw_value": 9
+    },
+    "copper_ingot_compressed_2": {
+      "name": "精炼铜锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "copper_ingot_compressed_1",
+      "raw_value": 81
+    },
+    "iron_ingot_compressed_1": {
+      "name": "压缩铁锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:IRON_INGOT",
+      "raw_value": 9
+    },
+    "iron_ingot_compressed_2": {
+      "name": "精炼铁锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "iron_ingot_compressed_1",
+      "raw_value": 81
+    },
+    "raw_gold_compressed_1": {
+      "name": "压缩粗金",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:RAW_GOLD",
+      "raw_value": 9
+    },
+    "raw_gold_compressed_2": {
+      "name": "精炼粗金",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "raw_gold_compressed_1",
+      "raw_value": 81
+    },
+    "gold_ingot_compressed_1": {
+      "name": "压缩金锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:GOLD_INGOT",
+      "raw_value": 9
+    },
+    "gold_ingot_compressed_2": {
+      "name": "精炼金锭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "gold_ingot_compressed_1",
+      "raw_value": 81
+    },
+    "quartz_compressed_1": {
+      "name": "压缩下界石英",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:QUARTZ",
+      "raw_value": 9
+    },
+    "quartz_compressed_2": {
+      "name": "精炼下界石英",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "quartz_compressed_1",
+      "raw_value": 81
+    },
+    "amethyst_shard_compressed_1": {
+      "name": "压缩紫水晶碎片",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:AMETHYST_SHARD",
+      "raw_value": 9
+    },
+    "amethyst_shard_compressed_2": {
+      "name": "精炼紫水晶碎片",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "amethyst_shard_compressed_1",
+      "raw_value": 81
+    },
+    "emerald_compressed_1": {
+      "name": "压缩绿宝石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:EMERALD",
+      "raw_value": 9
+    },
+    "emerald_compressed_2": {
+      "name": "精炼绿宝石",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "emerald_compressed_1",
+      "raw_value": 81
+    },
+    "netherite_scrap_compressed_1": {
+      "name": "压缩下界合金碎片",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:NETHERITE_SCRAP",
+      "raw_value": 9
+    },
+    "netherite_scrap_compressed_2": {
+      "name": "精炼下界合金碎片",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "netherite_scrap_compressed_1",
+      "raw_value": 81
+    },
+    "rotten_flesh_compressed_1": {
+      "name": "压缩腐肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:ROTTEN_FLESH",
+      "raw_value": 9
+    },
+    "rotten_flesh_compressed_2": {
+      "name": "精炼腐肉",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "rotten_flesh_compressed_1",
+      "raw_value": 81
+    },
+    "bone_compressed_1": {
+      "name": "压缩骨头",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BONE",
+      "raw_value": 9
+    },
+    "bone_compressed_2": {
+      "name": "精炼骨头",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "bone_compressed_1",
+      "raw_value": 81
+    },
+    "arrow_compressed_1": {
+      "name": "压缩箭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:ARROW",
+      "raw_value": 9
+    },
+    "arrow_compressed_2": {
+      "name": "精炼箭",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "arrow_compressed_1",
+      "raw_value": 81
+    },
+    "string_compressed_1": {
+      "name": "压缩线",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:STRING",
+      "raw_value": 9
+    },
+    "string_compressed_2": {
+      "name": "精炼线",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "string_compressed_1",
+      "raw_value": 81
+    },
+    "spider_eye_compressed_1": {
+      "name": "压缩蜘蛛眼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SPIDER_EYE",
+      "raw_value": 9
+    },
+    "spider_eye_compressed_2": {
+      "name": "精炼蜘蛛眼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "spider_eye_compressed_1",
+      "raw_value": 81
+    },
+    "gunpowder_compressed_1": {
+      "name": "压缩火药",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:GUNPOWDER",
+      "raw_value": 9
+    },
+    "gunpowder_compressed_2": {
+      "name": "精炼火药",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "gunpowder_compressed_1",
+      "raw_value": 81
+    },
+    "slime_ball_compressed_1": {
+      "name": "压缩黏液球",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SLIME_BALL",
+      "raw_value": 9
+    },
+    "slime_ball_compressed_2": {
+      "name": "精炼黏液球",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "slime_ball_compressed_1",
+      "raw_value": 81
+    },
+    "ender_pearl_compressed_1": {
+      "name": "压缩末影珍珠",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:ENDER_PEARL",
+      "raw_value": 9
+    },
+    "ender_pearl_compressed_2": {
+      "name": "精炼末影珍珠",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "ender_pearl_compressed_1",
+      "raw_value": 81
+    },
+    "phantom_membrane_compressed_1": {
+      "name": "压缩幻翼膜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:PHANTOM_MEMBRANE",
+      "raw_value": 9
+    },
+    "phantom_membrane_compressed_2": {
+      "name": "精炼幻翼膜",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "phantom_membrane_compressed_1",
+      "raw_value": 81
+    },
+    "ink_sac_compressed_1": {
+      "name": "压缩墨囊",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:INK_SAC",
+      "raw_value": 9
+    },
+    "ink_sac_compressed_2": {
+      "name": "精炼墨囊",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "ink_sac_compressed_1",
+      "raw_value": 81
+    },
+    "blaze_rod_compressed_1": {
+      "name": "压缩烈焰棒",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BLAZE_ROD",
+      "raw_value": 9
+    },
+    "blaze_rod_compressed_2": {
+      "name": "精炼烈焰棒",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "blaze_rod_compressed_1",
+      "raw_value": 81
+    },
+    "magma_cream_compressed_1": {
+      "name": "压缩岩浆膏",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:MAGMA_CREAM",
+      "raw_value": 9
+    },
+    "magma_cream_compressed_2": {
+      "name": "精炼岩浆膏",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "magma_cream_compressed_1",
+      "raw_value": 81
+    },
+    "ghast_tear_compressed_1": {
+      "name": "压缩恶魂之泪",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:GHAST_TEAR",
+      "raw_value": 9
+    },
+    "ghast_tear_compressed_2": {
+      "name": "精炼恶魂之泪",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "ghast_tear_compressed_1",
+      "raw_value": 81
+    },
+    "shulker_shell_compressed_1": {
+      "name": "压缩潜影壳",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SHULKER_SHELL",
+      "raw_value": 9
+    },
+    "shulker_shell_compressed_2": {
+      "name": "精炼潜影壳",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "shulker_shell_compressed_1",
+      "raw_value": 81
+    },
+    "breeze_rod_compressed_1": {
+      "name": "压缩旋风棒",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BREEZE_ROD",
+      "raw_value": 9
+    },
+    "breeze_rod_compressed_2": {
+      "name": "精炼旋风棒",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "breeze_rod_compressed_1",
+      "raw_value": 81
+    },
+    "nether_star_compressed_1": {
+      "name": "压缩下界之星",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:NETHER_STAR",
+      "raw_value": 9
+    },
+    "nether_star_compressed_2": {
+      "name": "精炼下界之星",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "nether_star_compressed_1",
+      "raw_value": 81
+    },
+    "oak_log_compressed_1": {
+      "name": "压缩橡木原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:OAK_LOG",
+      "raw_value": 9
+    },
+    "oak_log_compressed_2": {
+      "name": "精炼橡木原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "oak_log_compressed_1",
+      "raw_value": 81
+    },
+    "spruce_log_compressed_1": {
+      "name": "压缩云杉原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SPRUCE_LOG",
+      "raw_value": 9
+    },
+    "spruce_log_compressed_2": {
+      "name": "精炼云杉原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "spruce_log_compressed_1",
+      "raw_value": 81
+    },
+    "birch_log_compressed_1": {
+      "name": "压缩白桦原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:BIRCH_LOG",
+      "raw_value": 9
+    },
+    "birch_log_compressed_2": {
+      "name": "精炼白桦原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "birch_log_compressed_1",
+      "raw_value": 81
+    },
+    "jungle_log_compressed_1": {
+      "name": "压缩丛林原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:JUNGLE_LOG",
+      "raw_value": 9
+    },
+    "jungle_log_compressed_2": {
+      "name": "精炼丛林原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "jungle_log_compressed_1",
+      "raw_value": 81
+    },
+    "acacia_log_compressed_1": {
+      "name": "压缩金合欢原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:ACACIA_LOG",
+      "raw_value": 9
+    },
+    "acacia_log_compressed_2": {
+      "name": "精炼金合欢原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "acacia_log_compressed_1",
+      "raw_value": 81
+    },
+    "dark_oak_log_compressed_1": {
+      "name": "压缩深色橡木原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:DARK_OAK_LOG",
+      "raw_value": 9
+    },
+    "dark_oak_log_compressed_2": {
+      "name": "精炼深色橡木原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "dark_oak_log_compressed_1",
+      "raw_value": 81
+    },
+    "mangrove_log_compressed_1": {
+      "name": "压缩红树原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:MANGROVE_LOG",
+      "raw_value": 9
+    },
+    "mangrove_log_compressed_2": {
+      "name": "精炼红树原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "mangrove_log_compressed_1",
+      "raw_value": 81
+    },
+    "cherry_log_compressed_1": {
+      "name": "压缩樱花原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CHERRY_LOG",
+      "raw_value": 9
+    },
+    "cherry_log_compressed_2": {
+      "name": "精炼樱花原木",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cherry_log_compressed_1",
+      "raw_value": 81
+    },
+    "crimson_stem_compressed_1": {
+      "name": "压缩绯红菌柄",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:CRIMSON_STEM",
+      "raw_value": 9
+    },
+    "crimson_stem_compressed_2": {
+      "name": "精炼绯红菌柄",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "crimson_stem_compressed_1",
+      "raw_value": 81
+    },
+    "warped_stem_compressed_1": {
+      "name": "压缩诡异菌柄",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:WARPED_STEM",
+      "raw_value": 9
+    },
+    "warped_stem_compressed_2": {
+      "name": "精炼诡异菌柄",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "warped_stem_compressed_1",
+      "raw_value": 81
+    },
+    "cod_compressed_1": {
+      "name": "压缩鳕鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COD",
+      "raw_value": 9
+    },
+    "cod_compressed_2": {
+      "name": "精炼鳕鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cod_compressed_1",
+      "raw_value": 81
+    },
+    "salmon_compressed_1": {
+      "name": "压缩鲑鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:SALMON",
+      "raw_value": 9
+    },
+    "salmon_compressed_2": {
+      "name": "精炼鲑鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "salmon_compressed_1",
+      "raw_value": 81
+    },
+    "tropical_fish_compressed_1": {
+      "name": "压缩热带鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:TROPICAL_FISH",
+      "raw_value": 9
+    },
+    "tropical_fish_compressed_2": {
+      "name": "精炼热带鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "tropical_fish_compressed_1",
+      "raw_value": 81
+    },
+    "pufferfish_compressed_1": {
+      "name": "压缩河豚",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:PUFFERFISH",
+      "raw_value": 9
+    },
+    "pufferfish_compressed_2": {
+      "name": "精炼河豚",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "pufferfish_compressed_1",
+      "raw_value": 81
+    },
+    "cooked_cod_compressed_1": {
+      "name": "压缩熟鳕鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COOKED_COD",
+      "raw_value": 9
+    },
+    "cooked_cod_compressed_2": {
+      "name": "精炼熟鳕鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cooked_cod_compressed_1",
+      "raw_value": 81
+    },
+    "cooked_salmon_compressed_1": {
+      "name": "压缩熟鲑鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "vanilla:COOKED_SALMON",
+      "raw_value": 9
+    },
+    "cooked_salmon_compressed_2": {
+      "name": "精炼熟鲑鱼",
+      "material": "PAPER",
+      "kind": "material",
+      "compression": "cooked_salmon_compressed_1",
+      "raw_value": 81
+    },
     "farming_rare_fragment": {
       "name": "穗晶碎片",
       "material": "PRISMARINE_SHARD",

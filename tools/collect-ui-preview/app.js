@@ -127,6 +127,7 @@
       itemIndex: 0,
       tier: 1,
       recipeIdx: 0,
+      recipeStack: [], // 原料下钻追踪栈：存放 professionItem.id
       lbCategoryId: null, // null = overall
       missingCategoryId: null
     },
@@ -294,6 +295,14 @@
     const m = MATERIAL_RECIPES[material];
     if (!m) return [];
     return Object.keys(m).map(Number).sort((a, b) => a - b);
+  }
+
+  function findCollectionByMaterial(material) {
+    for (const cat of CATEGORIES) {
+      const idx = cat.items.findIndex(it => it.material === material);
+      if (idx >= 0) return { cat, item: cat.items[idx], itemIndex: idx };
+    }
+    return null;
   }
 
   // ---------- Web Audio 合成音效 ----------
@@ -1049,6 +1058,7 @@
             state.view.type = "tierRecipe";
             state.view.tier = tier;
             state.view.recipeIdx = 0;
+            state.view.recipeStack = [];
             playTone("click");
             render();
           },
@@ -1090,9 +1100,22 @@
     const tierRecipes = getRecipesForTier(item.material, tier);
     const recipeIdx = Math.max(0, Math.min(state.view.recipeIdx, Math.max(0, tierRecipes.length - 1)));
     state.view.recipeIdx = recipeIdx;
+    const drillStack = Array.isArray(state.view.recipeStack)
+      ? state.view.recipeStack.filter(id => PROF_ITEMS[id] && (PROF_ITEMS[id].compression || PROF_ITEMS[id].recipe))
+      : [];
+    state.view.recipeStack = drillStack;
+    const isDrilling = drillStack.length > 0;
+    const rootRef = tierRecipes.length > 0 ? tierRecipes[recipeIdx] : null;
+    const rootPi = rootRef ? PROF_ITEMS[rootRef.itemId] : null;
+    const activePi = isDrilling ? PROF_ITEMS[drillStack[drillStack.length - 1]] : rootPi;
 
-    elTitle.textContent = `${item.name} ${roman(tier)} · 奖励与合成配方`;
-    elHint.textContent = "左侧为 3×3 合成台摆放，右侧为成品，底部可切换不同配方或翻看上下级";
+    if (isDrilling && activePi) {
+      elTitle.textContent = `${activePi.name} · 原料合成配方`;
+      elHint.textContent = "已导航查看该原料的 3×3 合成配方 · 可继续点击可合成原料，或点击左下角返回上一层";
+    } else {
+      elTitle.textContent = `${item.name} ${roman(tier)} · 奖励与合成配方`;
+      elHint.textContent = "左侧为 3×3 合成台摆放，右侧为成品，点击可合成原料可逐级导航查看合成";
+    }
 
     const slots = Array.from({ length: 54 }, () => makeFiller("pane-gray"));
 
@@ -1138,9 +1161,8 @@
 
     // 3x3 合成工作台网格：slots [10,11,12, 19,20,21, 28,29,30]
     const craftSlots = [10, 11, 12, 19, 20, 21, 28, 29, 30];
-    if (tierRecipes.length > 0) {
-      const activeRef = tierRecipes[recipeIdx];
-      const pi = PROF_ITEMS[activeRef.itemId];
+    if (activePi) {
+      const pi = activePi;
       // 按 ProfessionCrafting.java: shape("ANB", "APB", "ANB") 或 9格压缩
       const tokens = pi.compression
         ? Array(9).fill(pi.compression)
@@ -1152,20 +1174,25 @@
 
       tokens.forEach((tok, idx) => {
         const info = tokenDisplay(tok);
+        const canDrill = !!(info.profItem && (info.profItem.compression || info.profItem.recipe));
+        const colRef = !info.profItem ? findCollectionByMaterial(info.material) : null;
         const lore = info.profItem
           ? [
               `<span class="c-gray">来源：自定义职业物品 (<span class="c-yellow">${info.profItem.id}</span>)</span>`,
               "",
               ...buildProfessionItemLore(info.profItem),
               "",
-              info.profItem.compression || info.profItem.recipe
-                ? `<span class="c-aqua">（提示：点击可预览该原料本身的合成方式）</span>`
-                : ""
+              canDrill
+                ? `<span class="c-aqua bold">▶ 点击进入查看「${info.name}」的 3×3 合成配方</span>`
+                : `<span class="c-gray">（基础掉落材料，不可继续向下拆分）</span>`
             ].filter(Boolean)
           : [
-              `<span class="c-gray">原版材料：<span class="c-yellow">${info.material}</span></span>`,
-              `<span class="c-gray">工作台格位 #${idx + 1}</span>`
-            ];
+              `<span class="c-gray">基础原材料：<span class="c-yellow">${info.name}</span> <span class="c-dark_gray">(${info.material})</span></span>`,
+              `<span class="c-gray">工作台格位 #${idx + 1}</span>`,
+              colRef
+                ? `<span class="c-gray">当前已收集：<span class="c-aqua">${formatNumber(getAmount(colRef.cat, colRef.item.material))}</span> <span class="c-dark_gray">(${colRef.cat.title})</span></span>`
+                : ""
+            ].filter(Boolean);
 
         slots[craftSlots[idx]] = makeIcon(info.material, `<span class="c-yellow bold">${info.name}</span>`, lore, {
           glow: info.visual ? info.visual.glow : false,
@@ -1173,22 +1200,37 @@
           badgeClass: info.visual ? info.visual.badgeClass : "",
           colorHex: info.profItem ? rgbIntToHex(info.profItem.color) : null,
           extraClass: "craft-grid",
-          onClick: info.profItem && (info.profItem.compression || info.profItem.recipe) ? () => {
-            // 如果原料本身也是职业物品，在聊天栏给出提示并跳到它对应的合成配方
-            pushChat(`<span class="c-aqua">[配方追踪]</span> <span class="c-gray">原料 <span class="c-gold">${info.name}</span>：${info.profItem.compression ? `9 × ${tokenDisplay(info.profItem.compression).name} 压缩合成` : `使用 3×3 职业合成表制作`}。</span>`);
+          onClick: canDrill ? () => {
+            if (drillStack[drillStack.length - 1] !== info.profItem.id) {
+              state.view.recipeStack = [...drillStack, info.profItem.id];
+            }
+            pushChat(`<span class="c-aqua">[配方导航]</span> <span class="c-gray">已展开原料 <span class="c-gold">${info.name}</span> 的 3×3 合成配方（${info.profItem.compression ? `9 × ${tokenDisplay(info.profItem.compression).name} 压缩合成` : `3×3 职业合成表`}）。</span>`);
             playTone("click");
+            render();
           } : null
         });
       });
 
       // 中间：工作台说明
-      slots[22] = makeIcon("CRAFTING_TABLE", `<span class="c-gold bold">3×3 合成规则</span>`, [
+      const chainNames = [
+        ...(rootPi ? [rootPi.name] : []),
+        ...drillStack.map(id => PROF_ITEMS[id].name)
+      ];
+      const craftSummaryLines = [
         `<span class="c-gray">当前配方：</span><span class="c-yellow">${pi.name}</span>`,
         `<span class="c-gray">合成类型：</span><span class="c-aqua">${pi.compression ? "九宫格压缩（9 合 1）" : "有序合成（ANB / APB / ANB）"}</span>`,
-        `<span class="c-gray">关联说明：</span><span class="c-green">${activeRef.reason}</span>`,
+        pi.compression
+          ? `<span class="c-gray">单次原料：</span><span class="c-green">9 × ${tokenDisplay(pi.compression).name}</span>`
+          : "",
+        isDrilling
+          ? `<span class="c-gray">追踪路径：</span><span class="c-light_purple">${chainNames.join(" → ")}</span>`
+          : (rootRef ? `<span class="c-gray">关联说明：</span><span class="c-green">${rootRef.reason}</span>` : ""),
         "",
-        `<span class="c-gray">游戏内输入 /profession 可选择配方并在工作台合成。</span>`
-      ]);
+        isDrilling
+          ? `<span class="c-yellow">提示：点击下方追踪链或左下角箭头可逐级返回。</span>`
+          : `<span class="c-gray">游戏内输入 /profession 可选择配方并在工作台合成。</span>`
+      ].filter(Boolean);
+      slots[22] = makeIcon("CRAFTING_TABLE", `<span class="c-gold bold">${isDrilling ? "3×3 合成规则（原料追踪）" : "3×3 合成规则"}</span>`, craftSummaryLines);
 
       // 右侧：合成成品槽
       const outVisual = resolveProfessionVisual(pi);
@@ -1204,32 +1246,67 @@
         extraClass: "craft-output"
       });
 
-      // 第 5 行（37..43）：同一层级多配方切换栏
+      // 第 5 行（37..43）：下钻中显示配方追踪链，否则显示同一层级多配方切换栏
       const switcherSlots = [37, 38, 39, 40, 41, 42, 43];
-      tierRecipes.slice(0, switcherSlots.length).forEach((ref, idx) => {
-        const subPi = PROF_ITEMS[ref.itemId];
-        const subVisual = resolveProfessionVisual(subPi);
-        const selected = idx === recipeIdx;
-        slots[switcherSlots[idx]] = makeIcon(
-          subVisual.material,
-          `<span class="${selected ? "c-green" : "c-gold"} bold">${subPi.name}</span>`,
-          [
-            `<span class="c-gray">${ref.reason}</span>`,
-            `<span class="${selected ? "c-green" : "c-yellow"}">${selected ? "✔ 当前正在预览" : "点击切换预览此合成配方"}</span>`
-          ],
-          {
-            glow: selected || subVisual.glow,
-            badge: subVisual.badge,
-            badgeClass: subVisual.badgeClass,
-            colorHex: rgbIntToHex(subPi.color),
-            onClick: () => {
-              state.view.recipeIdx = idx;
-              playTone("click");
-              render();
+      if (isDrilling) {
+        const trail = [];
+        if (rootPi) {
+          trail.push({ pi: rootPi, depth: 0, label: "顶层配方" });
+        }
+        drillStack.forEach((id, i) => {
+          trail.push({ pi: PROF_ITEMS[id], depth: i + 1, label: `原料追踪 #${i + 1}` });
+        });
+        const visibleTrail = trail.slice(-switcherSlots.length);
+        visibleTrail.forEach((node, idx) => {
+          const isCurrent = node.depth === drillStack.length;
+          const subVisual = resolveProfessionVisual(node.pi);
+          slots[switcherSlots[idx]] = makeIcon(
+            subVisual.material,
+            `<span class="${isCurrent ? "c-green" : "c-gold"} bold">${node.pi.name}</span>`,
+            [
+              `<span class="c-gray">${node.label}</span>`,
+              `<span class="${isCurrent ? "c-green" : "c-yellow"}">${isCurrent ? "✔ 当前正在查看" : "点击返回查看此配方"}</span>`
+            ],
+            {
+              glow: isCurrent || subVisual.glow,
+              badge: subVisual.badge,
+              badgeClass: subVisual.badgeClass,
+              colorHex: rgbIntToHex(node.pi.color),
+              onClick: isCurrent ? null : () => {
+                state.view.recipeStack = drillStack.slice(0, node.depth);
+                playTone("click");
+                render();
+              }
             }
-          }
-        );
-      });
+          );
+        });
+      } else {
+        tierRecipes.slice(0, switcherSlots.length).forEach((ref, idx) => {
+          const subPi = PROF_ITEMS[ref.itemId];
+          const subVisual = resolveProfessionVisual(subPi);
+          const selected = idx === recipeIdx;
+          slots[switcherSlots[idx]] = makeIcon(
+            subVisual.material,
+            `<span class="${selected ? "c-green" : "c-gold"} bold">${subPi.name}</span>`,
+            [
+              `<span class="c-gray">${ref.reason}</span>`,
+              `<span class="${selected ? "c-green" : "c-yellow"}">${selected ? "✔ 当前正在预览" : "点击切换预览此合成配方"}</span>`
+            ],
+            {
+              glow: selected || subVisual.glow,
+              badge: subVisual.badge,
+              badgeClass: subVisual.badgeClass,
+              colorHex: rgbIntToHex(subPi.color),
+              onClick: () => {
+                state.view.recipeIdx = idx;
+                state.view.recipeStack = [];
+                playTone("click");
+                render();
+              }
+            }
+          );
+        });
+      }
     } else {
       // 该层级暂未绑定专属合成配方
       craftSlots.forEach(s => {
@@ -1270,22 +1347,51 @@
       });
     }
 
-    // 底部导航：返回物品详情 / 上一级 / 关闭 / 下一级
-    slots[45] = makeIcon("ARROW", `<span class="c-gold bold">返回 ${item.name} 详情</span>`, [`<span class="c-gray">回到等级玻璃板总览。</span>`], {
-      onClick: () => { state.view.type = "detail"; playTone("click"); render(); }
-    });
-    if (tier > 1) {
-      slots[47] = makeIcon("ARROW", `<span class="c-yellow bold">上一级 (${roman(tier - 1)})</span>`, [`<span class="c-gray">查看 ${item.name} ${roman(tier - 1)} 的奖励与配方。</span>`], {
-        onClick: () => { state.view.tier = tier - 1; state.view.recipeIdx = 0; playTone("click"); render(); }
+    // 底部导航：下钻时优先提供「返回上一层配方」，否则返回物品详情 / 上一级 / 关闭 / 下一级
+    if (isDrilling) {
+      const prevPi = drillStack.length > 1 ? PROF_ITEMS[drillStack[drillStack.length - 2]] : rootPi;
+      const prevName = prevPi ? prevPi.name : `${item.name} ${roman(tier)}`;
+      slots[45] = makeIcon("ARROW", `<span class="c-aqua bold">返回上一层 (${prevName})</span>`, [
+        `<span class="c-gray">退回上一个正在查看的合成配方。</span>`
+      ], {
+        onClick: () => {
+          state.view.recipeStack = drillStack.slice(0, -1);
+          playTone("click");
+          render();
+        }
       });
-    }
-    slots[49] = makeIcon("BARRIER", `<span class="c-gold bold">关闭界面</span>`, [`<span class="c-gray">回到收集中心。</span>`], {
-      onClick: () => { state.view.type = "hub"; render(); }
-    });
-    if (tier < mt) {
-      slots[51] = makeIcon("ARROW", `<span class="c-yellow bold">下一级 (${roman(tier + 1)})</span>`, [`<span class="c-gray">查看 ${item.name} ${roman(tier + 1)} 的奖励与配方。</span>`], {
-        onClick: () => { state.view.tier = tier + 1; state.view.recipeIdx = 0; playTone("click"); render(); }
+      slots[47] = makeIcon("ARROW", `<span class="c-gold bold">返回 ${item.name} 详情</span>`, [`<span class="c-gray">回到等级玻璃板总览。</span>`], {
+        onClick: () => {
+          state.view.recipeStack = [];
+          state.view.type = "detail";
+          playTone("click");
+          render();
+        }
       });
+      slots[49] = makeIcon("BARRIER", `<span class="c-gold bold">关闭界面</span>`, [`<span class="c-gray">回到收集中心。</span>`], {
+        onClick: () => {
+          state.view.recipeStack = [];
+          state.view.type = "hub";
+          render();
+        }
+      });
+    } else {
+      slots[45] = makeIcon("ARROW", `<span class="c-gold bold">返回 ${item.name} 详情</span>`, [`<span class="c-gray">回到等级玻璃板总览。</span>`], {
+        onClick: () => { state.view.type = "detail"; playTone("click"); render(); }
+      });
+      if (tier > 1) {
+        slots[47] = makeIcon("ARROW", `<span class="c-yellow bold">上一级 (${roman(tier - 1)})</span>`, [`<span class="c-gray">查看 ${item.name} ${roman(tier - 1)} 的奖励与配方。</span>`], {
+          onClick: () => { state.view.tier = tier - 1; state.view.recipeIdx = 0; state.view.recipeStack = []; playTone("click"); render(); }
+        });
+      }
+      slots[49] = makeIcon("BARRIER", `<span class="c-gold bold">关闭界面</span>`, [`<span class="c-gray">回到收集中心。</span>`], {
+        onClick: () => { state.view.type = "hub"; render(); }
+      });
+      if (tier < mt) {
+        slots[51] = makeIcon("ARROW", `<span class="c-yellow bold">下一级 (${roman(tier + 1)})</span>`, [`<span class="c-gray">查看 ${item.name} ${roman(tier + 1)} 的奖励与配方。</span>`], {
+          onClick: () => { state.view.tier = tier + 1; state.view.recipeIdx = 0; state.view.recipeStack = []; playTone("click"); render(); }
+        });
+      }
     }
     return slots;
   }
@@ -1578,7 +1684,19 @@
       crumbs.push({ label: item.name, onClick: () => { v.type = "detail"; render(); } });
     }
     if (v.type === "tierRecipe") {
-      crumbs.push({ label: `第 ${roman(v.tier)} 级 · 合成配方`, onClick: null });
+      const stack = Array.isArray(v.recipeStack) ? v.recipeStack : [];
+      crumbs.push({
+        label: `第 ${roman(v.tier)} 级 · 合成配方`,
+        onClick: stack.length > 0 ? () => { v.recipeStack = []; render(); } : null
+      });
+      stack.forEach((id, i) => {
+        const pi = PROF_ITEMS[id];
+        if (!pi) return;
+        crumbs.push({
+          label: pi.name,
+          onClick: i < stack.length - 1 ? () => { v.recipeStack = stack.slice(0, i + 1); render(); } : null
+        });
+      });
     } else if (v.type === "leaderboard") {
       crumbs.push({ label: "排行榜", onClick: null });
     } else if (v.type === "missing") {
@@ -1762,8 +1880,14 @@
     elSimItem.addEventListener("change", renderInspectorCurrent);
     populateSimItems(CATEGORIES[0].id);
 
-    // 推荐配方快捷按钮
-    const recipeMats = Object.keys(MATERIAL_RECIPES);
+    // 推荐职业套装配方快捷按钮（筛选含 3 阶以上/装备配方的 12 个核心物品）
+    const recipeMats = Object.keys(MATERIAL_RECIPES).filter(mat => {
+      const tiers = getAllRecipeTiersForMaterial(mat);
+      return tiers.some(t => getRecipesForTier(mat, t).some(r => {
+        const pi = PROF_ITEMS[r.itemId];
+        return pi && pi.kind !== "material";
+      }));
+    });
     elRecipeShortcuts.innerHTML = "";
     recipeMats.forEach(mat => {
       // 找到对应分类与物品索引
@@ -1780,6 +1904,7 @@
             state.view.itemIndex = idx;
             state.view.tier = tiers[0];
             state.view.recipeIdx = 0;
+            state.view.recipeStack = [];
             syncInspectorSelection(cat.id, mat);
             playTone("click");
             render();
@@ -1970,6 +2095,9 @@
   }
 
   function render() {
+    if (state.view.type !== "tierRecipe" && state.view.recipeStack && state.view.recipeStack.length > 0) {
+      state.view.recipeStack = [];
+    }
     renderBreadcrumbs();
     renderGrid();
     renderInspectorCurrent();

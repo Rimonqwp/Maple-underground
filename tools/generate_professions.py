@@ -62,10 +62,57 @@ def materials(job, tier):
 parts = {'helmet': ('LEATHER_HELMET','头盔'), 'chestplate': ('LEATHER_CHESTPLATE','胸甲'),
          'leggings': ('LEATHER_LEGGINGS','护腿'), 'boots': ('LEATHER_BOOTS','靴子')}
 branches = ['yield','experience','balanced','rare','event']
-for material in ['WHEAT','CARROT','POTATO','SUGAR_CANE','PUMPKIN','COCOA_BEANS','COAL','RAW_IRON','RAW_COPPER','REDSTONE','LAPIS_LAZULI','DIAMOND']:
-    for tier, label in enumerate(['压缩','精炼','致密','极致'],1):
-        items[compressed(material,tier)] = dict(name=label+{'WHEAT':'小麦','CARROT':'胡萝卜','POTATO':'土豆','SUGAR_CANE':'甘蔗','PUMPKIN':'南瓜','COCOA_BEANS':'可可豆','COAL':'煤炭','RAW_IRON':'粗铁','RAW_COPPER':'粗铜','REDSTONE':'红石','LAPIS_LAZULI':'青金石','DIAMOND':'钻石'}[material],
-            material='PAPER', kind='material', compression=vanilla(material) if tier==1 else compressed(material,tier-1), raw_value=9**tier)
+FULL_COMPRESSED_NAMES = {
+    'WHEAT': '小麦', 'CARROT': '胡萝卜', 'POTATO': '土豆', 'SUGAR_CANE': '甘蔗',
+    'PUMPKIN': '南瓜', 'COCOA_BEANS': '可可豆', 'COAL': '煤炭', 'RAW_IRON': '粗铁',
+    'RAW_COPPER': '粗铜', 'REDSTONE': '红石', 'LAPIS_LAZULI': '青金石', 'DIAMOND': '钻石',
+}
+TWO_TIER_COMPRESSED_NAMES = {
+    # 农耕其余21项
+    'TORCHFLOWER_SEEDS': '火把花种子', 'PITCHER_POD': '瓶子草荚果', 'WHEAT_SEEDS': '小麦种子',
+    'BEETROOT': '甜菜根', 'MELON': '西瓜', 'BAMBOO': '竹子', 'CACTUS': '仙人掌',
+    'SWEET_BERRIES': '甜浆果', 'BROWN_MUSHROOM': '棕色蘑菇', 'RED_MUSHROOM': '红色蘑菇',
+    'NETHER_WART': '地狱疣', 'KELP': '海带', 'LEATHER': '皮革', 'RABBIT_HIDE': '兔子皮',
+    'RABBIT_FOOT': '兔子脚', 'BEEF': '生牛肉', 'PORKCHOP': '生猪排', 'MUTTON': '生羊肉',
+    'CHICKEN': '生鸡肉', 'RABBIT': '生兔肉', 'FEATHER': '羽毛',
+    # 挖矿其余15项
+    'SAND': '沙子', 'GRAVEL': '砂砾', 'DIRT': '泥土', 'CLAY': '黏土', 'STONE': '石头',
+    'OBSIDIAN': '黑曜石', 'GLOWSTONE': '荧石', 'COPPER_INGOT': '铜锭', 'IRON_INGOT': '铁锭',
+    'RAW_GOLD': '粗金', 'GOLD_INGOT': '金锭', 'QUARTZ': '下界石英',
+    'AMETHYST_SHARD': '紫水晶碎片', 'EMERALD': '绿宝石', 'NETHERITE_SCRAP': '下界合金碎片',
+    # 战斗全部16项
+    'ROTTEN_FLESH': '腐肉', 'BONE': '骨头', 'ARROW': '箭', 'STRING': '线',
+    'SPIDER_EYE': '蜘蛛眼', 'GUNPOWDER': '火药', 'SLIME_BALL': '黏液球',
+    'ENDER_PEARL': '末影珍珠', 'PHANTOM_MEMBRANE': '幻翼膜', 'INK_SAC': '墨囊',
+    'BLAZE_ROD': '烈焰棒', 'MAGMA_CREAM': '岩浆膏', 'GHAST_TEAR': '恶魂之泪',
+    'SHULKER_SHELL': '潜影壳', 'BREEZE_ROD': '旋风棒', 'NETHER_STAR': '下界之星',
+    # 伐木全部10项
+    'OAK_LOG': '橡木原木', 'SPRUCE_LOG': '云杉原木', 'BIRCH_LOG': '白桦原木',
+    'JUNGLE_LOG': '丛林原木', 'ACACIA_LOG': '金合欢原木', 'DARK_OAK_LOG': '深色橡木原木',
+    'MANGROVE_LOG': '红树原木', 'CHERRY_LOG': '樱花原木', 'CRIMSON_STEM': '绯红菌柄',
+    'WARPED_STEM': '诡异菌柄',
+    # 钓鱼全部6项
+    'COD': '鳕鱼', 'SALMON': '鲑鱼', 'TROPICAL_FISH': '热带鱼',
+    'PUFFERFISH': '河豚', 'COOKED_COD': '熟鳕鱼', 'COOKED_SALMON': '熟鲑鱼',
+}
+for material, cn_name in FULL_COMPRESSED_NAMES.items():
+    for tier, label in enumerate(['压缩', '精炼', '致密', '极致'], 1):
+        items[compressed(material, tier)] = dict(
+            name=label + cn_name,
+            material='PAPER',
+            kind='material',
+            compression=vanilla(material) if tier == 1 else compressed(material, tier - 1),
+            raw_value=9 ** tier,
+        )
+for material, cn_name in TWO_TIER_COMPRESSED_NAMES.items():
+    for tier, label in enumerate(['压缩', '精炼'], 1):
+        items[compressed(material, tier)] = dict(
+            name=label + cn_name,
+            material='PAPER',
+            kind='material',
+            compression=vanilla(material) if tier == 1 else compressed(material, tier - 1),
+            raw_value=9 ** tier,
+        )
 
 for job in ['farming','mining']:
     farm = job == 'farming'

@@ -1037,7 +1037,7 @@
           lore.push(`<span class="c-dark_gray">  ... 共 ${tierRecipes.length} 个配方</span>`);
         }
       }
-      lore.push("", `<span class="c-yellow bold">左键：点进查看本级详情与 3×3 合成表</span>`);
+      lore.push("", `<span class="c-yellow bold">点击进入本级详情</span>`);
       if (collected >= req && tier > claimed) {
         lore.push(`<span class="c-aqua">右键：立即领取至 ${roman(tier)} 级奖励</span>`);
       }

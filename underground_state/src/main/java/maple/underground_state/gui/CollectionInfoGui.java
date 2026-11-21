@@ -540,7 +540,7 @@ public final class CollectionInfoGui {
         }
         if (tierPageEnabled) {
             lore.add(Component.empty());
-            lore.add(actionText("左键：点进查看本级详情与 3×3 合成表"));
+            lore.add(actionText("点击进入本级详情"));
             if (hasBridge && collected >= required && tier > claimedTier) {
                 lore.add(text("右键：立即领取至 " + roman(tier) + " 级奖励", NamedTextColor.AQUA));
             }

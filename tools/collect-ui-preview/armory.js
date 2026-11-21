@@ -47,11 +47,12 @@
 
   const RARITY_FILTERS = [
     { id: "all", label: "全部稀有度" },
+    { id: "普通", label: "普通" },
     { id: "稀有", label: "稀有" },
     { id: "史詩", label: "史詩" },
     { id: "傳說", label: "傳說" },
-    { id: "永恆", label: "永恆" },
-    { id: "职业", label: "职业装备" }
+    { id: "神話", label: "神話" },
+    { id: "永恆", label: "永恆" }
   ];
 
   // Runtime state for Armory Compendium
@@ -276,9 +277,6 @@
   // Search & Filter Matching
   // ------------------------------------------------------------------
   function itemRarityKey(item, setObj) {
-    if ((item && item.job) || (setObj && (setObj.category === "prof_farming" || setObj.category === "prof_mining"))) {
-      return "职业";
-    }
     return (item && item.rarity) || (setObj && setObj.rarity) || "特殊";
   }
 
@@ -796,9 +794,9 @@
     ];
     for (const pc of profConfigs) {
       if (cat !== "all" && cat !== pc.key) continue;
-      const wList = pc.data.weapons.filter(it => matchesFilters(itemSearchText(it, pc.title), "职业"));
-      const tList = pc.data.tools.filter(it => matchesFilters(itemSearchText(it, pc.title), "职业"));
-      const sList = pc.data.sets.filter(s => matchesFilters(setSearchText(s) + " " + pc.title, "职业"));
+      const wList = pc.data.weapons.filter(it => matchesFilters(itemSearchText(it, pc.title), itemRarityKey(it, null)));
+      const tList = pc.data.tools.filter(it => matchesFilters(itemSearchText(it, pc.title), itemRarityKey(it, null)));
+      const sList = pc.data.sets.filter(s => matchesFilters(setSearchText(s) + " " + pc.title, itemRarityKey(null, s)));
       if (!wList.length && !tList.length && !sList.length) continue;
 
       const totalCount = wList.length + tList.length + sList.length * 4;

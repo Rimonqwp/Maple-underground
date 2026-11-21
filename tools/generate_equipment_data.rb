@@ -601,34 +601,102 @@ BRANCH_LABELS = {
   'event' => '事件专精'
 }.freeze
 
+RARITY_PALETTES = {
+  '普通' => %w[E9FFF2 DDFBEE D1F7EA C5F3E6 BAEFE3 AEEBDF A2E7DB 96E3D7],
+  '稀有' => %w[7FAFFF 8AB2FF 96B6FF A1B9FF ADBDFF B8C0FF C4C4FF CFC7FF],
+  '史诗' => %w[C09BFF C79EF8 CFA2F1 D6A5EA DDA9E3 E4ACDC ECB0D5 F3B3CE],
+  '传说' => %w[FFE4B8 FFDFC0 FFD9C8 FFD4CF FFCED7 FFC9DF FFC3E8 FFBEF0],
+  '神话' => %w[FFB6F0 FFAFE8 FFA9E0 FFA2D8 FF9CD0 FF95C8 FF8FC0 FF88B8],
+  '永恒' => %w[FFEDEE FFE7EA FFE1E6 FFDBE2 FFD5DE FFCFDA FFC9D6 FFC3D2]
+}.freeze
+
+def prof_rarity_of(set_cfg)
+  return '普通' unless set_cfg
+  branch = set_cfg['branch'].to_s
+  tier = set_cfg['tier'].to_i
+  if branch == 'main'
+    case tier
+    when 1 then '普通'
+    when 2 then '稀有'
+    when 3 then '史诗'
+    when 4 then '传说'
+    when 5 then '神话'
+    else '永恒'
+    end
+  else
+    tier >= 2 ? '传说' : '史诗'
+  end
+end
+
+def prof_gradient(text, rarity, bold: false)
+  palette = RARITY_PALETTES[rarity] || RARITY_PALETTES['普通']
+  chars = text.chars
+  out = +(bold ? '&l' : '')
+  chars.each_with_index do |ch, i|
+    hex = palette[(i * palette.length) / [chars.length, 1].max]
+    out << "&##{hex}#{ch}"
+  end
+  out
+end
+
+def fmt_stat(v)
+  f = v.to_f
+  (f == f.to_i) ? f.to_i.to_s : f.to_s
+end
+
 def build_prof_lore(item_cfg, set_cfg)
   kind = item_cfg['kind'].to_s
   job_cn = item_cfg['job'] == 'farming' ? '农业' : '挖矿'
+  rarity = prof_rarity_of(set_cfg)
   lore = []
-  lore << "&7#{job_cn}等级要求：#{item_cfg['level'].to_i}"
+  lore << '&8可放在铁砧/附魔台'
+  lore << "&7#{job_cn}等级要求: &e#{item_cfg['level'].to_i}"
   if kind == 'armor' && set_cfg
-    hp_piece = set_cfg['health'].to_f / 4.0
-    def_piece = set_cfg['defense'].to_f / 4.0
-    lore << "&7生命 +#{hp_piece}  防御 +#{def_piece}"
+    lore << "&7生命: &a+#{fmt_stat(set_cfg['health'].to_f / 4.0)}"
+    lore << "&7防御: &a+#{fmt_stat(set_cfg['defense'].to_f / 4.0)}"
     %w[fortune xp rare event].each do |field|
       val = set_cfg[field].to_f
       next unless val > 0
+      color = case field
+              when 'fortune' then '&a'
+              when 'xp' then '&b'
+              when 'rare' then '&d'
+              else '&6'
+              end
       suffix = field == 'fortune' ? '' : '%'
-      lore << "&7#{FIELD_LABELS[field]} +#{val / 5.0}#{suffix}"
+      lore << "&7#{FIELD_LABELS[field]}: #{color}+#{fmt_stat(val / 5.0)}#{suffix}"
     end
+    lore << ''
+    lore << '&#FFE066◆ &#FFCB49套&#FFC13A装&#FFB72C奖&#FFAD1D励 &#FF9800◆'
     lore << '&7四件同套：加成补足至整套数值'
     if set_cfg['reduction'].to_f > 0
-      lore << "&7同套职业怪物减伤 #{set_cfg['reduction'].to_f}%"
+      lore << "&7同套职业怪物减伤 &a#{fmt_stat(set_cfg['reduction'])}%"
     end
   elsif kind == 'tool'
-    lore << "&7职业幸运 +#{item_cfg['fortune'].to_f}  职业经验 +#{item_cfg['xp'].to_f}%"
+    lore << "&7职业幸运: &a+#{fmt_stat(item_cfg['fortune'])}"
+    if item_cfg['xp'].to_f > 0
+      lore << "&7职业经验: &b+#{fmt_stat(item_cfg['xp'])}%"
+    end
+    if item_cfg['efficiency'].to_i > 0
+      lore << "&7效率: &b#{roman(item_cfg['efficiency'].to_i)}"
+    end
     if item_cfg['replant']
-      lore << '&7成熟作物自动复种，消耗背包种植材料'
+      lore << ''
+      lore << '&#D946EF✦ &#E46178被&#E76B50动&#EB783F效&#EE852E果 &#F59E0B✦'
+      lore << '&6能力：&e自动复种'
+      lore << '&7成熟作物自动复种，消耗背包种植材料。'
     end
   elsif kind == 'weapon'
-    lore << "&7伤害 #{item_cfg['damage'].to_f}  力量 +#{item_cfg['strength'].to_f}"
-    lore << "&7对应职业怪物伤害 +#{item_cfg['mob_bonus'].to_f}%"
+    lore << "&7伤害: &c+#{fmt_stat(item_cfg['damage'])}"
+    lore << "&7力量: &c+#{fmt_stat(item_cfg['strength'])}"
+    lore << ''
+    lore << '&#D946EF✦ &#E46178被&#E76B50动&#EB783F效&#EE852E果 &#F59E0B✦'
+    lore << '&6能力：&e职业猎手'
+    lore << "&7对对应职业怪物造成伤害 &c+#{fmt_stat(item_cfg['mob_bonus'])}%&7。"
   end
+  lore << ''
+  lore << '&#D6FFB4不&#A7FF95可&#79FF76破&#4AFF57坏'
+  lore << prof_gradient("[#{rarity}#{job_cn}世界装备]", rarity, bold: false)
   lore
 end
 
@@ -659,11 +727,8 @@ def build_profession_section(job, prof_sets_cfg, prof_items_cfg)
     set_id = (ic['set'] || ic['gate']).to_s
     sc = prof_sets_cfg[set_id]
     eff = ic['efficiency'].to_i
-    enchant_lines = eff > 0 ? ["&7效率 #{roman(eff)}"] : []
-    lore = build_prof_lore(ic, sc)
-    # In ProfessionCatalog.create(), non-material items have meta.setUnbreakable(true)
-    # without HIDE_UNBREAKABLE, so Minecraft appends blue "无法破坏".
-    mc_lore = enchant_lines + lore + ['&9无法破坏']
+    rarity = prof_rarity_of(sc)
+    mc_lore = build_prof_lore(ic, sc)
 
     item_obj = {
       id: id,
@@ -672,8 +737,9 @@ def build_profession_section(job, prof_sets_cfg, prof_items_cfg)
       job: job,
       setId: set_id,
       level: ic['level'].to_i,
+      rarity: normalize_rarity(rarity),
       namePlain: ic['name'].to_s,
-      displayName: "&6#{ic['name']}",
+      displayName: prof_gradient(ic['name'].to_s, rarity, bold: true),
       material: ic['material'],
       colorHex: ic.key?('color') ? int_color_to_hex(ic['color']) : nil,
       glow: eff > 0,
@@ -709,6 +775,7 @@ def build_profession_section(job, prof_sets_cfg, prof_items_cfg)
       id: sid,
       category: "prof_#{job}",
       name: "#{first_name}套装",
+      rarity: normalize_rarity(prof_rarity_of(sc)),
       branch: branch_key,
       branchLabel: "#{BRANCH_LABELS[branch_key] || branch_key} · T#{tier_num}",
       level: pcs.first[:level],

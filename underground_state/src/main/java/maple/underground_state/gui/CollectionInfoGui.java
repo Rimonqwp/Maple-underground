@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public final class CollectionInfoGui {
 
@@ -57,11 +59,37 @@ public final class CollectionInfoGui {
             50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000, 50_000
     };
 
-    private static final int[] TIER_XP_REWARDS = {
-            20, 50, 100, 250, 500, 1_000, 2_000, 3_500, 5_000
-    };
+    private static volatile @Nullable CollectionCenterBridge bridge;
+
+    public interface CollectionCenterBridge {
+        void openHub(@NotNull Player player);
+
+        int getClaimedTier(@NotNull UUID uuid, @NotNull String collectionKey);
+
+        boolean claimItemTier(@NotNull Player player,
+                              @NotNull Category category,
+                              @NotNull CollectionItem item,
+                              int targetTier);
+    }
 
     private CollectionInfoGui() {
+    }
+
+    public static void registerBridge(@Nullable CollectionCenterBridge newBridge) {
+        bridge = newBridge;
+    }
+
+    public static boolean hasBridge() {
+        return bridge != null;
+    }
+
+    public static void openHubOrBookshelf(@NotNull Player player) {
+        CollectionCenterBridge current = bridge;
+        if (current != null) {
+            current.openHub(player);
+        } else {
+            BookshelfInfoGui.open(player);
+        }
     }
 
     public static void open(@NotNull Player player, @NotNull Category category) {
@@ -75,7 +103,7 @@ public final class CollectionInfoGui {
         holder.setInventory(inventory);
 
         fillInventory(inventory, Material.BLACK_STAINED_GLASS_PANE, NamedTextColor.BLACK);
-        inventory.setItem(TITLE_SLOT, createCategoryOverviewItem(category));
+        inventory.setItem(TITLE_SLOT, createCategoryOverviewItem(player, category));
 
         int startIndex = safePage * ITEM_SLOTS.length;
         for (int slotIndex = 0; slotIndex < ITEM_SLOTS.length; slotIndex++) {
@@ -87,10 +115,11 @@ public final class CollectionInfoGui {
             inventory.setItem(ITEM_SLOTS[slotIndex], createCollectionListItem(player, category, item));
         }
 
+        String backLabel = hasBridge() ? "返回收集中心" : "返回收藏主页";
         inventory.setItem(BACK_SLOT, InfoGuiItems.createNamedItem(
                 Material.ARROW,
-                title("返回"),
-                List.of(text("点击返回收藏主页。", NamedTextColor.GRAY))
+                title(backLabel),
+                List.of(text("点击" + backLabel + "。", NamedTextColor.GRAY))
         ));
         if (safePage > 0) {
             inventory.setItem(PREVIOUS_PAGE_SLOT, InfoGuiItems.createNamedItem(
@@ -119,21 +148,40 @@ public final class CollectionInfoGui {
 
         CollectionItem item = category.items().get(itemIndex);
         InfoGuiHolder holder = new InfoGuiHolder(player.getUniqueId(), category.pageId(), DETAIL_PAGE_OFFSET + itemIndex);
-        Inventory inventory = Bukkit.createInventory(holder, MENU_SIZE, title(item.name() + " Collection"));
+        Inventory inventory = Bukkit.createInventory(holder, MENU_SIZE, title(item.name() + " 收藏详情"));
         holder.setInventory(inventory);
 
         fillInventory(inventory, Material.GRAY_STAINED_GLASS_PANE, NamedTextColor.DARK_GRAY);
         inventory.setItem(DETAIL_ITEM_SLOT, createCollectionListItem(player, category, item));
 
         long collected = collectedAmount(player, category, item);
-        for (int index = 0; index < requirements(category).length; index++) {
+        CollectionCenterBridge currentBridge = bridge;
+        int claimedTier = currentBridge != null
+                ? currentBridge.getClaimedTier(player.getUniqueId(), collectionKey(category, item.material()))
+                : 0;
+        int[] reqs = requirements(category);
+        for (int index = 0; index < reqs.length && index < DETAIL_TIER_SLOTS.length; index++) {
             int tier = index + 1;
-            inventory.setItem(DETAIL_TIER_SLOTS[index], createTierPane(category, item, tier, collected));
+            inventory.setItem(
+                    DETAIL_TIER_SLOTS[index],
+                    createTierPane(category, item, tier, collected, claimedTier, currentBridge != null)
+            );
         }
 
         applyDetailStatusBar(inventory, category);
 
         player.openInventory(inventory);
+    }
+
+    public static void openDetailByMaterial(@NotNull Player player, @NotNull Category category, @NotNull Material material) {
+        List<CollectionItem> items = category.items();
+        for (int index = 0; index < items.size(); index++) {
+            if (items.get(index).material() == material) {
+                openDetail(player, category, index);
+                return;
+            }
+        }
+        open(player, category);
     }
 
     public static void handleClick(@NotNull Player player, @NotNull String pageId, int rawSlot) {
@@ -154,12 +202,23 @@ public final class CollectionInfoGui {
             }
             if (rawSlot == DETAIL_CLOSE_SLOT) {
                 player.closeInventory();
+                return;
+            }
+            int tierIndex = indexOf(DETAIL_TIER_SLOTS, rawSlot);
+            if (tierIndex >= 0 && tierIndex < requirements(category).length
+                    && itemIndex >= 0 && itemIndex < category.items().size()) {
+                CollectionCenterBridge currentBridge = bridge;
+                if (currentBridge != null) {
+                    CollectionItem item = category.items().get(itemIndex);
+                    currentBridge.claimItemTier(player, category, item, tierIndex + 1);
+                    openDetail(player, category, itemIndex);
+                }
             }
             return;
         }
 
         if (rawSlot == BACK_SLOT) {
-            BookshelfInfoGui.open(player);
+            openHubOrBookshelf(player);
             return;
         }
         if (rawSlot == PREVIOUS_PAGE_SLOT && encodedPage > 0) {
@@ -189,12 +248,60 @@ public final class CollectionInfoGui {
         List<Component> lore = new ArrayList<>();
         lore.add(text(category.description(), NamedTextColor.GRAY));
         lore.add(Component.empty());
-        lore.add(Component.text("收藏物品: ", NamedTextColor.GRAY)
+        lore.add(Component.text("收藏物品数: ", NamedTextColor.GRAY)
                 .append(Component.text(String.valueOf(category.items().size()), NamedTextColor.YELLOW))
                 .decoration(TextDecoration.ITALIC, false));
         lore.add(progressLine(0, category.items().size()));
         lore.add(Component.empty());
-        lore.add(actionText("点击查看!"));
+        lore.add(actionText("点击查看！"));
+        return InfoGuiItems.createNamedItem(category.icon(), title(category.title()), lore);
+    }
+
+    public static @NotNull ItemStack createCategoryOverviewItem(@NotNull Player player, @NotNull Category category) {
+        int totalItems = category.items().size();
+        int unlockedItems = 0;
+        int completedItems = 0;
+        long currentTiers = 0L;
+        long maxTiers = (long) totalItems * maxTier(category);
+        long claimableTiers = 0L;
+        CollectionCenterBridge currentBridge = bridge;
+
+        for (CollectionItem item : category.items()) {
+            long amount = collectedAmount(player, category, item);
+            if (amount > 0L) {
+                unlockedItems++;
+            }
+            int tier = tierFor(amount, category);
+            currentTiers += tier;
+            if (tier >= maxTier(category)) {
+                completedItems++;
+            }
+            if (currentBridge != null) {
+                int claimed = currentBridge.getClaimedTier(player.getUniqueId(), collectionKey(category, item.material()));
+                claimableTiers += Math.max(0, tier - claimed);
+            }
+        }
+
+        List<Component> lore = new ArrayList<>();
+        lore.add(text(category.description(), NamedTextColor.GRAY));
+        lore.add(Component.empty());
+        lore.add(Component.text("已解锁物品: ", NamedTextColor.GRAY)
+                .append(Component.text(unlockedItems + "/" + totalItems, NamedTextColor.YELLOW))
+                .decoration(TextDecoration.ITALIC, false));
+        lore.add(Component.text("已满级物品: ", NamedTextColor.GRAY)
+                .append(Component.text(completedItems + "/" + totalItems, NamedTextColor.GREEN))
+                .decoration(TextDecoration.ITALIC, false));
+        lore.add(Component.text("分类层级进度: ", NamedTextColor.GRAY)
+                .append(Component.text(percentText(currentTiers, maxTiers), NamedTextColor.YELLOW))
+                .decoration(TextDecoration.ITALIC, false));
+        lore.add(progressLine(currentTiers, maxTiers));
+        if (currentBridge != null) {
+            lore.add(Component.text("可领取奖励层数: ", NamedTextColor.GRAY)
+                    .append(Component.text(String.valueOf(claimableTiers), claimableTiers > 0 ? NamedTextColor.GOLD : NamedTextColor.DARK_GRAY))
+                    .decoration(TextDecoration.ITALIC, false));
+        }
+        lore.add(Component.empty());
+        lore.add(actionText("点击查看！"));
         return InfoGuiItems.createNamedItem(category.icon(), title(category.title()), lore);
     }
 
@@ -202,64 +309,133 @@ public final class CollectionInfoGui {
                                                                @NotNull Category category,
                                                                @NotNull CollectionItem item) {
         long collected = collectedAmount(player, category, item);
-        int nextTier = Math.min(requirements(category).length, tierFor(collected, category) + 1);
+        int maxTier = maxTier(category);
+        int currentTier = tierFor(collected, category);
+        boolean maxed = currentTier >= maxTier;
+        int nextTier = Math.min(maxTier, currentTier + 1);
         int required = requirements(category)[nextTier - 1];
-        int percent = percent(collected, required);
+        CollectionCenterBridge currentBridge = bridge;
+        int claimedTier = currentBridge != null
+                ? currentBridge.getClaimedTier(player.getUniqueId(), collectionKey(category, item.material()))
+                : 0;
+        int claimable = currentBridge != null ? Math.max(0, currentTier - claimedTier) : 0;
 
         List<Component> lore = new ArrayList<>();
         lore.add(text(item.description(), NamedTextColor.GRAY));
         lore.add(Component.empty());
-        lore.add(Component.text("Progress to " + item.name() + " " + roman(nextTier) + ": ", NamedTextColor.GRAY)
-                .append(Component.text(percentText(collected, required), NamedTextColor.YELLOW))
+        lore.add(Component.text("当前等级: ", NamedTextColor.GRAY)
+                .append(Component.text(currentTier > 0 ? roman(currentTier) : "未解锁", currentTier > 0 ? NamedTextColor.YELLOW : NamedTextColor.DARK_GRAY))
+                .append(Component.text(" (" + currentTier + "/" + maxTier + ")", NamedTextColor.DARK_GRAY))
                 .decoration(TextDecoration.ITALIC, false));
-        lore.add(progressLine(collected, required));
-        lore.add(Component.empty());
-        lore.add(text("下一个等级会解锁:", NamedTextColor.GRAY));
-        lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
-                .append(Component.text(formatNumber(xpReward(category, nextTier)) + " " + category.experienceName(), NamedTextColor.AQUA))
-                .decoration(TextDecoration.ITALIC, false));
-        lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
-                .append(Component.text(mapleXpReward(nextTier) + " Maple XP", NamedTextColor.AQUA))
-                .decoration(TextDecoration.ITALIC, false));
-        lore.add(Component.empty());
-        lore.add(actionText("Click to view!"));
 
-        return InfoGuiItems.createNamedItem(item.material(), title(item.name()), lore);
+        if (maxed) {
+            lore.add(Component.text("进度状态: ", NamedTextColor.GRAY)
+                    .append(Component.text("已满级 (100%)", NamedTextColor.GREEN))
+                    .decoration(TextDecoration.ITALIC, false));
+            lore.add(progressLine(collected, required));
+        } else {
+            lore.add(Component.text("距离 " + item.name() + " " + roman(nextTier) + ": ", NamedTextColor.GRAY)
+                    .append(Component.text(percentText(collected, required), NamedTextColor.YELLOW))
+                    .decoration(TextDecoration.ITALIC, false));
+            lore.add(progressLine(collected, required));
+            lore.add(Component.empty());
+            lore.add(text("下一级解锁奖励:", NamedTextColor.GRAY));
+            lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                    .append(Component.text(formatNumber(xpReward(category, nextTier)) + " " + category.experienceName(), NamedTextColor.AQUA))
+                    .decoration(TextDecoration.ITALIC, false));
+            lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                    .append(Component.text(mapleXpReward(nextTier) + " 枫叶经验", NamedTextColor.AQUA))
+                    .decoration(TextDecoration.ITALIC, false));
+            if (isFortuneMilestone(category, required)) {
+                lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                        .append(Component.text("1 职业采集幸运（全局上限 +30）", NamedTextColor.GREEN))
+                        .decoration(TextDecoration.ITALIC, false));
+            }
+        }
+
+        if (claimable > 0) {
+            lore.add(Component.empty());
+            lore.add(Component.text("✦ 有 " + claimable + " 层奖励可领取！", NamedTextColor.GOLD, TextDecoration.BOLD)
+                    .decoration(TextDecoration.ITALIC, false));
+        }
+        lore.add(Component.empty());
+        lore.add(actionText("点击查看详情与领奖！"));
+
+        ItemStack stack = InfoGuiItems.createNamedItem(item.material(), title(item.name()), lore);
+        if (claimable > 0) {
+            ItemMeta meta = stack.getItemMeta();
+            if (meta != null) {
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                meta.addItemFlags(ItemFlag.values());
+                stack.setItemMeta(meta);
+            }
+        }
+        return stack;
     }
 
     private static @NotNull ItemStack createTierPane(@NotNull Category category,
                                                      @NotNull CollectionItem item,
                                                      int tier,
-                                                     long collected) {
-        int required = requirements(category)[tier - 1];
-        int previousRequired = tier <= 1 ? 0 : requirements(category)[tier - 2];
+                                                     long collected,
+                                                     int claimedTier,
+                                                     boolean hasBridge) {
+        int[] reqs = requirements(category);
+        int required = reqs[tier - 1];
+        int previousRequired = tier <= 1 ? 0 : reqs[tier - 2];
+
         Material material;
         NamedTextColor nameColor;
+        Component statusLine;
+        boolean glow = false;
+
         if (collected >= required) {
-            material = Material.LIME_STAINED_GLASS_PANE;
-            nameColor = NamedTextColor.GREEN;
+            if (hasBridge && tier > claimedTier) {
+                material = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
+                nameColor = NamedTextColor.AQUA;
+                statusLine = Component.text("✦ 已解锁 — 点击领取本层奖励！", NamedTextColor.GOLD, TextDecoration.BOLD)
+                        .decoration(TextDecoration.ITALIC, false);
+                glow = true;
+            } else if (hasBridge) {
+                material = Material.LIME_STAINED_GLASS_PANE;
+                nameColor = NamedTextColor.GREEN;
+                statusLine = text("✔ 奖励已领取", NamedTextColor.GREEN);
+            } else {
+                material = Material.LIME_STAINED_GLASS_PANE;
+                nameColor = NamedTextColor.GREEN;
+                statusLine = text("✔ 已解锁", NamedTextColor.GREEN);
+            }
         } else if (collected >= previousRequired) {
             material = Material.YELLOW_STAINED_GLASS_PANE;
             nameColor = NamedTextColor.YELLOW;
+            statusLine = text("进行中", NamedTextColor.YELLOW);
         } else {
             material = Material.RED_STAINED_GLASS_PANE;
             nameColor = NamedTextColor.RED;
+            statusLine = text("未解锁", NamedTextColor.RED);
         }
 
         List<Component> lore = new ArrayList<>();
+        lore.add(Component.text("状态: ", NamedTextColor.GRAY)
+                .append(statusLine)
+                .decoration(TextDecoration.ITALIC, false));
         lore.add(Component.empty());
-        lore.add(Component.text("Progress: ", NamedTextColor.GRAY)
+        lore.add(Component.text("当前进度: ", NamedTextColor.GRAY)
                 .append(Component.text(percentText(collected, required), NamedTextColor.YELLOW))
                 .decoration(TextDecoration.ITALIC, false));
         lore.add(progressLine(collected, required));
         lore.add(Component.empty());
-        lore.add(text("Rewards:", NamedTextColor.GRAY));
-        lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
+        lore.add(text("层级奖励:", NamedTextColor.GRAY));
+        lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
                 .append(Component.text(formatNumber(xpReward(category, tier)) + " " + category.experienceName(), NamedTextColor.AQUA))
                 .decoration(TextDecoration.ITALIC, false));
-        lore.add(Component.text("+", NamedTextColor.DARK_GRAY)
-                .append(Component.text(mapleXpReward(tier) + " Maple XP", NamedTextColor.AQUA))
+        lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                .append(Component.text(mapleXpReward(tier) + " 枫叶经验", NamedTextColor.AQUA))
                 .decoration(TextDecoration.ITALIC, false));
+        if (isFortuneMilestone(category, required)) {
+            lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                    .append(Component.text("1 职业采集幸运（自动生效，全局上限 +30）", NamedTextColor.GREEN))
+                    .decoration(TextDecoration.ITALIC, false));
+        }
 
         ItemStack pane = new ItemStack(material, Math.max(1, Math.min(64, tier)));
         ItemMeta meta = pane.getItemMeta();
@@ -268,10 +444,17 @@ public final class CollectionInfoGui {
                     .decoration(TextDecoration.ITALIC, false)
                     .decorate(TextDecoration.BOLD));
             meta.lore(lore);
+            if (glow) {
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            }
             meta.addItemFlags(ItemFlag.values());
             pane.setItemMeta(meta);
         }
         return pane;
+    }
+
+    private static boolean isFortuneMilestone(@NotNull Category category, int required) {
+        return extended(category) && (required == 5_000 || required == 50_000 || required == 250_000);
     }
 
     private static void fillInventory(@NotNull Inventory inventory,
@@ -316,10 +499,42 @@ public final class CollectionInfoGui {
         return category.items().stream().anyMatch(item -> item.material() == material);
     }
 
-    private static boolean extended(Category category) { return category == Category.FARMING || category == Category.MINING; }
-    private static int[] requirements(Category category) { return extended(category) ? maple.underground_state.professions.ProfessionMath.COLLECTION_REQUIREMENTS : TIER_REQUIREMENTS; }
-    private static int xpReward(Category category, int tier) { return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category)); }
-    private static int tierFor(long collected, Category category) {
+    public static @Nullable CollectionItem findItem(@NotNull Category category, @NotNull Material material) {
+        for (CollectionItem item : category.items()) {
+            if (item.material() == material) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public static boolean extended(@NotNull Category category) {
+        return category == Category.FARMING || category == Category.MINING;
+    }
+
+    public static int maxTier(@NotNull Category category) {
+        return requirements(category).length;
+    }
+
+    public static int requirementForTier(@NotNull Category category, int tier) {
+        int[] reqs = requirements(category);
+        if (tier <= 0) {
+            return 0;
+        }
+        return reqs[Math.min(tier, reqs.length) - 1];
+    }
+
+    private static int[] requirements(@NotNull Category category) {
+        return extended(category)
+                ? maple.underground_state.professions.ProfessionMath.COLLECTION_REQUIREMENTS
+                : TIER_REQUIREMENTS;
+    }
+
+    public static int xpReward(@NotNull Category category, int tier) {
+        return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category));
+    }
+
+    public static int tierFor(long collected, @NotNull Category category) {
         int tier = 0;
         for (int requirement : requirements(category)) {
             if (collected < requirement) {
@@ -373,11 +588,11 @@ public final class CollectionInfoGui {
         return -1;
     }
 
-    private static int mapleXpReward(int tier) {
+    public static int mapleXpReward(int tier) {
         return Math.max(1, tier / 2);
     }
 
-    private static @NotNull String roman(int number) {
+    public static @NotNull String roman(int number) {
         return switch (number) {
             case 1 -> "I";
             case 2 -> "II";
@@ -395,7 +610,7 @@ public final class CollectionInfoGui {
         };
     }
 
-    private static @NotNull String formatNumber(long value) {
+    public static @NotNull String formatNumber(long value) {
         long abs = Math.abs(value);
         if (abs >= 1_000_000_000L) {
             return String.format(Locale.ROOT, "%.1fB", value / 1_000_000_000D);
@@ -431,7 +646,7 @@ public final class CollectionInfoGui {
                 "锄头收藏",
                 Material.COPPER_HOE,
                 "农作物、种子和畜牧材料收藏。",
-                "Farming Experience",
+                "农耕经验",
                 List.of(
                         item(Material.TORCHFLOWER_SEEDS, "火把花种子", "收集稀有的远古花种。"),
                         item(Material.PITCHER_POD, "瓶子草荚果", "收集可以培育瓶子草的荚果。"),
@@ -467,7 +682,7 @@ public final class CollectionInfoGui {
                 "镐子收藏",
                 Material.COPPER_PICKAXE,
                 "沙子、泥土、石头和矿物收藏。",
-                "Mining Experience",
+                "挖矿经验",
                 List.of(
                         item(Material.SAND, "沙子", "收集最常见的松散方块。"),
                         item(Material.GRAVEL, "砂砾", "收集会掉落燧石的松散方块。"),
@@ -497,7 +712,7 @@ public final class CollectionInfoGui {
                 "剑收藏",
                 Material.COPPER_SWORD,
                 "怪物战利品和战斗掉落收藏。",
-                "Combat Experience",
+                "战斗经验",
                 List.of(
                         item(Material.ROTTEN_FLESH, "腐肉", "收集僵尸类怪物掉落的战利品。"),
                         item(Material.BONE, "骨头", "收集骷髅类怪物掉落的骨头。"),
@@ -522,7 +737,7 @@ public final class CollectionInfoGui {
                 "斧头收藏",
                 Material.COPPER_AXE,
                 "原木、菌柄和木材相关收藏。",
-                "Foraging Experience",
+                "伐木经验",
                 List.of(
                         item(Material.OAK_LOG, "橡木原木", "收集最常见的橡木原木。"),
                         item(Material.SPRUCE_LOG, "云杉原木", "收集寒冷群系常见的云杉原木。"),
@@ -541,7 +756,7 @@ public final class CollectionInfoGui {
                 "钓鱼收藏",
                 Material.FISHING_ROD,
                 "通过钓鱼获得的鱼类收藏。",
-                "Fishing Experience",
+                "钓鱼经验",
                 List.of(
                         item(Material.COD, "鳕鱼", "收集最常见的钓鱼收获。"),
                         item(Material.SALMON, "鲑鱼", "收集河流与海洋里的鲑鱼。"),

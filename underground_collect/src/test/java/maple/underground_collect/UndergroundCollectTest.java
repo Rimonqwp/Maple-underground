@@ -36,6 +36,7 @@ class UndergroundCollectTest {
         assertFalse(plugin.isEnabled());
         assertSame(plugin, registeredPlugin);
         assertEquals("underground_collect", plugin.getDescription().getName());
+        assertEquals("26.3", plugin.getDescription().getVersion());
     }
 
     @Test

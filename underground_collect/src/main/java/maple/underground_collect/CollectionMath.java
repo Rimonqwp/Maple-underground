@@ -1,22 +1,31 @@
 package maple.underground_collect;
 
+import maple.underground_state.gui.CollectionInfoGui;
+import org.jetbrains.annotations.NotNull;
+
 final class CollectionMath {
 
     static final int[] TIER_REQUIREMENTS = {
             50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000, 50_000
     };
 
-    static boolean extended(maple.underground_state.gui.CollectionInfoGui.Category category) {
-        return category == maple.underground_state.gui.CollectionInfoGui.Category.FARMING || category == maple.underground_state.gui.CollectionInfoGui.Category.MINING;
-    }
-    static int maxTier(maple.underground_state.gui.CollectionInfoGui.Category category) { return extended(category) ? 12 : 9; }
-    static int currentTier(long amount, maple.underground_state.gui.CollectionInfoGui.Category category) {
-        return maple.underground_state.professions.ProfessionMath.collectionTier(amount, extended(category));
-    }
-    static int tierXpReward(int tier, maple.underground_state.gui.CollectionInfoGui.Category category) {
-        return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category));
-    }
     private CollectionMath() {
+    }
+
+    static boolean extended(@NotNull CollectionInfoGui.Category category) {
+        return CollectionInfoGui.extended(category);
+    }
+
+    static int maxTier(@NotNull CollectionInfoGui.Category category) {
+        return CollectionInfoGui.maxTier(category);
+    }
+
+    static int currentTier(long amount, @NotNull CollectionInfoGui.Category category) {
+        return CollectionInfoGui.tierFor(amount, category);
+    }
+
+    static int tierXpReward(int tier, @NotNull CollectionInfoGui.Category category) {
+        return CollectionInfoGui.xpReward(category, tier);
     }
 
     static int maxTier() {
@@ -49,24 +58,14 @@ final class CollectionMath {
     }
 
     static int mapleXpReward(int tier) {
-        return Math.max(1, tier / 2);
+        return CollectionInfoGui.mapleXpReward(tier);
     }
 
-    static String roman(int number) {
-        return switch (number) {
-            case 1 -> "I";
-            case 2 -> "II";
-            case 3 -> "III";
-            case 4 -> "IV";
-            case 5 -> "V";
-            case 6 -> "VI";
-            case 7 -> "VII";
-            case 8 -> "VIII";
-            case 9 -> "IX";
-            case 10 -> "X";
-            case 11 -> "XI";
-            case 12 -> "XII";
-            default -> String.valueOf(number);
-        };
+    static @NotNull String roman(int number) {
+        return CollectionInfoGui.roman(number);
+    }
+
+    static @NotNull String formatNumber(long value) {
+        return CollectionInfoGui.formatNumber(value);
     }
 }

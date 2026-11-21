@@ -71,20 +71,7 @@ public final class MainInfoGui {
                         actionText("點擊查看！")
                 )
         ));
-        inventory.setItem(BOOKSHELF_SLOT, InfoGuiItems.createNamedItem(
-                Material.BOOKSHELF,
-                nameText("收藏"),
-                List.of(
-                        Component.text("收集更多物品，解鎖獎勵，幫助你成為 楓葉伺服器 高手！", NamedTextColor.GRAY),
-                        Component.empty(),
-                        Component.text("收藏物品已解鎖: ", NamedTextColor.GRAY)
-                                .append(Component.text("0", ACTION_RGB))
-                                .append(Component.text("%", SYMBOL_RGB)),
-                        progressLine(),
-                        Component.empty(),
-                        actionText("點擊查看！")
-                )
-        ));
+        inventory.setItem(BOOKSHELF_SLOT, createCollectionEntryItem(player));
         inventory.setItem(ITEM_FRAME_SLOT, InfoGuiItems.createNamedItem(
                 Material.ITEM_FRAME,
                 nameText("配方書"),
@@ -208,7 +195,7 @@ public final class MainInfoGui {
             return;
         }
         if (rawSlot == BOOKSHELF_SLOT) {
-            BookshelfInfoGui.open(player);
+            CollectionInfoGui.openHubOrBookshelf(player);
             return;
         }
         if (rawSlot == WRITABLE_BOOK_SLOT) {
@@ -244,6 +231,47 @@ public final class MainInfoGui {
         if (rawSlot == CLOSE_SLOT) {
             player.closeInventory();
         }
+    }
+
+    private static ItemStack createCollectionEntryItem(@NotNull Player player) {
+        int totalItems = 0;
+        int unlockedItems = 0;
+        UndergroundState plugin = UndergroundState.getInstance();
+        var manager = plugin != null ? plugin.getCollectionProgressManager() : null;
+        for (CollectionInfoGui.Category category : CollectionInfoGui.Category.values()) {
+            for (CollectionInfoGui.CollectionItem item : category.items()) {
+                totalItems++;
+                if (manager != null) {
+                    long amount = manager.getAmount(player.getUniqueId(), CollectionInfoGui.collectionKey(category, item.material()));
+                    if (amount > 0L) {
+                        unlockedItems++;
+                    }
+                }
+            }
+        }
+        int percent = totalItems <= 0 ? 0 : (int) Math.min(100L, (unlockedItems * 100L) / totalItems);
+        Component dynamicProgress = InfoGuiItems.createColoredProgressBar(percent)
+                .append(Component.text(" ").decoration(TextDecoration.STRIKETHROUGH, false))
+                .append(Component.text(String.valueOf(unlockedItems), ACTION_RGB).decoration(TextDecoration.STRIKETHROUGH, false))
+                .append(Component.text("/", SYMBOL_RGB).decoration(TextDecoration.STRIKETHROUGH, false))
+                .append(Component.text(String.valueOf(totalItems), ACTION_RGB).decoration(TextDecoration.STRIKETHROUGH, false))
+                .decoration(TextDecoration.ITALIC, false);
+        String entryTitle = CollectionInfoGui.hasBridge() ? "收集中心" : "收藏";
+        return InfoGuiItems.createNamedItem(
+                Material.BOOKSHELF,
+                nameText(entryTitle),
+                List.of(
+                        Component.text("收集更多物品，解锁奖励，帮助你成为枫叶服务器高手！", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+                        Component.empty(),
+                        Component.text("收藏物品已解锁: ", NamedTextColor.GRAY)
+                                .append(Component.text(String.valueOf(percent), ACTION_RGB))
+                                .append(Component.text("%", SYMBOL_RGB))
+                                .decoration(TextDecoration.ITALIC, false),
+                        dynamicProgress,
+                        Component.empty(),
+                        actionText("点击查看！")
+                )
+        );
     }
 
     private static Component progressLine() {

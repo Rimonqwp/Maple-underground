@@ -41,11 +41,11 @@ public final class BookshelfInfoGui {
         }
 
         inventory.setItem(BOOKSHELF_SLOT, InfoGuiItems.createNamedItem(Material.BOOKSHELF, "收藏"));
-        inventory.setItem(HOE_SLOT, CollectionInfoGui.createCategoryOverviewItem(CollectionInfoGui.Category.FARMING));
-        inventory.setItem(PICKAXE_SLOT, CollectionInfoGui.createCategoryOverviewItem(CollectionInfoGui.Category.MINING));
-        inventory.setItem(SWORD_SLOT, CollectionInfoGui.createCategoryOverviewItem(CollectionInfoGui.Category.COMBAT));
-        inventory.setItem(AXE_SLOT, CollectionInfoGui.createCategoryOverviewItem(CollectionInfoGui.Category.FORAGING));
-        inventory.setItem(ROD_SLOT, CollectionInfoGui.createCategoryOverviewItem(CollectionInfoGui.Category.FISHING));
+        inventory.setItem(HOE_SLOT, CollectionInfoGui.createCategoryOverviewItem(player, CollectionInfoGui.Category.FARMING));
+        inventory.setItem(PICKAXE_SLOT, CollectionInfoGui.createCategoryOverviewItem(player, CollectionInfoGui.Category.MINING));
+        inventory.setItem(SWORD_SLOT, CollectionInfoGui.createCategoryOverviewItem(player, CollectionInfoGui.Category.COMBAT));
+        inventory.setItem(AXE_SLOT, CollectionInfoGui.createCategoryOverviewItem(player, CollectionInfoGui.Category.FORAGING));
+        inventory.setItem(ROD_SLOT, CollectionInfoGui.createCategoryOverviewItem(player, CollectionInfoGui.Category.FISHING));
         inventory.setItem(BACK_SLOT, InfoGuiItems.createNamedItem(
                 Material.ARROW,
                 "返回",

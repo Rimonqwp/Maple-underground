@@ -43,6 +43,7 @@ import maple.underground_state.wardrobe.WardrobeDataDB;
 import maple.underground_state.wardrobe.WardrobeSyncListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
 
@@ -78,6 +79,7 @@ public final class UndergroundState extends JavaPlugin {
     private CraftingXpService craftingXpService;
     private PlayerStatsDisplayTask playerStatsDisplayTask;
     private HealthRegenTask healthRegenTask;
+    private BukkitTask collectionSaveTask;
     private DungeonPanelManager dungeonPanelManager;
     private volatile DungeonPanelDataProvider dungeonPanelDataProvider;
 
@@ -196,10 +198,16 @@ public final class UndergroundState extends JavaPlugin {
         playerStatsDisplayTask.runTaskTimer(this, 40L, 20L);
         healthRegenTask = new HealthRegenTask(this, playerStatsRuntime);
         healthRegenTask.runTaskTimer(this, 40L, 40L);
+        collectionSaveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            if (collectionProgressManager != null) {
+                collectionProgressManager.saveDirty();
+            }
+        }, 1200L, 1200L);
         for (var player : Bukkit.getOnlinePlayers()) {
             queuePlayerStatsInitialLoad(player.getUniqueId());
             skillProgressManager.onJoin(player.getUniqueId());
-            collectionProgressManager.onJoin(player);
+            UUID onlineUuid = player.getUniqueId();
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> collectionProgressManager.loadIntoCache(onlineUuid));
         }
 
         var playerStatsCmd = getCommand("playerstats");
@@ -259,6 +267,10 @@ public final class UndergroundState extends JavaPlugin {
         if (healthRegenTask != null) {
             healthRegenTask.cancel();
             healthRegenTask = null;
+        }
+        if (collectionSaveTask != null) {
+            collectionSaveTask.cancel();
+            collectionSaveTask = null;
         }
         if (playerStatsManager != null) {
             for (var player : Bukkit.getOnlinePlayers()) {

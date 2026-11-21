@@ -2,6 +2,7 @@ package maple.underground_state.collection;
 
 import maple.underground_state.db.MySqlConnectionFactory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.sql.Connection;
@@ -86,5 +87,39 @@ public final class CollectionProgressDB {
         } catch (SQLException e) {
             logger.log(Level.WARNING, "CollectionProgressDB save failed for " + uuid, e);
         }
+    }
+
+    public void deleteKey(@NotNull UUID uuid, @NotNull String collectionKey) {
+        String sql = "DELETE FROM " + TABLE + " WHERE uuid=? AND collection_key=?";
+        try (Connection connection = connect(); PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, collectionKey);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "CollectionProgressDB deleteKey failed for " + uuid + " / " + collectionKey, e);
+        }
+    }
+
+    public void delete(@NotNull UUID uuid, @Nullable String keyPrefix) {
+        boolean filtered = keyPrefix != null && !keyPrefix.isBlank();
+        String sql = filtered
+                ? "DELETE FROM " + TABLE + " WHERE uuid=? AND collection_key LIKE ? ESCAPE '\\\\'"
+                : "DELETE FROM " + TABLE + " WHERE uuid=?";
+        try (Connection connection = connect(); PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+            if (filtered) {
+                ps.setString(2, escapeLike(keyPrefix) + ":%");
+            }
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "CollectionProgressDB delete failed for " + uuid, e);
+        }
+    }
+
+    private static @NotNull String escapeLike(@NotNull String raw) {
+        return raw
+                .replace("\\", "\\\\")
+                .replace("_", "\\_")
+                .replace("%", "\\%");
     }
 }

@@ -1,13 +1,13 @@
 name: underground_collect
-version: '1.0'
+version: '26.3'
 main: maple.underground_collect.UndergroundCollect
 api-version: '26.3'
 load: POSTWORLD
 depend: [underground_state]
 commands:
   collect:
-    description: 打开收集中心、领取奖励或查看榜单
-    usage: /collect [open|claim|leaderboard|missing|guide] [category]
+    description: 打开收集中心、领取奖励、查看榜单或执行管理操作
+    usage: /collect [open|claim|leaderboard|missing|guide|admin] [args...]
     permission: underground_collect.use
 permissions:
   underground_collect.use:

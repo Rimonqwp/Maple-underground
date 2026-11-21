@@ -315,8 +315,8 @@ body {
 .slot-icon {
   position: relative;
   z-index: 1;
-  width: 78%;
-  height: 78%;
+  width: 80%;
+  height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,19 +325,95 @@ body {
   filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.45));
 }
 
+.mc-tex {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+  display: block;
+}
+
+.mc-tex-block {
+  width: 88%;
+  height: 88%;
+  border-radius: 2px;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.25),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.35),
+    2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.slot-armor-tex {
+  position: relative;
+  z-index: 1;
+  width: 82%;
+  height: 82%;
+  filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.55));
+}
+
+.slot-armor-tex .armor-tint {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  image-rendering: pixelated;
+}
+
+.slot-armor-tex .armor-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+}
+
+.slot-armor-tex .armor-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .slot-pane {
-  width: 74%;
-  height: 74%;
-  border-radius: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.25);
+  position: relative;
+  z-index: 1;
+  width: 80%;
+  height: 80%;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 900;
   font-size: 13px;
   color: #ffffff;
-  text-shadow: 1px 1px 0 #111;
+  text-shadow: 1.5px 1.5px 0 #111, -1px -1px 0 #111;
+  overflow: hidden;
+}
+
+.slot-pane .pane-tex {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  opacity: 0.92;
+}
+
+.slot-pane .pane-label {
+  position: relative;
+  z-index: 2;
 }
 
 .pane-black { background: rgba(18, 18, 22, 0.82); border-color: rgba(255, 255, 255, 0.08); }
@@ -639,6 +715,9 @@ body {
 }
 
 .shortcut-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #1e283b;
   border: 1px solid #314261;
   color: #cfe0ff;
@@ -646,6 +725,22 @@ body {
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
+}
+
+.mini-mc-tex {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  vertical-align: middle;
+}
+
+.sim-item-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
 }
 
 .shortcut-tag:hover {

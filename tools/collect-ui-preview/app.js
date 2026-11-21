@@ -6,7 +6,38 @@
   const MATERIAL_RECIPES = DATA.materialRecipes || {};
   const PLAYER_NAME = "MaplePlayer";
 
-  // 物品视觉图标映射（离线可用，不依赖外链）
+  // 方块类材质集合（用于渲染立体方块边框质感）
+  const BLOCK_MATERIALS = new Set([
+    "MELON", "PUMPKIN", "SAND", "GRAVEL", "DIRT", "CLAY", "STONE", "OBSIDIAN",
+    "GLOWSTONE", "CACTUS", "OAK_LOG", "SPRUCE_LOG", "BIRCH_LOG", "JUNGLE_LOG",
+    "ACACIA_LOG", "DARK_OAK_LOG", "MANGROVE_LOG", "CHERRY_LOG", "CRIMSON_STEM",
+    "WARPED_STEM", "BOOKSHELF", "CRAFTING_TABLE", "GOLD_BLOCK", "DIAMOND_BLOCK",
+    "COBBLESTONE"
+  ]);
+
+  const LEATHER_ARMOR_MATERIALS = new Set([
+    "LEATHER_HELMET", "LEATHER_CHESTPLATE", "LEATHER_LEGGINGS", "LEATHER_BOOTS"
+  ]);
+
+  const PANE_TEXTURE_MAP = {
+    "pane-black": "BLACK_STAINED_GLASS_PANE",
+    "pane-gray": "GRAY_STAINED_GLASS_PANE",
+    "pane-blue": "BLUE_STAINED_GLASS_PANE",
+    "pane-lime": "LIME_STAINED_GLASS_PANE",
+    "pane-light-blue": "LIGHT_BLUE_STAINED_GLASS_PANE",
+    "pane-yellow": "YELLOW_STAINED_GLASS_PANE",
+    "pane-red": "RED_STAINED_GLASS_PANE"
+  };
+
+  function textureUrl(material) {
+    return `textures/${material}.png`;
+  }
+
+  function createMiniIconHtml(material) {
+    return `<img class="mini-mc-tex" src="${textureUrl(material)}" alt="${material}" />`;
+  }
+
+  // 物品视觉图标兜底（如果贴图意外加载失败时回退）
   const MATERIAL_ICONS = {
     // 分类与界面图标
     COPPER_HOE: "🪓", COPPER_PICKAXE: "⛏️", COPPER_SWORD: "⚔️", COPPER_AXE: "🪓", FISHING_ROD: "🎣",
@@ -1576,7 +1607,20 @@
       if (s.paneClass && !s.material) {
         const pane = document.createElement("div");
         pane.className = `slot-pane ${s.paneClass}`;
-        if (s.paneLabel) pane.textContent = s.paneLabel;
+        const paneMat = PANE_TEXTURE_MAP[s.paneClass];
+        if (paneMat) {
+          const img = document.createElement("img");
+          img.className = "pane-tex";
+          img.src = textureUrl(paneMat);
+          img.alt = paneMat;
+          pane.appendChild(img);
+        }
+        if (s.paneLabel) {
+          const lbl = document.createElement("span");
+          lbl.className = "pane-label";
+          lbl.textContent = s.paneLabel;
+          pane.appendChild(lbl);
+        }
         cell.appendChild(pane);
       } else if (s.headText) {
         const head = document.createElement("div");
@@ -1585,16 +1629,41 @@
         head.textContent = s.headText;
         cell.appendChild(head);
       } else if (s.material) {
-        if (s.colorHex) {
-          const armor = document.createElement("div");
-          armor.className = "slot-armor";
-          armor.style.background = s.colorHex;
-          armor.textContent = MATERIAL_ICONS[s.material] || "🛡️";
-          cell.appendChild(armor);
+        if (s.colorHex && LEATHER_ARMOR_MATERIALS.has(s.material)) {
+          const wrap = document.createElement("div");
+          wrap.className = "slot-armor-tex";
+          const baseSrc = textureUrl(s.material);
+          const tint = document.createElement("div");
+          tint.className = "armor-tint";
+          tint.style.backgroundColor = s.colorHex;
+          tint.style.webkitMaskImage = `url("${baseSrc}")`;
+          tint.style.maskImage = `url("${baseSrc}")`;
+          wrap.appendChild(tint);
+
+          const baseImg = document.createElement("img");
+          baseImg.className = "armor-base";
+          baseImg.src = baseSrc;
+          baseImg.alt = s.material;
+          wrap.appendChild(baseImg);
+
+          const overlayImg = document.createElement("img");
+          overlayImg.className = "armor-overlay";
+          overlayImg.src = textureUrl(`${s.material}_OVERLAY`);
+          overlayImg.alt = "";
+          wrap.appendChild(overlayImg);
+          cell.appendChild(wrap);
         } else {
           const icon = document.createElement("div");
           icon.className = "slot-icon";
-          icon.textContent = MATERIAL_ICONS[s.material] || "📦";
+          const img = document.createElement("img");
+          img.className = "mc-tex" + (BLOCK_MATERIALS.has(s.material) ? " mc-tex-block" : "");
+          img.src = textureUrl(s.material);
+          img.alt = s.material;
+          img.onerror = () => {
+            img.remove();
+            icon.textContent = MATERIAL_ICONS[s.material] || "📦";
+          };
+          icon.appendChild(img);
           cell.appendChild(icon);
         }
       }
@@ -1689,7 +1758,7 @@
           const tiers = getAllRecipeTiersForMaterial(mat);
           const btn = document.createElement("button");
           btn.className = "shortcut-tag";
-          btn.textContent = `${MATERIAL_ICONS[mat] || "⚒"} ${cat.items[idx].name} (${tiers.length}档)`;
+          btn.innerHTML = `${createMiniIconHtml(mat)}<span>${cat.items[idx].name} (${tiers.length}档)</span>`;
           btn.addEventListener("click", () => {
             state.view.type = "tierRecipe";
             state.view.categoryId = cat.id;
@@ -1734,7 +1803,7 @@
     const cl = getClaimedTier(cat, item.material);
     const nextReq = requirements(cat)[Math.min(mt, ct + 1) - 1];
     elSimCurrent.innerHTML = `
-      <div><strong>${MATERIAL_ICONS[item.material] || ""} ${item.name}</strong> <span class="c-gray">(${cat.title})</span></div>
+      <div class="sim-item-head">${createMiniIconHtml(item.material)}<strong>${item.name}</strong> <span class="c-gray">(${cat.title})</span></div>
       <div>当前数量：<span class="c-aqua bold">${amt.toLocaleString()}</span> / ${nextReq.toLocaleString()}</div>
       <div>收藏等级：<span class="c-yellow bold">${ct}/${mt}</span> · 已领：<span class="c-green">${cl}</span> · 待领：<span class="c-gold">${Math.max(0, ct - cl)}</span></div>
     `;

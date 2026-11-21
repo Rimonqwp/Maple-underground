@@ -120,7 +120,6 @@
     progress: {}, // key: `${pageId}:${material}` -> number
     claims: {},   // key: `${pageId}:${material}` -> claimedTier
     mapleXp: 0,
-    skillXp: { FARMING: 0, MINING: 0, COMBAT: 0, FORAGING: 0, FISHING: 0 },
     view: {
       type: "hub", // main | hub | category | detail | tierRecipe | leaderboard | missing | guide
       categoryId: "FARMING",
@@ -169,17 +168,6 @@
       t++;
     }
     return t;
-  }
-
-  function tierXpReward(cat, tier) {
-    if (tier <= 0) return 0;
-    if (tier <= 9) {
-      const base = DATA.legacyTierXp[tier - 1];
-      return cat.extended ? Math.floor(base / 10) : base;
-    }
-    if (tier === 10) return 750;
-    if (tier === 11) return 1000;
-    return 1500;
   }
 
   function mapleXpReward(tier) {
@@ -400,7 +388,6 @@
   function claimScope(catId = null) {
     const targetCats = catId ? [CATEGORY_MAP[catId]] : CATEGORIES;
     let itemsClaimed = 0, tiersClaimed = 0, mapleGain = 0;
-    const xpGains = {};
 
     for (const cat of targetCats) {
       for (const item of cat.items) {
@@ -412,7 +399,6 @@
         state.claims[key] = curT;
         for (let t = prev + 1; t <= curT; t++) {
           tiersClaimed++;
-          xpGains[cat.id] = (xpGains[cat.id] || 0) + tierXpReward(cat, t);
           mapleGain += mapleXpReward(t);
         }
       }
@@ -424,14 +410,8 @@
     }
 
     state.mapleXp += mapleGain;
-    for (const [cid, xp] of Object.entries(xpGains)) {
-      state.skillXp[cid] = (state.skillXp[cid] || 0) + xp;
-    }
 
     pushChat(`<span class="c-green">收藏奖励领取完成！</span> <span class="c-gray">层数:</span> <span class="c-yellow">${tiersClaimed}</span> <span class="c-gray">| 项数:</span> <span class="c-yellow">${itemsClaimed}</span> <span class="c-gray">| 枫叶经验:</span> <span class="c-aqua">+${formatNumber(mapleGain)}</span>`);
-    for (const [cid, xp] of Object.entries(xpGains)) {
-      pushChat(`<span class="c-gray">  └ ${CATEGORY_MAP[cid].experienceName}: </span><span class="c-aqua">+${formatNumber(xp)}</span>`);
-    }
     showActionbar(`<span class="c-green bold">✔ 已领取 ${tiersClaimed} 层奖励</span> <span class="c-aqua">+${formatNumber(mapleGain)} 枫叶经验</span>`);
     playTone("claim");
     return true;
@@ -451,18 +431,16 @@
       return false;
     }
 
-    let tiersClaimed = 0, xpGain = 0, mapleGain = 0;
+    let tiersClaimed = 0, mapleGain = 0;
     for (let t = prev + 1; t <= eff; t++) {
       tiersClaimed++;
-      xpGain += tierXpReward(cat, t);
       mapleGain += mapleXpReward(t);
     }
     state.claims[key] = eff;
-    state.skillXp[cat.id] += xpGain;
     state.mapleXp += mapleGain;
 
-    pushChat(`<span class="c-green">已领取 </span><span class="c-yellow bold">${item.name} ${roman(eff)}</span><span class="c-green"> 奖励（共 ${tiersClaimed} 层）：</span><span class="c-aqua">+${formatNumber(xpGain)} ${cat.experienceName}</span><span class="c-gray">，</span><span class="c-aqua">+${mapleGain} 枫叶经验</span>`);
-    showActionbar(`<span class="c-green bold">✔ 领取 ${item.name} ${roman(eff)}</span> <span class="c-aqua">+${formatNumber(xpGain)} ${cat.experienceName}</span>`);
+    pushChat(`<span class="c-green">已领取 </span><span class="c-yellow bold">${item.name} ${roman(eff)}</span><span class="c-green"> 奖励（共 ${tiersClaimed} 层）：</span><span class="c-aqua">+${mapleGain} 枫叶经验</span>`);
+    showActionbar(`<span class="c-green bold">✔ 领取 ${item.name} ${roman(eff)}</span> <span class="c-aqua">+${mapleGain} 枫叶经验</span>`);
     playTone("claim");
     return true;
   }
@@ -472,7 +450,6 @@
     state.progress = {};
     state.claims = {};
     state.mapleXp = 0;
-    state.skillXp = { FARMING: 0, MINING: 0, COMBAT: 0, FORAGING: 0, FISHING: 0 };
 
     if (name === "newbie") {
       setItemAmount(CATEGORY_MAP.FARMING, "WHEAT", 80, false);
@@ -517,7 +494,6 @@
         if (cl > 0) {
           state.claims[cKey(cat, mat)] = cl;
           for (let t = 1; t <= cl; t++) {
-            state.skillXp[cid] += tierXpReward(cat, t);
             state.mapleXp += mapleXpReward(t);
           }
         }
@@ -530,7 +506,6 @@
           state.progress[cKey(cat, item.material)] = topReq;
           state.claims[cKey(cat, item.material)] = maxTier(cat) - 1; // 留最后一层可领
           for (let t = 1; t <= maxTier(cat) - 1; t++) {
-            state.skillXp[cat.id] += tierXpReward(cat, t);
             state.mapleXp += mapleXpReward(t);
           }
         }
@@ -814,7 +789,7 @@
       `<span class="c-gray">一键领取所有已解锁且未领取的收藏奖励。</span>`,
       "",
       `<span class="${sum.claimableTiers > 0 ? "c-gold" : "c-dark_gray"}">可领取层数: ${sum.claimableTiers}</span>`,
-      `<span class="c-gray">自动发放对应技能经验与枫叶经验。</span>`,
+      `<span class="c-gray">自动发放枫叶经验。</span>`,
       "",
       `<span class="${sum.claimableTiers > 0 ? "c-green" : "c-yellow"}">${sum.claimableTiers > 0 ? "点击立即领取！" : "当前暂无可领取奖励。"}</span>`
     ], {
@@ -936,7 +911,6 @@
         lore.push(`<span class="c-gray">距离 ${item.name} ${roman(nextT)}: <span class="c-yellow">${percentText(collected, req)}</span></span>`);
         lore.push(progressBarHtml(collected, req));
         lore.push("", `<span class="c-gray">下一级解锁奖励:</span>`);
-        lore.push(`<span class="c-dark_gray"> +<span class="c-aqua">${formatNumber(tierXpReward(cat, nextT))} ${cat.experienceName}</span></span>`);
         lore.push(`<span class="c-dark_gray"> +<span class="c-aqua">${mapleXpReward(nextT)} 枫叶经验</span></span>`);
         if (isFortuneMilestone(cat, req)) {
           lore.push(`<span class="c-dark_gray"> +<span class="c-green">1 职业采集幸运（全局上限 +30）</span></span>`);
@@ -1042,7 +1016,6 @@
         progressBarHtml(collected, req),
         "",
         `<span class="c-gray">层级奖励:</span>`,
-        `<span class="c-dark_gray"> +<span class="c-aqua">${formatNumber(tierXpReward(cat, tier))} ${cat.experienceName}</span></span>`,
         `<span class="c-dark_gray"> +<span class="c-aqua">${mapleXpReward(tier)} 枫叶经验</span></span>`
       ];
       if (isFortuneMilestone(cat, req)) {
@@ -1138,7 +1111,6 @@
       `<span class="c-gray">本层状态: ${unlocked ? (isClaimed ? '<span class="c-green">✔ 已领取</span>' : '<span class="c-gold bold">✦ 已解锁待领取</span>') : '<span class="c-red">✖ 未解锁</span>'}</span>`,
       "",
       `<span class="c-gray">固定奖励:</span>`,
-      `<span class="c-dark_gray"> +<span class="c-aqua">${formatNumber(tierXpReward(cat, tier))} ${cat.experienceName}</span></span>`,
       `<span class="c-dark_gray"> +<span class="c-aqua">${mapleXpReward(tier)} 枫叶经验</span></span>`
     ];
     if (isFortuneMilestone(cat, req)) {
@@ -1156,7 +1128,7 @@
       [
         unlocked && !isClaimed
           ? `<span class="c-green">点击将领取至 ${item.name} ${roman(tier)} 的全部未领奖励！</span>`
-          : (isClaimed ? `<span class="c-gray">你已经领取过本层的经验和枫叶经验。</span>` : `<span class="c-red">还差 ${formatNumber(req - collected)} 个 ${item.name}。</span>`)
+          : (isClaimed ? `<span class="c-gray">你已经领取过本层的枫叶经验。</span>` : `<span class="c-red">还差 ${formatNumber(req - collected)} 个 ${item.name}。</span>`)
       ],
       {
         glow: unlocked && !isClaimed,
@@ -1271,7 +1243,6 @@
       ], { extraClass: "craft-grid" });
 
       slots[24] = makeIcon("EXPERIENCE_BOTTLE", `<span class="c-aqua bold">本层奖励预览</span>`, [
-        `<span class="c-gray">• <span class="c-aqua">+${formatNumber(tierXpReward(cat, tier))} ${cat.experienceName}</span></span>`,
         `<span class="c-gray">• <span class="c-aqua">+${mapleXpReward(tier)} 枫叶经验</span></span>`,
         isFortuneMilestone(cat, req) ? `<span class="c-gray">• <span class="c-green">+1 职业采集幸运（自动生效）</span></span>` : ""
       ].filter(Boolean), { glow: unlocked && !isClaimed, extraClass: "craft-output" });
@@ -1452,7 +1423,7 @@
     if (claimableTiers > 0) {
       slots[6] = makeIcon("AMETHYST_SHARD", `<span class="c-gold bold">一键领取当前范围奖励</span>`, [
         `<span class="c-gold">立即领取 ${claimableTiers} 层待领取奖励。</span>`,
-        `<span class="c-gray">点击后自动发放技能经验与枫叶经验。</span>`
+        `<span class="c-gray">点击后自动发放枫叶经验。</span>`
       ], {
         glow: true,
         onClick: () => { claimScope(filterCatId); render(); }
@@ -1536,7 +1507,7 @@
     slots[21] = makeIcon("EXPERIENCE_BOTTLE", `<span class="c-gold bold">2. 层级与奖励领取</span>`, [
       `<span class="c-gray">• 战斗 / 伐木 / 钓鱼：每项最高 9 级（上限 50,000）。</span>`,
       `<span class="c-gray">• 农耕 / 挖矿：每项最高 12 级（上限 500,000）。</span>`,
-      `<span class="c-gray">• 达成新层级时会弹出升级提示与音效。</span>`,
+      `<span class="c-aqua">• 收藏层级奖励仅发放枫叶经验，不再发放技能经验。</span>`,
       `<span class="c-green">• 支持首页一键全领，或点进物品详情页逐层领取。</span>`
     ]);
 
@@ -1862,8 +1833,8 @@
       <div class="stat-chip"><span class="k">总收藏等级</span><span class="v">${sum.curTiers}/${sum.maxTiers}</span></div>
       <div class="stat-chip"><span class="k">农耕收藏幸运</span><span class="v">+${farmFort} / 30</span></div>
       <div class="stat-chip"><span class="k">挖矿收藏幸运</span><span class="v">+${mineFort} / 30</span></div>
-      <div class="stat-chip"><span class="k">农耕 / 挖矿经验</span><span class="v">${formatNumber(state.skillXp.FARMING)} / ${formatNumber(state.skillXp.MINING)}</span></div>
-      <div class="stat-chip"><span class="k">战 / 伐 / 钓经验</span><span class="v">${formatNumber(state.skillXp.COMBAT)} / ${formatNumber(state.skillXp.FORAGING)} / ${formatNumber(state.skillXp.FISHING)}</span></div>
+      <div class="stat-chip"><span class="k">已解锁 / 总物品</span><span class="v">${sum.unlockedItems} / ${sum.totalItems}</span></div>
+      <div class="stat-chip"><span class="k">待领取层数</span><span class="v">${sum.claimableTiers} 层</span></div>
     `;
   }
 

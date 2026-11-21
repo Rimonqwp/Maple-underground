@@ -341,9 +341,6 @@ public final class CollectionInfoGui {
             lore.add(Component.empty());
             lore.add(text("下一级解锁奖励:", NamedTextColor.GRAY));
             lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
-                    .append(Component.text(formatNumber(xpReward(category, nextTier)) + " " + category.experienceName(), NamedTextColor.AQUA))
-                    .decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
                     .append(Component.text(mapleXpReward(nextTier) + " 枫叶经验", NamedTextColor.AQUA))
                     .decoration(TextDecoration.ITALIC, false));
             if (isFortuneMilestone(category, required)) {
@@ -425,9 +422,6 @@ public final class CollectionInfoGui {
         lore.add(progressLine(collected, required));
         lore.add(Component.empty());
         lore.add(text("层级奖励:", NamedTextColor.GRAY));
-        lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
-                .append(Component.text(formatNumber(xpReward(category, tier)) + " " + category.experienceName(), NamedTextColor.AQUA))
-                .decoration(TextDecoration.ITALIC, false));
         lore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
                 .append(Component.text(mapleXpReward(tier) + " 枫叶经验", NamedTextColor.AQUA))
                 .decoration(TextDecoration.ITALIC, false));
@@ -531,7 +525,7 @@ public final class CollectionInfoGui {
     }
 
     public static int xpReward(@NotNull Category category, int tier) {
-        return maple.underground_state.professions.ProfessionMath.collectionXp(tier, extended(category));
+        return 0;
     }
 
     public static int tierFor(long collected, @NotNull Category category) {

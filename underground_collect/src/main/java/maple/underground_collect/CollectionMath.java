@@ -25,7 +25,7 @@ final class CollectionMath {
     }
 
     static int tierXpReward(int tier, @NotNull CollectionInfoGui.Category category) {
-        return CollectionInfoGui.xpReward(category, tier);
+        return 0;
     }
 
     static int maxTier() {
@@ -44,17 +44,7 @@ final class CollectionMath {
     }
 
     static int tierXpReward(int tier) {
-        return switch (tier) {
-            case 1 -> 20;
-            case 2 -> 50;
-            case 3 -> 100;
-            case 4 -> 250;
-            case 5 -> 500;
-            case 6 -> 1_000;
-            case 7 -> 2_000;
-            case 8 -> 3_500;
-            default -> 5_000;
-        };
+        return 0;
     }
 
     static int mapleXpReward(int tier) {

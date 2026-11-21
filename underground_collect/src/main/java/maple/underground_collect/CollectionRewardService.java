@@ -4,7 +4,6 @@ import maple.underground_state.UndergroundState;
 import maple.underground_state.collection.CollectionProgressManager;
 import maple.underground_state.gui.CollectionInfoGui;
 import maple.underground_state.skills.SkillProgressManager;
-import maple.underground_state.skills.SkillRewardService;
 import maple.underground_state.skills.SkillType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,19 +57,14 @@ final class CollectionRewardService {
                            @NotNull CollectionInfoGui.CollectionItem item,
                            int targetTier) {
         UUID uuid = player.getUniqueId();
-        ClaimSummary guard = checkReady(uuid, category);
+        ClaimSummary guard = checkReady(uuid);
         if (guard != null) {
             return guard;
-        }
-        SkillType skillType = skillTypeForCategory(category);
-        if (skillType == null) {
-            return ClaimSummary.nothing();
         }
 
         Object lock = playerLocks.computeIfAbsent(uuid, ignored -> new Object());
         synchronized (lock) {
             CollectionProgressManager progressManager = state.getCollectionProgressManager();
-            SkillRewardService rewardService = state.getSkillRewardService();
             SkillProgressManager skillProgressManager = state.getSkillProgressManager();
 
             String key = CollectionInfoGui.collectionKey(category, item.material());
@@ -84,12 +77,10 @@ final class CollectionRewardService {
                 return ClaimSummary.nothing();
             }
 
-            Map<SkillType, Long> skillXpByType = new EnumMap<>(SkillType.class);
             long mapleXp = 0L;
             int tiersClaimed = 0;
             for (int tier = previousClaimedTier + 1; tier <= effectiveTarget; tier++) {
                 tiersClaimed++;
-                skillXpByType.merge(skillType, (long) CollectionMath.tierXpReward(tier, category), Long::sum);
                 mapleXp += CollectionMath.mapleXpReward(tier);
             }
 
@@ -97,14 +88,14 @@ final class CollectionRewardService {
             repository.updateCachedClaims(uuid, updates);
             repository.saveClaimsBatchAsync(uuid, updates);
 
-            grantRewards(uuid, rewardService, skillProgressManager, skillXpByType, mapleXp);
-            return new ClaimSummary(ClaimStatus.CLAIMED, 1, tiersClaimed, mapleXp, skillXpByType);
+            grantRewards(uuid, skillProgressManager, mapleXp);
+            return new ClaimSummary(ClaimStatus.CLAIMED, 1, tiersClaimed, mapleXp, Map.of());
         }
     }
 
     @NotNull
     ClaimSummary claim(@NotNull UUID uuid, @Nullable CollectionInfoGui.Category category) {
-        ClaimSummary guard = checkReady(uuid, category);
+        ClaimSummary guard = checkReady(uuid);
         if (guard != null) {
             return guard;
         }
@@ -112,22 +103,16 @@ final class CollectionRewardService {
         Object lock = playerLocks.computeIfAbsent(uuid, ignored -> new Object());
         synchronized (lock) {
             CollectionProgressManager progressManager = state.getCollectionProgressManager();
-            SkillRewardService rewardService = state.getSkillRewardService();
             SkillProgressManager skillProgressManager = state.getSkillProgressManager();
 
             Map<String, Long> progress = progressManager != null ? progressManager.snapshot(uuid) : Map.of();
             Map<String, Integer> claimed = repository.getCachedClaims(uuid);
-            Map<SkillType, Long> skillXpByType = new EnumMap<>(SkillType.class);
             Map<String, Integer> newClaimStates = new LinkedHashMap<>();
             long mapleXp = 0L;
             int collectionsClaimed = 0;
             int tiersClaimed = 0;
 
             for (CollectionInfoGui.Category currentCategory : targetCategories(category)) {
-                SkillType skillType = skillTypeForCategory(currentCategory);
-                if (skillType == null) {
-                    continue;
-                }
                 for (CollectionInfoGui.CollectionItem item : currentCategory.items()) {
                     String key = CollectionInfoGui.collectionKey(currentCategory, item.material());
                     long collected = progress.getOrDefault(key, 0L);
@@ -140,7 +125,6 @@ final class CollectionRewardService {
                     newClaimStates.put(key, currentTier);
                     for (int tier = previousClaimedTier + 1; tier <= currentTier; tier++) {
                         tiersClaimed++;
-                        skillXpByType.merge(skillType, (long) CollectionMath.tierXpReward(tier, currentCategory), Long::sum);
                         mapleXp += CollectionMath.mapleXpReward(tier);
                     }
                 }
@@ -152,8 +136,8 @@ final class CollectionRewardService {
 
             repository.updateCachedClaims(uuid, newClaimStates);
             repository.saveClaimsBatchAsync(uuid, newClaimStates);
-            grantRewards(uuid, rewardService, skillProgressManager, skillXpByType, mapleXp);
-            return new ClaimSummary(ClaimStatus.CLAIMED, collectionsClaimed, tiersClaimed, mapleXp, skillXpByType);
+            grantRewards(uuid, skillProgressManager, mapleXp);
+            return new ClaimSummary(ClaimStatus.CLAIMED, collectionsClaimed, tiersClaimed, mapleXp, Map.of());
         }
     }
 
@@ -228,7 +212,6 @@ final class CollectionRewardService {
 
     void sendClaimFeedback(@NotNull Player player, @NotNull ClaimSummary summary) {
         switch (summary.status()) {
-            case LOADING_PROFESSION -> player.sendMessage(Component.text("职业存档正在加载中，请稍候片刻再领取收藏奖励。", NamedTextColor.YELLOW));
             case LOADING_CLAIMS -> player.sendMessage(Component.text("收藏领取记录正在加载中，请稍候片刻再试。", NamedTextColor.YELLOW));
             case NOTHING -> player.sendMessage(Component.text("当前没有可领取的收藏奖励。", NamedTextColor.YELLOW));
             case CLAIMED -> {
@@ -241,27 +224,13 @@ final class CollectionRewardService {
                     player.sendMessage(Component.text("枫叶经验: ", NamedTextColor.GRAY)
                             .append(Component.text("+" + CollectionMath.formatNumber(summary.mapleXp()), NamedTextColor.AQUA)));
                 }
-                for (Map.Entry<SkillType, Long> entry : summary.skillXpByType().entrySet()) {
-                    if (entry.getValue() == null || entry.getValue() <= 0L) {
-                        continue;
-                    }
-                    player.sendMessage(Component.text(entry.getKey().displayName() + " 经验: ", NamedTextColor.GRAY)
-                            .append(Component.text("+" + CollectionMath.formatNumber(entry.getValue()), NamedTextColor.AQUA)));
-                }
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.8f, 1.2f);
             }
         }
     }
 
     @Nullable
-    private ClaimSummary checkReady(@NotNull UUID uuid, @Nullable CollectionInfoGui.Category category) {
-        if (state.getProfessionService() != null && (category == null || CollectionMath.extended(category))) {
-            var store = state.getProfessionService().store();
-            if (!store.ready(uuid)) {
-                runAsync(() -> store.load(uuid));
-                return ClaimSummary.loadingProfession();
-            }
-        }
+    private ClaimSummary checkReady(@NotNull UUID uuid) {
         if (!repository.isClaimsLoaded(uuid)) {
             repository.preloadClaimsAsync(uuid, null);
             return ClaimSummary.loadingClaims();
@@ -270,17 +239,8 @@ final class CollectionRewardService {
     }
 
     private void grantRewards(@NotNull UUID uuid,
-                              @Nullable SkillRewardService rewardService,
                               @Nullable SkillProgressManager skillProgressManager,
-                              @NotNull Map<SkillType, Long> skillXpByType,
                               long mapleXp) {
-        if (rewardService != null) {
-            for (Map.Entry<SkillType, Long> entry : skillXpByType.entrySet()) {
-                if (entry.getValue() != null && entry.getValue() > 0L) {
-                    rewardService.addSkillXp(uuid, entry.getKey(), entry.getValue());
-                }
-            }
-        }
         if (mapleXp > 0L && skillProgressManager != null) {
             skillProgressManager.addMapleXp(uuid, mapleXp);
             runAsync(() -> skillProgressManager.save(uuid));
@@ -300,21 +260,9 @@ final class CollectionRewardService {
         return category == null ? CollectionInfoGui.Category.values() : new CollectionInfoGui.Category[]{category};
     }
 
-    @Nullable
-    private static SkillType skillTypeForCategory(@NotNull CollectionInfoGui.Category category) {
-        return switch (category) {
-            case FARMING -> SkillType.FARMING;
-            case MINING -> SkillType.MINING;
-            case COMBAT -> SkillType.COMBAT;
-            case FORAGING -> SkillType.FORAGING;
-            case FISHING -> SkillType.FISHING;
-        };
-    }
-
     enum ClaimStatus {
         CLAIMED,
         NOTHING,
-        LOADING_PROFESSION,
         LOADING_CLAIMS
     }
 
@@ -326,10 +274,6 @@ final class CollectionRewardService {
 
         static ClaimSummary nothing() {
             return new ClaimSummary(ClaimStatus.NOTHING, 0, 0, 0L, Map.of());
-        }
-
-        static ClaimSummary loadingProfession() {
-            return new ClaimSummary(ClaimStatus.LOADING_PROFESSION, 0, 0, 0L, Map.of());
         }
 
         static ClaimSummary loadingClaims() {

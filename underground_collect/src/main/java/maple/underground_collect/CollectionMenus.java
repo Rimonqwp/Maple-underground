@@ -259,7 +259,7 @@ final class CollectionMenus {
                     title("一键领取当前范围奖励"),
                     List.of(
                             text("立即领取 " + claimableTiers + " 层待领取奖励。", NamedTextColor.GOLD),
-                            text("点击后自动发放技能经验与枫叶经验。", NamedTextColor.GRAY)
+                            text("点击后自动发放枫叶经验。", NamedTextColor.GRAY)
                     )
             );
             applyGlow(claimBtn);
@@ -339,7 +339,7 @@ final class CollectionMenus {
                 List.of(
                         text("• 战斗 / 伐木 / 钓鱼：每项最高 9 级（上限 50,000）。", NamedTextColor.GRAY),
                         text("• 农耕 / 挖矿：每项最高 12 级（上限 500,000）。", NamedTextColor.GRAY),
-                        text("• 达成新层级时会弹出升级提示与音效。", NamedTextColor.GRAY),
+                        text("• 收藏层级奖励仅发放枫叶经验，不再发放技能经验。", NamedTextColor.AQUA),
                         text("• 可在首页一键领取，或点进物品详情页逐层领取。", NamedTextColor.GREEN)
                 )
         ));
@@ -585,7 +585,7 @@ final class CollectionMenus {
                 text("一键领取所有已解锁且未领取的收藏奖励。", NamedTextColor.GRAY),
                 Component.empty(),
                 text("可领取层数: " + claimable, claimable > 0 ? NamedTextColor.GOLD : NamedTextColor.DARK_GRAY),
-                text("自动发放对应技能经验与枫叶经验。", NamedTextColor.GRAY),
+                text("自动发放枫叶经验。", NamedTextColor.GRAY),
                 Component.empty(),
                 text(claimable > 0 ? "点击立即领取！" : "当前暂无可领取奖励。", claimable > 0 ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
         );

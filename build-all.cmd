@@ -118,9 +118,9 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-if not exist "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" (
-    if exist "%ROOT%underground_state\target\underground_state-1.0.jar" (
-        copy /Y "%ROOT%underground_state\target\underground_state-1.0.jar" "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" >nul
+if not exist "%ROOT%underground_state\target\underground_state-26.3-shaded.jar" (
+    if exist "%ROOT%underground_state\target\underground_state-26.3.jar" (
+        copy /Y "%ROOT%underground_state\target\underground_state-26.3.jar" "%ROOT%underground_state\target\underground_state-26.3-shaded.jar" >nul
     )
 )
 echo [INFO] Finished underground_state.
@@ -135,9 +135,9 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-if not exist "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" (
-    if exist "%ROOT%underground_item\target\underground_item-1.0.jar" (
-        copy /Y "%ROOT%underground_item\target\underground_item-1.0.jar" "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" >nul
+if not exist "%ROOT%underground_item\target\underground_item-26.3-shaded.jar" (
+    if exist "%ROOT%underground_item\target\underground_item-26.3.jar" (
+        copy /Y "%ROOT%underground_item\target\underground_item-26.3.jar" "%ROOT%underground_item\target\underground_item-26.3-shaded.jar" >nul
     )
 )
 echo [INFO] Finished underground_item.
@@ -169,9 +169,9 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-if not exist "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" (
-    if exist "%ROOT%underground_island\target\underground_island-1.0.jar" (
-        copy /Y "%ROOT%underground_island\target\underground_island-1.0.jar" "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" >nul
+if not exist "%ROOT%underground_island\target\underground_island-26.3-shaded.jar" (
+    if exist "%ROOT%underground_island\target\underground_island-26.3.jar" (
+        copy /Y "%ROOT%underground_island\target\underground_island-26.3.jar" "%ROOT%underground_island\target\underground_island-26.3-shaded.jar" >nul
     )
 )
 echo [INFO] Finished underground_island.
@@ -186,9 +186,9 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-if not exist "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" (
-    if exist "%ROOT%underground_caves\target\underground_caves-1.0.jar" (
-        copy /Y "%ROOT%underground_caves\target\underground_caves-1.0.jar" "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" >nul
+if not exist "%ROOT%underground_caves\target\underground_caves-26.3-shaded.jar" (
+    if exist "%ROOT%underground_caves\target\underground_caves-26.3.jar" (
+        copy /Y "%ROOT%underground_caves\target\underground_caves-26.3.jar" "%ROOT%underground_caves\target\underground_caves-26.3-shaded.jar" >nul
     )
 )
 echo [INFO] Finished underground_caves.
@@ -203,9 +203,9 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-if not exist "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" (
-    if exist "%ROOT%underground_mayor\target\underground_mayor-1.0.jar" (
-        copy /Y "%ROOT%underground_mayor\target\underground_mayor-1.0.jar" "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" >nul
+if not exist "%ROOT%underground_mayor\target\underground_mayor-26.3-shaded.jar" (
+    if exist "%ROOT%underground_mayor\target\underground_mayor-26.3.jar" (
+        copy /Y "%ROOT%underground_mayor\target\underground_mayor-26.3.jar" "%ROOT%underground_mayor\target\underground_mayor-26.3-shaded.jar" >nul
     )
 )
 echo [INFO] Finished underground_mayor.
@@ -235,18 +235,18 @@ popd
 echo [INFO] Finished underground_velocity Velocity bridge.
 echo.
 
-if exist "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" (
-    copy /Y "%ROOT%underground_state\target\underground_state-1.0-shaded.jar" "%DIST_DIR%\underground_state-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_state-1.0-shaded.jar
+if exist "%ROOT%underground_state\target\underground_state-26.3-shaded.jar" (
+    copy /Y "%ROOT%underground_state\target\underground_state-26.3-shaded.jar" "%DIST_DIR%\underground_state-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_state-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_state\target\underground_state-1.0-shaded.jar
+    echo [WARN] Missing artifact: %ROOT%underground_state\target\underground_state-26.3-shaded.jar
 )
 
-if exist "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" (
-    copy /Y "%ROOT%underground_item\target\underground_item-1.0-shaded.jar" "%DIST_DIR%\underground_item-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_item-1.0-shaded.jar
+if exist "%ROOT%underground_item\target\underground_item-26.3-shaded.jar" (
+    copy /Y "%ROOT%underground_item\target\underground_item-26.3-shaded.jar" "%DIST_DIR%\underground_item-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_item-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_item\target\underground_item-1.0-shaded.jar
+    echo [WARN] Missing artifact: %ROOT%underground_item\target\underground_item-26.3-shaded.jar
 )
 
 if exist "%ROOT%underground_collect\target\underground_collect-26.3-shaded.jar" (
@@ -256,39 +256,39 @@ if exist "%ROOT%underground_collect\target\underground_collect-26.3-shaded.jar" 
     echo [WARN] Missing artifact: %ROOT%underground_collect\target\underground_collect-26.3-shaded.jar
 )
 
-if exist "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" (
-    copy /Y "%ROOT%underground_island\target\underground_island-1.0-shaded.jar" "%DIST_DIR%\underground_island-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_island-1.0-shaded.jar
+if exist "%ROOT%underground_island\target\underground_island-26.3-shaded.jar" (
+    copy /Y "%ROOT%underground_island\target\underground_island-26.3-shaded.jar" "%DIST_DIR%\underground_island-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_island-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_island\target\underground_island-1.0-shaded.jar
+    echo [WARN] Missing artifact: %ROOT%underground_island\target\underground_island-26.3-shaded.jar
 )
 
-if exist "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" (
-    copy /Y "%ROOT%underground_caves\target\underground_caves-1.0-shaded.jar" "%DIST_DIR%\underground_caves-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_caves-1.0-shaded.jar
+if exist "%ROOT%underground_caves\target\underground_caves-26.3-shaded.jar" (
+    copy /Y "%ROOT%underground_caves\target\underground_caves-26.3-shaded.jar" "%DIST_DIR%\underground_caves-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_caves-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_caves\target\underground_caves-1.0-shaded.jar
+    echo [WARN] Missing artifact: %ROOT%underground_caves\target\underground_caves-26.3-shaded.jar
 )
 
-if exist "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" (
-    copy /Y "%ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar" "%DIST_DIR%\underground_mayor-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_mayor-1.0-shaded.jar
+if exist "%ROOT%underground_mayor\target\underground_mayor-26.3-shaded.jar" (
+    copy /Y "%ROOT%underground_mayor\target\underground_mayor-26.3-shaded.jar" "%DIST_DIR%\underground_mayor-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_mayor-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_mayor\target\underground_mayor-1.0-shaded.jar
+    echo [WARN] Missing artifact: %ROOT%underground_mayor\target\underground_mayor-26.3-shaded.jar
 )
 
 
-if exist "%ROOT%underground_quest\target\underground_quest-1.0.jar" (
-    copy /Y "%ROOT%underground_quest\target\underground_quest-1.0.jar" "%DIST_DIR%\underground_quest-1.0-shaded.jar" >nul
-    echo [INFO] Copied underground_quest-1.0-shaded.jar
+if exist "%ROOT%underground_quest\target\underground_quest-26.3.jar" (
+    copy /Y "%ROOT%underground_quest\target\underground_quest-26.3.jar" "%DIST_DIR%\underground_quest-26.3-shaded.jar" >nul
+    echo [INFO] Copied underground_quest-26.3-shaded.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_quest\target\underground_quest-1.0.jar
+    echo [WARN] Missing artifact: %ROOT%underground_quest\target\underground_quest-26.3.jar
 )
-if exist "%ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar" (
-    copy /Y "%ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar" "%DIST_DIR%\underground_velocity-1.0-SNAPSHOT.jar" >nul
-    echo [INFO] Copied underground_velocity-1.0-SNAPSHOT.jar
+if exist "%ROOT%underground_velocity\target\underground_velocity-26.3.jar" (
+    copy /Y "%ROOT%underground_velocity\target\underground_velocity-26.3.jar" "%DIST_DIR%\underground_velocity-26.3.jar" >nul
+    echo [INFO] Copied underground_velocity-26.3.jar
 ) else (
-    echo [WARN] Missing artifact: %ROOT%underground_velocity\target\underground_velocity-1.0-SNAPSHOT.jar
+    echo [WARN] Missing artifact: %ROOT%underground_velocity\target\underground_velocity-26.3.jar
 )
 
 echo.

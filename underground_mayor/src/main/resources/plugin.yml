@@ -1,5 +1,5 @@
 name: underground_mayor
-version: '$version'
+version: '26.3'
 
 main: maple.underground_mayor.UndergroundMayor
 api-version: '26.3'

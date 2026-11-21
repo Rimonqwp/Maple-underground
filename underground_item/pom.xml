@@ -6,7 +6,7 @@
 
     <groupId>maple</groupId>
     <artifactId>underground_item</artifactId>
-    <version>1.0</version>
+    <version>26.3</version>
     <packaging>jar</packaging>
 
     <name>underground_item</name>
@@ -17,7 +17,7 @@
         <mockbukkit.version>4.116.1</mockbukkit.version>
         <junit.jupiter.version>6.1.3</junit.jupiter.version>
         <maven.surefire.version>3.5.4</maven.surefire.version>
-        <underground_state.jar>${project.basedir}/../underground_state/target/underground_state-1.0-shaded.jar</underground_state.jar>
+        <underground_state.jar>${project.basedir}/../underground_state/target/underground_state-26.3-shaded.jar</underground_state.jar>
     </properties>
 
     <build>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>maple</groupId>
             <artifactId>underground_state</artifactId>
-            <version>1.0</version>
+            <version>26.3</version>
             <scope>system</scope>
             <systemPath>${underground_state.jar}</systemPath>
         </dependency>

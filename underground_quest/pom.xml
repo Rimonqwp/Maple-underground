@@ -6,7 +6,7 @@
 
     <groupId>maple</groupId>
     <artifactId>underground_quest</artifactId>
-    <version>1.0</version>
+    <version>26.3</version>
     <packaging>jar</packaging>
 
     <name>underground_quest</name>
@@ -17,8 +17,8 @@
         <mockbukkit.version>4.116.1</mockbukkit.version>
         <junit.jupiter.version>6.1.3</junit.jupiter.version>
         <maven.surefire.version>3.5.4</maven.surefire.version>
-        <underground_state.jar>${project.basedir}/../underground_state/target/underground_state-1.0-shaded.jar</underground_state.jar>
-        <underground_caves.jar>${project.basedir}/../underground_caves/target/underground_caves-1.0-shaded.jar</underground_caves.jar>
+        <underground_state.jar>${project.basedir}/../underground_state/target/underground_state-26.3-shaded.jar</underground_state.jar>
+        <underground_caves.jar>${project.basedir}/../underground_caves/target/underground_caves-26.3-shaded.jar</underground_caves.jar>
     </properties>
 
     <build>
@@ -74,14 +74,14 @@
         <dependency>
             <groupId>maple</groupId>
             <artifactId>underground_state</artifactId>
-            <version>1.0</version>
+            <version>26.3</version>
             <scope>system</scope>
             <systemPath>${underground_state.jar}</systemPath>
         </dependency>
         <dependency>
             <groupId>maple</groupId>
             <artifactId>underground_caves</artifactId>
-            <version>1.0</version>
+            <version>26.3</version>
             <scope>system</scope>
             <systemPath>${underground_caves.jar}</systemPath>
         </dependency>

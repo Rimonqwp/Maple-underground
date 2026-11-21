@@ -1,5 +1,5 @@
 name: underground_island
-version: '1.0'
+version: '26.3'
 main: maple.underground_island.UndergroundIsland
 api-version: '26.3'
 load: POSTWORLD

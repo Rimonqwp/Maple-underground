@@ -24,7 +24,7 @@ Citizens 编译依赖更新至 `2.0.44-SNAPSHOT`，Lombok 更新至 `1.18.48`，
 - 将需要的 Paper 插件 JAR 放入后端 `plugins/`；所有子插件都需要
   `underground_state`，地城还需要 `underground_item`，任务还需要地城。
 - 市长模块需要服务端安装支持 26.3 的 Citizens。
-- `underground_velocity-1.0-SNAPSHOT.jar` 放入 Velocity 代理的 `plugins/`，
+- `underground_velocity-26.3.jar` 放入 Velocity 代理的 `plugins/`，
   代理也使用 Java 25 或更新版本启动。
 - 已有 Velocity 配置不会自动覆盖。升级时检查代理插件 `config.yml`
   中的 `java-command` 和 `paper-jar`，以及副本模板目录里的服务端 JAR。

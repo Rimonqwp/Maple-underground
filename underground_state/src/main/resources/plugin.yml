@@ -1,5 +1,5 @@
 name: underground_state
-version: '1.0'
+version: '26.3'
 main: maple.underground_state.UndergroundState
 api-version: '26.3'
 load: POSTWORLD

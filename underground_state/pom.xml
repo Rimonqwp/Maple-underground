@@ -6,7 +6,7 @@
 
     <groupId>maple</groupId>
     <artifactId>underground_state</artifactId>
-    <version>1.0</version>
+    <version>26.3</version>
     <packaging>jar</packaging>
 
     <name>underground_state</name>

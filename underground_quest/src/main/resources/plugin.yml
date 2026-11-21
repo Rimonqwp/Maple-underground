@@ -1,5 +1,5 @@
 name: underground_quest
-version: '1.0'
+version: '26.3'
 main: maple.underground_quest.UndergroundQuest
 api-version: '26.3'
 load: POSTWORLD

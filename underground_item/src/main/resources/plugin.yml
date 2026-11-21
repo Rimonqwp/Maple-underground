@@ -1,5 +1,5 @@
 name: underground_item
-version: '1.0'
+version: '26.3'
 main: maple.underground_item.UndergroundItem
 api-version: '26.3'
 load: POSTWORLD

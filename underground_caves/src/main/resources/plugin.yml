@@ -1,5 +1,5 @@
 name: underground_caves
-version: '1.0'
+version: '26.3'
 main: maple.underground_caves.Test_dungeons
 api-version: '26.3'
 depend: [underground_state, underground_item]

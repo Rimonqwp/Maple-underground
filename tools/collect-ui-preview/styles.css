@@ -1435,3 +1435,95 @@ body {
   border-radius: 14px;
   font-size: 13.5px;
 }
+
+/* Inline 3x3 Crafting Recipe Card inside Armory Inspector */
+.armory-craft-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.armory-craft-head h2 {
+  margin: 0;
+}
+
+.armory-craft-bench {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--mc-bg);
+  border: 3px solid #2b2b2b;
+  box-shadow:
+    inset 2px 2px 0 var(--mc-border-light),
+    inset -2px -2px 0 var(--mc-border-dark);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.armory-craft-3x3 {
+  display: grid;
+  grid-template-columns: repeat(3, 46px);
+  gap: 4px;
+}
+
+.armory-craft-3x3 .mc-slot,
+.armory-craft-result .mc-slot {
+  width: 46px;
+  height: 46px;
+}
+
+.armory-craft-arrow {
+  font-size: 20px;
+  font-weight: 900;
+  color: #4b4b4b;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.65);
+  user-select: none;
+}
+
+.armory-craft-ingredients {
+  margin-top: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.craft-ing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 7px;
+  background: #111622;
+  border: 1px solid #242f44;
+  border-radius: 6px;
+}
+
+.craft-ing-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.craft-ing-qty {
+  color: var(--accent);
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.craft-ing-link {
+  background: transparent;
+  border: none;
+  color: #55ffff;
+  font-size: 11.5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.craft-ing-link:hover {
+  text-decoration: underline;
+}

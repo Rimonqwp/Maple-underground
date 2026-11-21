@@ -62,7 +62,8 @@
     rarity: "all",
     floorBySet: {},     // setId -> "F1" | "F2" | "F3"
     setProgress: 4,     // 0..4 for {set_progress} preview
-    selected: null      // { type: "item"|"setPiece", item, set? }
+    selected: null,     // { type: "item"|"setPiece", item, set? }
+    recipeStack: []     // inline 3x3 drill-down stack of professionItem IDs
   };
 
   // Initialize default floors
@@ -345,6 +346,7 @@
       item,
       set: setObj
     };
+    state.recipeStack = [];
     const sim = SIM();
     if (sim) sim.playTone("click");
     renderCatalog();
@@ -492,21 +494,171 @@
       stage.appendChild(notice);
     }
 
-    // Jump to 3x3 crafting recipe for profession items
-    const sim = SIM();
-    if (item.job && sim && sim.findRecipeLocation && sim.findRecipeLocation(item.id)) {
-      const recipeBtn = document.createElement("button");
-      recipeBtn.type = "button";
-      recipeBtn.className = "ctrl-btn accent";
-      recipeBtn.style.width = "100%";
-      recipeBtn.textContent = "⚒ 前往收集中心查看 3×3 合成配方 →";
-      recipeBtn.addEventListener("click", () => {
-        sim.openProfessionRecipe(item.id);
-      });
-      stage.appendChild(recipeBtn);
-    }
-
     elInspector.appendChild(stage);
+
+    // Inline 3x3 Crafting Recipe Card (for profession items with recipes)
+    const profItemsMap = (window.COLLECT_DATA && window.COLLECT_DATA.professionItems) || {};
+    const sim = SIM();
+    if (item.recipe && sim && sim.tokenDisplay) {
+      const drillId = state.recipeStack.length ? state.recipeStack[state.recipeStack.length - 1] : null;
+      const activeProf = drillId ? profItemsMap[drillId] : null;
+      const activeRecipe = activeProf ? activeProf.recipe : item.recipe;
+      const activeCompression = activeProf ? activeProf.compression : null;
+
+      if (activeRecipe || activeCompression) {
+        const tokens = activeCompression
+          ? Array(9).fill(activeCompression)
+          : [
+              activeRecipe.a, activeRecipe.n, activeRecipe.b,
+              activeRecipe.a, activeRecipe.p, activeRecipe.b,
+              activeRecipe.a, activeRecipe.n, activeRecipe.b
+            ];
+
+        const craftCard = document.createElement("div");
+        craftCard.className = "panel-card";
+
+        const head = document.createElement("div");
+        head.className = "armory-craft-head";
+        const heading = document.createElement("h2");
+        heading.textContent = activeProf ? `⚒ 原料配方：${activeProf.name}` : "⚒ 3×3 合成配方";
+        head.appendChild(heading);
+
+        if (state.recipeStack.length > 0) {
+          const backBtn = document.createElement("button");
+          backBtn.type = "button";
+          backBtn.className = "ctrl-btn";
+          backBtn.textContent = "← 返回上一层";
+          backBtn.addEventListener("click", () => {
+            state.recipeStack.pop();
+            sim.playTone("click");
+            renderInspector();
+          });
+          head.appendChild(backBtn);
+        }
+        craftCard.appendChild(head);
+
+        const bench = document.createElement("div");
+        bench.className = "armory-craft-bench";
+
+        const grid3x3 = document.createElement("div");
+        grid3x3.className = "armory-craft-3x3";
+
+        const countsMap = new Map();
+        tokens.forEach((tok) => {
+          const info = sim.tokenDisplay(tok);
+          const canDrill = !!(info.profItem && (info.profItem.compression || info.profItem.recipe));
+          const key = tok;
+          if (!countsMap.has(key)) countsMap.set(key, { tok, info, canDrill, qty: 0 });
+          countsMap.get(key).qty += 1;
+
+          const cell = document.createElement("div");
+          const ingColor = info.profItem && info.profItem.color && sim.rgbIntToHex ? sim.rgbIntToHex(info.profItem.color) : null;
+          const ingItem = {
+            id: tok,
+            namePlain: info.name,
+            material: info.material,
+            colorHex: ingColor,
+            glow: info.visual ? info.visual.glow : false
+          };
+          cell.className = "mc-slot craft-grid" + (ingItem.glow ? " glow" : "") + (canDrill ? " clickable" : "");
+          buildSlotVisual(cell, ingItem);
+          if (info.visual && info.visual.badge) {
+            const b = document.createElement("span");
+            b.className = "slot-badge" + (info.visual.badgeClass ? ` ${info.visual.badgeClass}` : "");
+            b.textContent = info.visual.badge;
+            cell.appendChild(b);
+          }
+
+          const ttPayload = {
+            titleHtml: `<span class="c-yellow bold">${escapeHtml(info.name)}</span>`,
+            loreLines: [
+              info.profItem
+                ? `<span class="c-gray">自定义职业物品 (<span class="c-yellow">${escapeHtml(info.profItem.id)}</span>)</span>`
+                : `<span class="c-gray">原版材料 (${escapeHtml(info.material)})</span>`,
+              canDrill ? `<span class="c-aqua bold">▶ 点击查看「${escapeHtml(info.name)}」的 3×3 配方</span>` : ""
+            ].filter(Boolean)
+          };
+          cell.addEventListener("mouseenter", (ev) => sim.showTooltip(ttPayload, ev));
+          cell.addEventListener("mousemove", (ev) => sim.moveTooltip(ev));
+          cell.addEventListener("mouseleave", () => sim.hideTooltip());
+          if (canDrill) {
+            cell.addEventListener("click", () => {
+              state.recipeStack.push(info.profItem.id);
+              sim.playTone("click");
+              renderInspector();
+            });
+          }
+          grid3x3.appendChild(cell);
+        });
+        bench.appendChild(grid3x3);
+
+        const arrow = document.createElement("div");
+        arrow.className = "armory-craft-arrow";
+        arrow.textContent = "➡";
+        bench.appendChild(arrow);
+
+        const resultWrap = document.createElement("div");
+        resultWrap.className = "armory-craft-result";
+        const outVisualItem = activeProf
+          ? (() => {
+              const info = sim.tokenDisplay(activeProf.id);
+              return {
+                id: activeProf.id,
+                namePlain: activeProf.name,
+                displayName: `&6&l${activeProf.name}`,
+                material: info.material,
+                colorHex: activeProf.color && sim.rgbIntToHex ? sim.rgbIntToHex(activeProf.color) : null,
+                glow: info.visual ? info.visual.glow : false,
+                badge: info.visual ? info.visual.badge : null,
+                badgeClass: info.visual ? info.visual.badgeClass : "",
+                lore: activeProf.compression ? [`&7相当于 &e${activeProf.rawValue || 9} &7个原料`] : []
+              };
+            })()
+          : item;
+
+        const outCell = document.createElement("div");
+        outCell.className = "mc-slot craft-output" + (outVisualItem.glow ? " glow" : "");
+        buildSlotVisual(outCell, outVisualItem);
+        if (outVisualItem.badge) {
+          const b = document.createElement("span");
+          b.className = "slot-badge" + (outVisualItem.badgeClass ? ` ${outVisualItem.badgeClass}` : "");
+          b.textContent = outVisualItem.badge;
+          outCell.appendChild(b);
+        }
+        attachHoverTooltip(outCell, () => outVisualItem);
+        resultWrap.appendChild(outCell);
+        bench.appendChild(resultWrap);
+        craftCard.appendChild(bench);
+
+        // Ingredient summary list
+        const ingList = document.createElement("div");
+        ingList.className = "armory-craft-ingredients";
+        countsMap.forEach(({ info, canDrill, qty }) => {
+          const row = document.createElement("div");
+          row.className = "craft-ing-row";
+          const left = document.createElement("div");
+          left.className = "craft-ing-left";
+          left.innerHTML = `<img class="mini-mc-tex" src="textures/${info.material}.png" alt="" /><span class="craft-ing-qty">${qty}×</span><span>${escapeHtml(info.name)}</span>`;
+          row.appendChild(left);
+          if (canDrill) {
+            const linkBtn = document.createElement("button");
+            linkBtn.type = "button";
+            linkBtn.className = "craft-ing-link";
+            linkBtn.textContent = "查看配方 ›";
+            linkBtn.addEventListener("click", () => {
+              state.recipeStack.push(info.profItem.id);
+              sim.playTone("click");
+              renderInspector();
+            });
+            row.appendChild(linkBtn);
+          }
+          ingList.appendChild(row);
+        });
+        craftCard.appendChild(ingList);
+
+        elInspector.appendChild(craftCard);
+      }
+    }
 
     // Card 2: Set Total Stats (when viewing an armor set)
     if (set && activeSetData && activeSetData.totalStats && Object.keys(activeSetData.totalStats).length > 0) {

@@ -2143,6 +2143,8 @@
     showCollectWorkspace,
     openProfessionRecipe,
     findRecipeLocation,
+    tokenDisplay,
+    rgbIntToHex,
     showTooltip,
     moveTooltip,
     hideTooltip

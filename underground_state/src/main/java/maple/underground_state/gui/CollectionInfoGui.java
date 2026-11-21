@@ -432,10 +432,6 @@ public final class CollectionInfoGui {
 
         CollectionRecipeBridge currentRecipeBridge = recipeBridge;
         boolean hasRecipes = currentRecipeBridge != null && !currentRecipeBridge.recipeTiersForMaterial(item.material()).isEmpty();
-        if (hasRecipes) {
-            lore.add(Component.empty());
-            lore.add(text("⚒ 关联真实 3×3 合成配方（点进等级可查看）", NamedTextColor.LIGHT_PURPLE));
-        }
 
         if (claimable > 0) {
             lore.add(Component.empty());

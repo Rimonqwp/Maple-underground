@@ -925,9 +925,6 @@
           lore.push(`<span class="c-dark_gray"> +<span class="c-green">1 职业采集幸运（全局上限 +30）</span></span>`);
         }
       }
-      if (hasRecipes) {
-        lore.push("", `<span class="c-light_purple">⚒ 关联真实 3×3 职业合成配方（点进等级可查看）</span>`);
-      }
       if (claimable > 0) {
         lore.push("", `<span class="c-gold bold">✦ 有 ${claimable} 层奖励可领取！</span>`);
       }

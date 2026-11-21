@@ -55,6 +55,15 @@ public class UndergroundCollect extends JavaPlugin {
                 rewardService.sendClaimFeedback(player, summary);
                 return summary.hasAnything();
             }
+
+            @Override
+            public boolean openTierRecipe(@NotNull Player player,
+                                          @NotNull CollectionInfoGui.Category category,
+                                          int itemIndex,
+                                          int tier) {
+                collectionMenus.openTierRecipe(player, category, itemIndex, tier);
+                return true;
+            }
         });
 
         CollectCommand command = new CollectCommand(this, state, dataRepository, collectionMenus, rewardService);

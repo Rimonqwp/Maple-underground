@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,6 +65,17 @@ final class CollectionMenus {
     private static final int GUIDE_FORTUNE_SLOT = 23;
     private static final int GUIDE_COMMANDS_SLOT = 25;
     private static final int[] GUIDE_CATEGORY_SLOTS = {29, 30, 31, 32, 33};
+
+    private static final int TIER_RECIPE_ITEM_SLOT = 2;
+    private static final int TIER_RECIPE_PANE_SLOT = 4;
+    private static final int TIER_RECIPE_CLAIM_SLOT = 6;
+    private static final int[] TIER_RECIPE_CRAFT_SLOTS = {10, 11, 12, 19, 20, 21, 28, 29, 30};
+    private static final int TIER_RECIPE_EMPTY_CRAFT_SLOT = 20;
+    private static final int TIER_RECIPE_TABLE_SLOT = 22;
+    private static final int TIER_RECIPE_OUTPUT_SLOT = 24;
+    private static final int[] TIER_RECIPE_SWITCHER_SLOTS = {37, 38, 39, 40, 41, 42, 43};
+    private static final int TIER_RECIPE_PREV_OR_DETAIL_SLOT = 47;
+    private static final int TIER_RECIPE_NEXT_SLOT = 51;
 
     private final UndergroundState state;
     private final CollectionDataRepository repository;
@@ -383,12 +396,414 @@ final class CollectionMenus {
         player.openInventory(inventory);
     }
 
+    void openTierRecipe(@NotNull Player player,
+                        @NotNull CollectionInfoGui.Category category,
+                        int itemIndex,
+                        int tier) {
+        UUID uuid = player.getUniqueId();
+        if (!repository.isClaimsLoaded(uuid)) {
+            player.sendMessage(Component.text("正在加载你的收藏数据...", NamedTextColor.GRAY));
+            repository.preloadClaimsAsync(uuid, () -> {
+                if (player.isOnline()) {
+                    renderTierRecipe(player, category, itemIndex, tier, 0, List.of());
+                }
+            });
+            return;
+        }
+        renderTierRecipe(player, category, itemIndex, tier, 0, List.of());
+    }
+
+    private void renderTierRecipe(@NotNull Player player,
+                                  @NotNull CollectionInfoGui.Category category,
+                                  int itemIndex,
+                                  int requestedTier,
+                                  int requestedRecipeIndex,
+                                  @NotNull List<String> requestedStack) {
+        List<CollectionInfoGui.CollectionItem> items = category.items();
+        if (itemIndex < 0 || itemIndex >= items.size()) {
+            CollectionInfoGui.open(player, category);
+            return;
+        }
+
+        CollectionInfoGui.CollectionItem item = items.get(itemIndex);
+        int maxTier = CollectionMath.maxTier(category);
+        int tier = Math.max(1, Math.min(requestedTier, maxTier));
+        int required = CollectionInfoGui.requirementForTier(category, tier);
+        String collectionKey = CollectionInfoGui.collectionKey(category, item.material());
+        CollectionProgressManager progressManager = state.getCollectionProgressManager();
+        long collected = progressManager != null ? progressManager.getAmount(player.getUniqueId(), collectionKey) : 0L;
+        boolean unlocked = collected >= required;
+        int claimed = repository.getClaimedTier(player.getUniqueId(), collectionKey);
+        boolean isClaimed = claimed >= tier;
+
+        CollectionInfoGui.CollectionRecipeBridge recipeBridge = CollectionInfoGui.recipeBridge();
+        List<CollectionInfoGui.RecipeEntry> tierRecipes = recipeBridge != null
+                ? recipeBridge.recipesForTier(item.material(), tier)
+                : List.of();
+        int safeRecipeIndex = tierRecipes.isEmpty()
+                ? 0
+                : Math.max(0, Math.min(requestedRecipeIndex, tierRecipes.size() - 1));
+
+        List<String> drillStack = sanitizeRecipeStack(recipeBridge, requestedStack);
+        boolean isDrilling = !drillStack.isEmpty();
+        CollectionInfoGui.RecipeEntry rootRef = tierRecipes.isEmpty() ? null : tierRecipes.get(safeRecipeIndex);
+        CollectionInfoGui.RecipeView rootRecipe = (recipeBridge != null && rootRef != null)
+                ? recipeBridge.describeRecipe(rootRef.itemId())
+                : null;
+        CollectionInfoGui.RecipeView activeRecipe = (recipeBridge != null && isDrilling)
+                ? recipeBridge.describeRecipe(drillStack.get(drillStack.size() - 1))
+                : rootRecipe;
+
+        String headerTitle = (isDrilling && activeRecipe != null)
+                ? activeRecipe.name() + " · 原料合成配方"
+                : item.name() + " " + CollectionMath.roman(tier) + " · 奖励与合成配方";
+
+        CollectionMenuHolder holder = new CollectionMenuHolder(
+                player.getUniqueId(),
+                CollectionMenuType.TIER_RECIPE,
+                category.pageId(),
+                itemIndex,
+                tier,
+                safeRecipeIndex,
+                drillStack
+        );
+        Inventory inventory = Bukkit.createInventory(holder, MENU_SIZE, title(headerTitle));
+        holder.setInventory(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE, NamedTextColor.DARK_GRAY);
+
+        // 顶部左侧：物品摘要
+        inventory.setItem(TIER_RECIPE_ITEM_SLOT, InfoGuiItems.createNamedItem(
+                item.material(),
+                title(item.name()),
+                List.of(
+                        Component.text("当前累计: ", NamedTextColor.GRAY)
+                                .append(Component.text(CollectionMath.formatNumber(collected), NamedTextColor.AQUA))
+                                .append(Component.text(" / ", NamedTextColor.GRAY))
+                                .append(Component.text(CollectionMath.formatNumber(required), NamedTextColor.YELLOW))
+                                .decoration(TextDecoration.ITALIC, false),
+                        CollectionInfoGui.progressLine(collected, required)
+                )
+        ));
+
+        // 顶部中央：当前层级玻璃板
+        Material paneMaterial = unlocked
+                ? (isClaimed ? Material.LIME_STAINED_GLASS_PANE : Material.LIGHT_BLUE_STAINED_GLASS_PANE)
+                : Material.RED_STAINED_GLASS_PANE;
+        List<Component> tierLore = new ArrayList<>();
+        tierLore.add(Component.text("解锁需求: ", NamedTextColor.GRAY)
+                .append(Component.text(CollectionMath.formatNumber(required) + " 个 " + item.name(), NamedTextColor.YELLOW))
+                .decoration(TextDecoration.ITALIC, false));
+        Component statusComp = unlocked
+                ? (isClaimed
+                    ? text("✔ 已领取", NamedTextColor.GREEN)
+                    : Component.text("✦ 已解锁待领取", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false))
+                : text("✖ 未解锁", NamedTextColor.RED);
+        tierLore.add(Component.text("本层状态: ", NamedTextColor.GRAY)
+                .append(statusComp)
+                .decoration(TextDecoration.ITALIC, false));
+        tierLore.add(Component.empty());
+        tierLore.add(text("固定奖励:", NamedTextColor.GRAY));
+        tierLore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                .append(Component.text(CollectionMath.mapleXpReward(tier) + " 枫叶经验", NamedTextColor.AQUA))
+                .decoration(TextDecoration.ITALIC, false));
+        if (CollectionInfoGui.isFortuneMilestone(category, required)) {
+            tierLore.add(Component.text(" +", NamedTextColor.DARK_GRAY)
+                    .append(Component.text("1 职业采集幸运（全局上限 +30）", NamedTextColor.GREEN))
+                    .decoration(TextDecoration.ITALIC, false));
+        }
+        ItemStack tierPane = createCountedItem(paneMaterial, Math.max(1, Math.min(64, tier)),
+                title(item.name() + " " + CollectionMath.roman(tier) + " 级"), tierLore, unlocked && !isClaimed, null);
+        inventory.setItem(TIER_RECIPE_PANE_SLOT, tierPane);
+
+        // 顶部右侧：领取本层奖励按钮（已领取后不再显示）
+        if (!isClaimed) {
+            ItemStack claimBtn = InfoGuiItems.createNamedItem(
+                    Material.AMETHYST_SHARD,
+                    title(unlocked ? "点击领取本层奖励" : "尚未达到解锁门槛"),
+                    List.of(unlocked
+                            ? text("点击将领取至 " + item.name() + " " + CollectionMath.roman(tier) + " 的全部未领奖励！", NamedTextColor.GREEN)
+                            : text("还差 " + CollectionMath.formatNumber(Math.max(0L, required - collected)) + " 个 " + item.name() + "。", NamedTextColor.RED))
+            );
+            if (unlocked) {
+                applyGlow(claimBtn);
+            }
+            inventory.setItem(TIER_RECIPE_CLAIM_SLOT, claimBtn);
+        }
+
+        // 3x3 合成工作台与成品预览
+        if (activeRecipe != null && recipeBridge != null) {
+            List<String> tokens = activeRecipe.matrixTokens();
+            for (int i = 0; i < TIER_RECIPE_CRAFT_SLOTS.length && i < tokens.size(); i++) {
+                CollectionInfoGui.IngredientView ing = recipeBridge.describeToken(tokens.get(i));
+                if (ing == null) {
+                    continue;
+                }
+                List<Component> ingLore = new ArrayList<>();
+                if (ing.professionItemId() != null) {
+                    ingLore.add(Component.text("来源：自定义职业物品 (", NamedTextColor.GRAY)
+                            .append(Component.text(ing.professionItemId(), NamedTextColor.YELLOW))
+                            .append(Component.text(")", NamedTextColor.GRAY))
+                            .decoration(TextDecoration.ITALIC, false));
+                    if (!ing.extraLore().isEmpty()) {
+                        ingLore.add(Component.empty());
+                        ingLore.addAll(ing.extraLore());
+                    }
+                    ingLore.add(Component.empty());
+                    if (ing.craftable()) {
+                        ingLore.add(Component.text("▶ 点击进入查看「" + ing.displayName() + "」的 3×3 合成配方", NamedTextColor.AQUA, TextDecoration.BOLD)
+                                .decoration(TextDecoration.ITALIC, false));
+                    } else {
+                        ingLore.add(text("（基础掉落材料，不可继续向下拆分）", NamedTextColor.GRAY));
+                    }
+                } else {
+                    ingLore.add(Component.text("基础原材料：", NamedTextColor.GRAY)
+                            .append(Component.text(ing.displayName(), NamedTextColor.YELLOW))
+                            .append(Component.text(" (" + ing.material().name() + ")", NamedTextColor.DARK_GRAY))
+                            .decoration(TextDecoration.ITALIC, false));
+                    ingLore.add(text("工作台格位 #" + (i + 1), NamedTextColor.GRAY));
+                    CollectionInfoGui.Category ingCat = CollectionInfoGui.findCategoryForMaterial(ing.material());
+                    if (ingCat != null && progressManager != null) {
+                        long ingCollected = progressManager.getAmount(
+                                player.getUniqueId(),
+                                CollectionInfoGui.collectionKey(ingCat, ing.material())
+                        );
+                        ingLore.add(Component.text("当前已收集：", NamedTextColor.GRAY)
+                                .append(Component.text(CollectionMath.formatNumber(ingCollected), NamedTextColor.AQUA))
+                                .append(Component.text(" (" + ingCat.title() + ")", NamedTextColor.DARK_GRAY))
+                                .decoration(TextDecoration.ITALIC, false));
+                    }
+                }
+                ItemStack ingStack = createCountedItem(
+                        ing.material(),
+                        1,
+                        Component.text(ing.displayName(), NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                        ingLore,
+                        ing.glow(),
+                        ing.leatherColor()
+                );
+                inventory.setItem(TIER_RECIPE_CRAFT_SLOTS[i], ingStack);
+            }
+
+            // 中间：工作台说明（支持点击直接选中该配方用于原版工作台制作）
+            List<Component> craftLore = new ArrayList<>();
+            craftLore.add(Component.text("当前配方：", NamedTextColor.GRAY)
+                    .append(Component.text(activeRecipe.name(), NamedTextColor.YELLOW))
+                    .decoration(TextDecoration.ITALIC, false));
+            craftLore.add(Component.text("合成类型：", NamedTextColor.GRAY)
+                    .append(Component.text(activeRecipe.compression() ? "九宫格压缩（9 合 1）" : "有序合成（ANB / APB / ANB）", NamedTextColor.AQUA))
+                    .decoration(TextDecoration.ITALIC, false));
+            if (activeRecipe.compression() && activeRecipe.compressionToken() != null) {
+                CollectionInfoGui.IngredientView compIng = recipeBridge.describeToken(activeRecipe.compressionToken());
+                if (compIng != null) {
+                    craftLore.add(Component.text("单次原料：", NamedTextColor.GRAY)
+                            .append(Component.text("9 × " + compIng.displayName(), NamedTextColor.GREEN))
+                            .decoration(TextDecoration.ITALIC, false));
+                }
+            }
+            if (isDrilling) {
+                List<String> chain = new ArrayList<>();
+                if (rootRecipe != null) {
+                    chain.add(rootRecipe.name());
+                }
+                for (String id : drillStack) {
+                    CollectionInfoGui.RecipeView rv = recipeBridge.describeRecipe(id);
+                    if (rv != null) {
+                        chain.add(rv.name());
+                    }
+                }
+                craftLore.add(Component.text("追踪路径：", NamedTextColor.GRAY)
+                        .append(Component.text(String.join(" → ", chain), NamedTextColor.LIGHT_PURPLE))
+                        .decoration(TextDecoration.ITALIC, false));
+            } else if (rootRef != null) {
+                craftLore.add(Component.text("关联说明：", NamedTextColor.GRAY)
+                        .append(Component.text(rootRef.reason(), NamedTextColor.GREEN))
+                        .decoration(TextDecoration.ITALIC, false));
+            }
+            craftLore.add(Component.empty());
+            craftLore.add(Component.text("▶ 点击选中此合成配方（随后用工作台制作）", NamedTextColor.YELLOW, TextDecoration.BOLD)
+                    .decoration(TextDecoration.ITALIC, false));
+            if (isDrilling) {
+                craftLore.add(text("提示：点击下方追踪链或左下角箭头可逐级返回。", NamedTextColor.GRAY));
+            }
+            inventory.setItem(TIER_RECIPE_TABLE_SLOT, InfoGuiItems.createNamedItem(
+                    Material.CRAFTING_TABLE,
+                    title(isDrilling ? "3×3 合成规则（原料追踪）" : "3×3 合成规则"),
+                    craftLore
+            ));
+
+            // 右侧：合成成品槽
+            List<Component> outLore = new ArrayList<>();
+            String setSuffix = activeRecipe.setName() != null && !activeRecipe.setName().isBlank()
+                    ? " · 套装「" + activeRecipe.setName() + "」"
+                    : "";
+            outLore.add(Component.text("成品类型：", NamedTextColor.GRAY)
+                    .append(Component.text(kindLabel(activeRecipe.kind()), NamedTextColor.YELLOW))
+                    .append(Component.text(setSuffix, NamedTextColor.GRAY))
+                    .decoration(TextDecoration.ITALIC, false));
+            if (!activeRecipe.itemLore().isEmpty()) {
+                outLore.add(Component.empty());
+                outLore.addAll(activeRecipe.itemLore());
+            }
+            inventory.setItem(TIER_RECIPE_OUTPUT_SLOT, createCountedItem(
+                    activeRecipe.displayMaterial(),
+                    1,
+                    title(activeRecipe.name()),
+                    outLore,
+                    activeRecipe.glow(),
+                    activeRecipe.leatherColor()
+            ));
+
+            // 第 5 行：追踪链或同层多配方切换
+            if (isDrilling) {
+                List<RecipeTrailNode> trail = buildTrail(recipeBridge, rootRecipe, drillStack);
+                int start = Math.max(0, trail.size() - TIER_RECIPE_SWITCHER_SLOTS.length);
+                for (int i = 0; i < TIER_RECIPE_SWITCHER_SLOTS.length && (start + i) < trail.size(); i++) {
+                    RecipeTrailNode node = trail.get(start + i);
+                    boolean isCurrent = node.depth() == drillStack.size();
+                    ItemStack nodeStack = createCountedItem(
+                            node.recipe().displayMaterial(),
+                            1,
+                            Component.text(node.recipe().name(), isCurrent ? NamedTextColor.GREEN : NamedTextColor.GOLD, TextDecoration.BOLD)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            List.of(
+                                    text(node.label(), NamedTextColor.GRAY),
+                                    text(isCurrent ? "✔ 当前正在查看" : "点击返回查看此配方", isCurrent ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
+                            ),
+                            isCurrent || node.recipe().compression(),
+                            node.recipe().leatherColor()
+                    );
+                    inventory.setItem(TIER_RECIPE_SWITCHER_SLOTS[i], nodeStack);
+                }
+            } else {
+                for (int i = 0; i < TIER_RECIPE_SWITCHER_SLOTS.length && i < tierRecipes.size(); i++) {
+                    CollectionInfoGui.RecipeEntry ref = tierRecipes.get(i);
+                    CollectionInfoGui.RecipeView sub = recipeBridge.describeRecipe(ref.itemId());
+                    if (sub == null) {
+                        continue;
+                    }
+                    boolean selected = i == safeRecipeIndex;
+                    ItemStack subStack = createCountedItem(
+                            sub.displayMaterial(),
+                            1,
+                            Component.text(sub.name(), selected ? NamedTextColor.GREEN : NamedTextColor.GOLD, TextDecoration.BOLD)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            List.of(
+                                    text(ref.reason(), NamedTextColor.GRAY),
+                                    text(selected ? "✔ 当前正在预览" : "点击切换预览此合成配方", selected ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
+                            ),
+                            selected || sub.compression(),
+                            sub.leatherColor()
+                    );
+                    inventory.setItem(TIER_RECIPE_SWITCHER_SLOTS[i], subStack);
+                }
+            }
+        } else {
+            // 本层暂无专属合成配方
+            ItemStack blackFiller = InfoGuiItems.createFiller(Material.BLACK_STAINED_GLASS_PANE, NamedTextColor.BLACK);
+            for (int craftSlot : TIER_RECIPE_CRAFT_SLOTS) {
+                inventory.setItem(craftSlot, blackFiller.clone());
+            }
+            inventory.setItem(TIER_RECIPE_EMPTY_CRAFT_SLOT, InfoGuiItems.createNamedItem(
+                    Material.CRAFTING_TABLE,
+                    Component.text("本层级暂无专属合成配方", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                    List.of(
+                            text(item.name() + " " + CollectionMath.roman(tier) + " 当前发放固定枫叶经验奖励"
+                                    + (CollectionInfoGui.isFortuneMilestone(category, required) ? "与职业采集幸运" : "") + "。", NamedTextColor.GRAY),
+                            Component.empty(),
+                            text("可点击下方按钮快速跳转到该物品含配方的层级。", NamedTextColor.AQUA)
+                    )
+            ));
+
+            List<Component> rewardLore = new ArrayList<>();
+            rewardLore.add(Component.text("• ", NamedTextColor.GRAY)
+                    .append(Component.text("+" + CollectionMath.mapleXpReward(tier) + " 枫叶经验", NamedTextColor.AQUA))
+                    .decoration(TextDecoration.ITALIC, false));
+            if (CollectionInfoGui.isFortuneMilestone(category, required)) {
+                rewardLore.add(Component.text("• ", NamedTextColor.GRAY)
+                        .append(Component.text("+1 职业采集幸运（自动生效）", NamedTextColor.GREEN))
+                        .decoration(TextDecoration.ITALIC, false));
+            }
+            inventory.setItem(TIER_RECIPE_OUTPUT_SLOT, createCountedItem(
+                    Material.EXPERIENCE_BOTTLE,
+                    1,
+                    Component.text("本层奖励预览", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                    rewardLore,
+                    unlocked && !isClaimed,
+                    null
+            ));
+
+            if (recipeBridge != null) {
+                List<Integer> otherTiers = recipeBridge.recipeTiersForMaterial(item.material());
+                for (int i = 0; i < TIER_RECIPE_SWITCHER_SLOTS.length && i < otherTiers.size(); i++) {
+                    int targetTier = otherTiers.get(i);
+                    List<CollectionInfoGui.RecipeEntry> targetRecipes = recipeBridge.recipesForTier(item.material(), targetTier);
+                    ItemStack jumpPane = createCountedItem(
+                            Material.LIGHT_BLUE_STAINED_GLASS_PANE,
+                            Math.max(1, Math.min(64, targetTier)),
+                            Component.text("跳转到 " + item.name() + " " + CollectionMath.roman(targetTier), NamedTextColor.AQUA, TextDecoration.BOLD)
+                                    .decoration(TextDecoration.ITALIC, false),
+                            List.of(
+                                    text("该层级包含 " + targetRecipes.size() + " 个合成配方。", NamedTextColor.GRAY),
+                                    text("点击直接切换查看！", NamedTextColor.YELLOW)
+                            ),
+                            false,
+                            null
+                    );
+                    inventory.setItem(TIER_RECIPE_SWITCHER_SLOTS[i], jumpPane);
+                }
+            }
+        }
+
+        // 底部导航栏
+        if (isDrilling && recipeBridge != null) {
+            CollectionInfoGui.RecipeView prevRecipe = drillStack.size() > 1
+                    ? recipeBridge.describeRecipe(drillStack.get(drillStack.size() - 2))
+                    : rootRecipe;
+            String prevName = prevRecipe != null ? prevRecipe.name() : (item.name() + " " + CollectionMath.roman(tier));
+            inventory.setItem(BACK_SLOT, InfoGuiItems.createNamedItem(
+                    Material.ARROW,
+                    Component.text("返回上一层 (" + prevName + ")", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                    List.of(text("退回上一个正在查看的合成配方。", NamedTextColor.GRAY))
+            ));
+            inventory.setItem(TIER_RECIPE_PREV_OR_DETAIL_SLOT, InfoGuiItems.createNamedItem(
+                    Material.ARROW,
+                    title("返回 " + item.name() + " 详情"),
+                    List.of(text("回到等级玻璃板总览。", NamedTextColor.GRAY))
+            ));
+            inventory.setItem(CLOSE_SLOT, InfoGuiItems.createCloseItem());
+        } else {
+            inventory.setItem(BACK_SLOT, InfoGuiItems.createNamedItem(
+                    Material.ARROW,
+                    title("返回 " + item.name() + " 详情"),
+                    List.of(text("回到等级玻璃板总览。", NamedTextColor.GRAY))
+            ));
+            if (tier > 1) {
+                inventory.setItem(TIER_RECIPE_PREV_OR_DETAIL_SLOT, InfoGuiItems.createNamedItem(
+                        Material.ARROW,
+                        Component.text("上一级 (" + CollectionMath.roman(tier - 1) + ")", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                        List.of(text("查看 " + item.name() + " " + CollectionMath.roman(tier - 1) + " 的奖励与配方。", NamedTextColor.GRAY))
+                ));
+            }
+            inventory.setItem(CLOSE_SLOT, InfoGuiItems.createCloseItem());
+            if (tier < maxTier) {
+                inventory.setItem(TIER_RECIPE_NEXT_SLOT, InfoGuiItems.createNamedItem(
+                        Material.ARROW,
+                        Component.text("下一级 (" + CollectionMath.roman(tier + 1) + ")", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false),
+                        List.of(text("查看 " + item.name() + " " + CollectionMath.roman(tier + 1) + " 的奖励与配方。", NamedTextColor.GRAY))
+                ));
+            }
+        }
+
+        player.openInventory(inventory);
+    }
+
     void handleClick(@NotNull Player player, @NotNull CollectionMenuHolder holder, int rawSlot) {
         switch (holder.type()) {
             case HUB -> handleHubClick(player, rawSlot);
             case LEADERBOARD -> handleLeaderboardClick(player, holder, rawSlot);
             case GUIDE -> handleGuideClick(player, rawSlot);
             case MISSING -> handleMissingClick(player, holder, rawSlot);
+            case TIER_RECIPE -> handleTierRecipeClick(player, holder, rawSlot);
         }
     }
 
@@ -460,6 +875,11 @@ final class CollectionMenus {
     private void handleMissingClick(@NotNull Player player, @NotNull CollectionMenuHolder holder, int rawSlot) {
         CollectionInfoGui.Category currentCategory = parseScope(holder.scope());
         if (rawSlot == MISSING_CLAIM_ALL_SLOT) {
+            List<CollectionRewardService.MissingEntry> currentEntries = rewardService.missingEntries(player.getUniqueId(), currentCategory);
+            boolean hasClaimable = currentEntries.stream().anyMatch(entry -> entry.claimableTiers() > 0);
+            if (!hasClaimable) {
+                return;
+            }
             CollectionRewardService.ClaimSummary summary = currentCategory == null
                     ? rewardService.claimAll(player)
                     : rewardService.claimCategory(player, currentCategory);
@@ -514,6 +934,203 @@ final class CollectionMenus {
         if (rawSlot == CLOSE_SLOT) {
             player.closeInventory();
         }
+    }
+
+    private void handleTierRecipeClick(@NotNull Player player,
+                                       @NotNull CollectionMenuHolder holder,
+                                       int rawSlot) {
+        CollectionInfoGui.Category category = parseScope(holder.scope());
+        if (category == null) {
+            openHub(player);
+            return;
+        }
+        int itemIndex = holder.itemIndex();
+        List<CollectionInfoGui.CollectionItem> items = category.items();
+        if (itemIndex < 0 || itemIndex >= items.size()) {
+            CollectionInfoGui.open(player, category);
+            return;
+        }
+        CollectionInfoGui.CollectionItem item = items.get(itemIndex);
+        int maxTier = CollectionMath.maxTier(category);
+        int tier = Math.max(1, Math.min(holder.tier(), maxTier));
+        int recipeIndex = holder.recipeIndex();
+
+        CollectionInfoGui.CollectionRecipeBridge recipeBridge = CollectionInfoGui.recipeBridge();
+        List<CollectionInfoGui.RecipeEntry> tierRecipes = recipeBridge != null
+                ? recipeBridge.recipesForTier(item.material(), tier)
+                : List.of();
+        int safeRecipeIndex = tierRecipes.isEmpty()
+                ? 0
+                : Math.max(0, Math.min(recipeIndex, tierRecipes.size() - 1));
+        List<String> drillStack = sanitizeRecipeStack(recipeBridge, holder.recipeStack());
+        boolean isDrilling = !drillStack.isEmpty();
+
+        if (rawSlot == TIER_RECIPE_CLAIM_SLOT) {
+            String collectionKey = CollectionInfoGui.collectionKey(category, item.material());
+            int claimed = repository.getClaimedTier(player.getUniqueId(), collectionKey);
+            if (claimed >= tier) {
+                return;
+            }
+            CollectionRewardService.ClaimSummary summary = rewardService.claimItem(player, category, item, tier);
+            rewardService.sendClaimFeedback(player, summary);
+            renderTierRecipe(player, category, itemIndex, tier, safeRecipeIndex, drillStack);
+            return;
+        }
+
+        if (rawSlot == CLOSE_SLOT) {
+            player.closeInventory();
+            return;
+        }
+
+        if (rawSlot == BACK_SLOT) {
+            if (isDrilling) {
+                renderTierRecipe(player, category, itemIndex, tier, safeRecipeIndex,
+                        drillStack.subList(0, drillStack.size() - 1));
+            } else {
+                CollectionInfoGui.openDetail(player, category, itemIndex);
+            }
+            return;
+        }
+
+        if (rawSlot == TIER_RECIPE_PREV_OR_DETAIL_SLOT) {
+            if (isDrilling) {
+                CollectionInfoGui.openDetail(player, category, itemIndex);
+            } else if (tier > 1) {
+                renderTierRecipe(player, category, itemIndex, tier - 1, 0, List.of());
+            }
+            return;
+        }
+
+        if (rawSlot == TIER_RECIPE_NEXT_SLOT && !isDrilling && tier < maxTier) {
+            renderTierRecipe(player, category, itemIndex, tier + 1, 0, List.of());
+            return;
+        }
+
+        if (recipeBridge == null) {
+            return;
+        }
+
+        CollectionInfoGui.RecipeEntry rootRef = tierRecipes.isEmpty() ? null : tierRecipes.get(safeRecipeIndex);
+        CollectionInfoGui.RecipeView rootRecipe = rootRef != null ? recipeBridge.describeRecipe(rootRef.itemId()) : null;
+        CollectionInfoGui.RecipeView activeRecipe = isDrilling
+                ? recipeBridge.describeRecipe(drillStack.get(drillStack.size() - 1))
+                : rootRecipe;
+
+        if (rawSlot == TIER_RECIPE_TABLE_SLOT && activeRecipe != null) {
+            if (recipeBridge.selectRecipe(player, activeRecipe.itemId())) {
+                player.closeInventory();
+                player.sendMessage(Component.text("已选择合成配方「" + activeRecipe.name() + "」，请使用原版合成台制作。", NamedTextColor.GREEN));
+            }
+            return;
+        }
+
+        int craftIdx = indexOf(TIER_RECIPE_CRAFT_SLOTS, rawSlot);
+        if (craftIdx >= 0 && activeRecipe != null) {
+            List<String> tokens = activeRecipe.matrixTokens();
+            if (craftIdx < tokens.size()) {
+                CollectionInfoGui.IngredientView ing = recipeBridge.describeToken(tokens.get(craftIdx));
+                if (ing != null && ing.craftable() && ing.professionItemId() != null) {
+                    List<String> nextStack = new ArrayList<>(drillStack);
+                    if (nextStack.isEmpty() || !nextStack.get(nextStack.size() - 1).equals(ing.professionItemId())) {
+                        nextStack.add(ing.professionItemId());
+                    }
+                    renderTierRecipe(player, category, itemIndex, tier, safeRecipeIndex, nextStack);
+                }
+            }
+            return;
+        }
+
+        int switchIdx = indexOf(TIER_RECIPE_SWITCHER_SLOTS, rawSlot);
+        if (switchIdx >= 0) {
+            if (isDrilling) {
+                List<RecipeTrailNode> trail = buildTrail(recipeBridge, rootRecipe, drillStack);
+                int start = Math.max(0, trail.size() - TIER_RECIPE_SWITCHER_SLOTS.length);
+                int trailPos = start + switchIdx;
+                if (trailPos < trail.size()) {
+                    RecipeTrailNode node = trail.get(trailPos);
+                    if (node.depth() < drillStack.size()) {
+                        renderTierRecipe(player, category, itemIndex, tier, safeRecipeIndex,
+                                drillStack.subList(0, node.depth()));
+                    }
+                }
+            } else if (!tierRecipes.isEmpty()) {
+                if (switchIdx < tierRecipes.size() && switchIdx != safeRecipeIndex) {
+                    renderTierRecipe(player, category, itemIndex, tier, switchIdx, List.of());
+                }
+            } else {
+                List<Integer> otherTiers = recipeBridge.recipeTiersForMaterial(item.material());
+                if (switchIdx < otherTiers.size()) {
+                    renderTierRecipe(player, category, itemIndex, otherTiers.get(switchIdx), 0, List.of());
+                }
+            }
+        }
+    }
+
+    private static @NotNull List<String> sanitizeRecipeStack(@Nullable CollectionInfoGui.CollectionRecipeBridge recipeBridge,
+                                                             @NotNull List<String> rawStack) {
+        if (recipeBridge == null || rawStack.isEmpty()) {
+            return List.of();
+        }
+        List<String> valid = new ArrayList<>(rawStack.size());
+        for (String id : rawStack) {
+            if (id != null && recipeBridge.describeRecipe(id) != null) {
+                valid.add(id);
+            }
+        }
+        return valid;
+    }
+
+    private static @NotNull List<RecipeTrailNode> buildTrail(@NotNull CollectionInfoGui.CollectionRecipeBridge recipeBridge,
+                                                             @Nullable CollectionInfoGui.RecipeView rootRecipe,
+                                                             @NotNull List<String> drillStack) {
+        List<RecipeTrailNode> trail = new ArrayList<>();
+        if (rootRecipe != null) {
+            trail.add(new RecipeTrailNode(rootRecipe, 0, "顶层配方"));
+        }
+        for (int i = 0; i < drillStack.size(); i++) {
+            CollectionInfoGui.RecipeView rv = recipeBridge.describeRecipe(drillStack.get(i));
+            if (rv != null) {
+                trail.add(new RecipeTrailNode(rv, i + 1, "原料追踪 #" + (i + 1)));
+            }
+        }
+        return trail;
+    }
+
+    private static @NotNull ItemStack createCountedItem(@NotNull Material material,
+                                                        int amount,
+                                                        @NotNull Component displayName,
+                                                        @NotNull List<Component> lore,
+                                                        boolean glow,
+                                                        @Nullable Color leatherColor) {
+        ItemStack stack = new ItemStack(material, Math.max(1, Math.min(64, amount)));
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            meta.displayName(displayName);
+            meta.lore(lore);
+            if (leatherColor != null && meta instanceof LeatherArmorMeta leatherMeta) {
+                leatherMeta.setColor(leatherColor);
+            }
+            if (glow) {
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            }
+            meta.addItemFlags(ItemFlag.values());
+            stack.setItemMeta(meta);
+        }
+        return stack;
+    }
+
+    private static @NotNull String kindLabel(@NotNull String kind) {
+        return switch (kind) {
+            case "armor" -> "职业防具";
+            case "tool" -> "职业工具";
+            case "weapon" -> "职业武器";
+            default -> "压缩/职业材料";
+        };
+    }
+
+    private record RecipeTrailNode(@NotNull CollectionInfoGui.RecipeView recipe,
+                                   int depth,
+                                   @NotNull String label) {
     }
 
     @NotNull

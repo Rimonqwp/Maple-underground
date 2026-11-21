@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -60,6 +61,7 @@ public final class CollectionInfoGui {
     };
 
     private static volatile @Nullable CollectionCenterBridge bridge;
+    private static volatile @Nullable CollectionRecipeBridge recipeBridge;
 
     public interface CollectionCenterBridge {
         void openHub(@NotNull Player player);
@@ -70,6 +72,55 @@ public final class CollectionInfoGui {
                               @NotNull Category category,
                               @NotNull CollectionItem item,
                               int targetTier);
+
+        default boolean openTierRecipe(@NotNull Player player,
+                                       @NotNull Category category,
+                                       int itemIndex,
+                                       int tier) {
+            return false;
+        }
+    }
+
+    public record RecipeEntry(@NotNull String itemId,
+                              @NotNull String name,
+                              @NotNull String reason) {
+    }
+
+    public record RecipeView(@NotNull String itemId,
+                             @NotNull String name,
+                             @NotNull String kind,
+                             @Nullable String setName,
+                             boolean compression,
+                             @Nullable String compressionToken,
+                             @NotNull List<String> matrixTokens,
+                             @NotNull Material displayMaterial,
+                             boolean glow,
+                             @Nullable Color leatherColor,
+                             @NotNull List<Component> itemLore) {
+    }
+
+    public record IngredientView(@NotNull String token,
+                                 @NotNull Material material,
+                                 @NotNull String displayName,
+                                 @Nullable String professionItemId,
+                                 boolean craftable,
+                                 boolean glow,
+                                 @Nullable Color leatherColor,
+                                 @NotNull List<Component> extraLore) {
+    }
+
+    public interface CollectionRecipeBridge {
+        @NotNull List<RecipeEntry> recipesForTier(@NotNull Material material, int tier);
+
+        @NotNull List<Integer> recipeTiersForMaterial(@NotNull Material material);
+
+        @Nullable RecipeView describeRecipe(@NotNull String itemId);
+
+        @Nullable IngredientView describeToken(@NotNull String token);
+
+        default boolean selectRecipe(@NotNull Player player, @NotNull String itemId) {
+            return false;
+        }
     }
 
     private CollectionInfoGui() {
@@ -81,6 +132,14 @@ public final class CollectionInfoGui {
 
     public static boolean hasBridge() {
         return bridge != null;
+    }
+
+    public static void registerRecipeBridge(@Nullable CollectionRecipeBridge newRecipeBridge) {
+        recipeBridge = newRecipeBridge;
+    }
+
+    public static @Nullable CollectionRecipeBridge recipeBridge() {
+        return recipeBridge;
     }
 
     public static void openHubOrBookshelf(@NotNull Player player) {
@@ -185,14 +244,28 @@ public final class CollectionInfoGui {
     }
 
     public static void handleClick(@NotNull Player player, @NotNull String pageId, int rawSlot) {
+        handleClick(player, pageId, rawSlot, false);
+    }
+
+    public static void handleClick(@NotNull Player player,
+                                   @NotNull String pageId,
+                                   int rawSlot,
+                                   boolean rightClick) {
         Category category = categoryForPageId(pageId);
         if (category == null) {
             return;
         }
-        handleClick(player, category, rawSlot);
+        handleClick(player, category, rawSlot, rightClick);
     }
 
     public static void handleClick(@NotNull Player player, @NotNull Category category, int rawSlot) {
+        handleClick(player, category, rawSlot, false);
+    }
+
+    public static void handleClick(@NotNull Player player,
+                                   @NotNull Category category,
+                                   int rawSlot,
+                                   boolean rightClick) {
         int encodedPage = currentPage(player, category);
         if (encodedPage >= DETAIL_PAGE_OFFSET) {
             int itemIndex = encodedPage - DETAIL_PAGE_OFFSET;
@@ -207,11 +280,18 @@ public final class CollectionInfoGui {
             int tierIndex = indexOf(DETAIL_TIER_SLOTS, rawSlot);
             if (tierIndex >= 0 && tierIndex < requirements(category).length
                     && itemIndex >= 0 && itemIndex < category.items().size()) {
+                int tier = tierIndex + 1;
                 CollectionCenterBridge currentBridge = bridge;
                 if (currentBridge != null) {
-                    CollectionItem item = category.items().get(itemIndex);
-                    currentBridge.claimItemTier(player, category, item, tierIndex + 1);
-                    openDetail(player, category, itemIndex);
+                    if (rightClick) {
+                        CollectionItem item = category.items().get(itemIndex);
+                        currentBridge.claimItemTier(player, category, item, tier);
+                        openDetail(player, category, itemIndex);
+                    } else if (!currentBridge.openTierRecipe(player, category, itemIndex, tier)) {
+                        CollectionItem item = category.items().get(itemIndex);
+                        currentBridge.claimItemTier(player, category, item, tier);
+                        openDetail(player, category, itemIndex);
+                    }
                 }
             }
             return;
@@ -350,13 +430,20 @@ public final class CollectionInfoGui {
             }
         }
 
+        CollectionRecipeBridge currentRecipeBridge = recipeBridge;
+        boolean hasRecipes = currentRecipeBridge != null && !currentRecipeBridge.recipeTiersForMaterial(item.material()).isEmpty();
+        if (hasRecipes) {
+            lore.add(Component.empty());
+            lore.add(text("⚒ 关联真实 3×3 合成配方（点进等级可查看）", NamedTextColor.LIGHT_PURPLE));
+        }
+
         if (claimable > 0) {
             lore.add(Component.empty());
             lore.add(Component.text("✦ 有 " + claimable + " 层奖励可领取！", NamedTextColor.GOLD, TextDecoration.BOLD)
                     .decoration(TextDecoration.ITALIC, false));
         }
         lore.add(Component.empty());
-        lore.add(actionText("点击查看详情与领奖！"));
+        lore.add(actionText(hasRecipes ? "点击查看等级与合成详情！" : "点击查看详情与领奖！"));
 
         ItemStack stack = InfoGuiItems.createNamedItem(item.material(), title(item.name()), lore);
         if (claimable > 0) {
@@ -385,12 +472,19 @@ public final class CollectionInfoGui {
         Component statusLine;
         boolean glow = false;
 
+        CollectionRecipeBridge currentRecipeBridge = recipeBridge;
+        boolean recipeEnabled = currentRecipeBridge != null;
+        boolean tierPageEnabled = hasBridge || recipeEnabled;
+
         if (collected >= required) {
             if (hasBridge && tier > claimedTier) {
                 material = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
                 nameColor = NamedTextColor.AQUA;
-                statusLine = Component.text("✦ 已解锁 — 点击领取本层奖励！", NamedTextColor.GOLD, TextDecoration.BOLD)
-                        .decoration(TextDecoration.ITALIC, false);
+                statusLine = Component.text(
+                        tierPageEnabled ? "✦ 已解锁（左键看配方 / 右键直接领奖）" : "✦ 已解锁 — 点击领取本层奖励！",
+                        NamedTextColor.GOLD,
+                        TextDecoration.BOLD
+                ).decoration(TextDecoration.ITALIC, false);
                 glow = true;
             } else if (hasBridge) {
                 material = Material.LIME_STAINED_GLASS_PANE;
@@ -431,6 +525,31 @@ public final class CollectionInfoGui {
                     .decoration(TextDecoration.ITALIC, false));
         }
 
+        if (recipeEnabled) {
+            List<RecipeEntry> tierRecipes = currentRecipeBridge.recipesForTier(item.material(), tier);
+            if (!tierRecipes.isEmpty()) {
+                lore.add(Component.empty());
+                lore.add(Component.text("⚒ 本层关联 " + tierRecipes.size() + " 个合成配方：", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)
+                        .decoration(TextDecoration.ITALIC, false));
+                int shown = Math.min(4, tierRecipes.size());
+                for (int i = 0; i < shown; i++) {
+                    lore.add(Component.text("  • ", NamedTextColor.GRAY)
+                            .append(Component.text(tierRecipes.get(i).name(), NamedTextColor.GOLD))
+                            .decoration(TextDecoration.ITALIC, false));
+                }
+                if (tierRecipes.size() > shown) {
+                    lore.add(text("  ... 共 " + tierRecipes.size() + " 个配方", NamedTextColor.DARK_GRAY));
+                }
+            }
+        }
+        if (tierPageEnabled) {
+            lore.add(Component.empty());
+            lore.add(actionText("左键：点进查看本级详情与 3×3 合成表"));
+            if (hasBridge && collected >= required && tier > claimedTier) {
+                lore.add(text("右键：立即领取至 " + roman(tier) + " 级奖励", NamedTextColor.AQUA));
+            }
+        }
+
         ItemStack pane = new ItemStack(material, Math.max(1, Math.min(64, tier)));
         ItemMeta meta = pane.getItemMeta();
         if (meta != null) {
@@ -447,7 +566,7 @@ public final class CollectionInfoGui {
         return pane;
     }
 
-    private static boolean isFortuneMilestone(@NotNull Category category, int required) {
+    public static boolean isFortuneMilestone(@NotNull Category category, int required) {
         return extended(category) && (required == 5_000 || required == 50_000 || required == 250_000);
     }
 
@@ -497,6 +616,25 @@ public final class CollectionInfoGui {
         for (CollectionItem item : category.items()) {
             if (item.material() == material) {
                 return item;
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable CollectionItem findAnyItem(@NotNull Material material) {
+        for (Category category : Category.values()) {
+            CollectionItem found = findItem(category, material);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable Category findCategoryForMaterial(@NotNull Material material) {
+        for (Category category : Category.values()) {
+            if (hasCollectionMaterial(category, material)) {
+                return category;
             }
         }
         return null;
@@ -557,7 +695,7 @@ public final class CollectionInfoGui {
         return String.format(Locale.ROOT, "%.1f%%", value);
     }
 
-    private static @NotNull Component progressLine(long current, long required) {
+    public static @NotNull Component progressLine(long current, long required) {
         return InfoGuiItems.createColoredProgressBar(percent(current, required))
                 .append(Component.text(" ").decoration(TextDecoration.STRIKETHROUGH, false))
                 .append(Component.text(formatNumber(current), NamedTextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false))

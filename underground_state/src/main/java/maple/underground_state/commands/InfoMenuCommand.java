@@ -128,11 +128,11 @@ public final class InfoMenuCommand implements CommandExecutor, Listener {
             case BackpackInfoGui.PAGE_ID -> BackpackInfoGui.handleOverviewClick(event);
             case CopperSwordMenuGui.PAGE_ID -> CopperSwordMenuGui.handleClick(player, rawSlot);
             case BookshelfInfoGui.PAGE_ID -> BookshelfInfoGui.handleClick(player, rawSlot);
-            case CollectionInfoGui.HOE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot);
-            case CollectionInfoGui.PICKAXE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot);
-            case CollectionInfoGui.SWORD_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot);
-            case CollectionInfoGui.AXE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot);
-            case CollectionInfoGui.FISHING_ROD_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot);
+            case CollectionInfoGui.HOE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot, event.isRightClick());
+            case CollectionInfoGui.PICKAXE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot, event.isRightClick());
+            case CollectionInfoGui.SWORD_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot, event.isRightClick());
+            case CollectionInfoGui.AXE_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot, event.isRightClick());
+            case CollectionInfoGui.FISHING_ROD_PAGE_ID -> CollectionInfoGui.handleClick(player, holder.pageId(), rawSlot, event.isRightClick());
             case HoeInfoGui.PAGE_ID -> HoeInfoGui.handleClick(player, rawSlot);
             case PickaxeInfoGui.PAGE_ID -> PickaxeInfoGui.handleClick(player, rawSlot);
             case SwordInfoGui.PAGE_ID -> SwordInfoGui.handleClick(player, rawSlot);

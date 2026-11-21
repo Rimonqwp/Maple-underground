@@ -1,6 +1,7 @@
 package maple.underground_item.professions;
 
 import maple.underground_state.UndergroundState;
+import maple.underground_state.gui.CollectionInfoGui;
 import maple.underground_state.skills.SkillType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,6 +25,7 @@ public final class ProfessionModule {
         core.getPlayerStatsRuntime().registerExtension(plugin,"profession-equipment",equipment);
         Bukkit.getPluginManager().registerEvents(crafting,plugin);Bukkit.getPluginManager().registerEvents(events,plugin);Bukkit.getPluginManager().registerEvents(book,plugin);
         core.getProfessionService().setMenu(book::open);
+        CollectionInfoGui.registerRecipeBridge(new ProfessionCollectionRecipeBridge(catalog, crafting));
         var command=Objects.requireNonNull(plugin.getCommand("profession"));
         command.setExecutor((sender,cmd,label,args) -> {
             if(args.length>=2 && args[0].equalsIgnoreCase("give")) {
@@ -44,5 +46,5 @@ public final class ProfessionModule {
         });
         plugin.getLogger().info("职业系统已加载："+catalog.sets().size()+" 套装备，"+catalog.items().size()+" 个物品定义。");
     }
-    public void close() { events.close();crafting.close();core.getProfessionService().setMenu(null);core.getPlayerStatsRuntime().unregisterExtension(plugin,"profession-equipment"); }
+    public void close() { CollectionInfoGui.registerRecipeBridge(null);events.close();crafting.close();core.getProfessionService().setMenu(null);core.getPlayerStatsRuntime().unregisterExtension(plugin,"profession-equipment"); }
 }

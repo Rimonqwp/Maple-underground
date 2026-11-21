@@ -4,5 +4,6 @@ enum CollectionMenuType {
     HUB,
     LEADERBOARD,
     GUIDE,
-    MISSING
+    MISSING,
+    TIER_RECIPE
 }

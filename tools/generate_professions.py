@@ -114,6 +114,44 @@ for material, cn_name in TWO_TIER_COMPRESSED_NAMES.items():
             raw_value=9 ** tier,
         )
 
+SET_COLORS = {
+    # 农业主线套装 (T1-T6)
+    'farming_main_1': 0x8B9A46,       # 田野：麦田嫩绿
+    'farming_main_2': 0x3E9C4B,       # 丰苗：鲜嫩翠绿
+    'farming_main_3': 0x8D5524,       # 沃土：肥沃棕褐
+    'farming_main_4': 0xDDA027,       # 丰穰：丰收麦金
+    'farming_main_5': 0x1E9E89,       # 灵穗：灵动翡翠青
+    'farming_main_6': 0xE6B800,       # 丰收圣约：辉煌圣金
+    # 农业分支专精套装
+    'farming_yield_1': 0xC8B040,      # 聚穗：麦穗暖黄
+    'farming_yield_2': 0xF0B429,      # 金穗：耀眼金橙
+    'farming_experience_1': 0x3B82A6, # 农学研习：学者青蓝
+    'farming_experience_2': 0x1E5AA8, # 农学贤者：贤者琉璃蓝
+    'farming_balanced_1': 0x6BA368,   # 田园匠心：鼠尾草绿
+    'farming_balanced_2': 0x2E7D32,   # 百谷协奏：繁茂森翠
+    'farming_rare_1': 0x9B59B6,       # 寻珍：神秘丁香紫
+    'farming_rare_2': 0xC23B9B,       # 天赐穗晶：璀璨晶紫
+    'farming_event_1': 0xD96B43,      # 巡田：暖阳珊瑚橙
+    'farming_event_2': 0xB73229,      # 镇田守望：炽烈朱红
+    # 挖矿主线套装 (T1-T6)
+    'mining_main_1': 0x7A7F85,        # 勘矿：粗糙岩灰
+    'mining_main_2': 0x9EA7B3,        # 铁脉：锻铁银蓝
+    'mining_main_3': 0x3D4856,        # 深岩：深板岩墨蓝
+    'mining_main_4': 0x2A62B8,        # 晶脉：幽邃青金蓝
+    'mining_main_5': 0xC84B28,        # 地心：地心熔岩橙红
+    'mining_main_6': 0x6A2C91,        # 星核：星核靛紫
+    # 挖矿分支专精套装
+    'mining_yield_1': 0xB87333,       # 富矿：古铜矿棕
+    'mining_yield_2': 0xE0A12E,       # 聚晶：闪耀琥珀金
+    'mining_experience_1': 0x4BA3C3,  # 矿研：冰晶天蓝
+    'mining_experience_2': 0x1D6FA5,  # 地质贤者：苍穹湛蓝
+    'mining_balanced_1': 0x5F8D8B,    # 探岩：秘银青灰
+    'mining_balanced_2': 0x2B9E6E,    # 万矿协奏：祖母绿矿
+    'mining_rare_1': 0xA855C7,        # 淘珍：紫水晶粉紫
+    'mining_rare_2': 0xD9468F,        # 星痕寻宝：星芒玫红
+    'mining_event_1': 0xA8383B,       # 唤矿：赤铁矿红
+    'mining_event_2': 0xE04F26,       # 地脉共鸣：烈焰绯红
+}
 for job in ['farming','mining']:
     farm = job == 'farming'
     nucleus = '穗' if farm else '矿'
@@ -139,7 +177,7 @@ for job in ['farming','mining']:
             event_tier = (0 if tier<=2 else 1 if tier<=4 else 2) if main else tier
             reduction = {4:10,5:15,6:20}.get(tier,0) if main else [5,15][tier-1] if branch=='event' else 0
             setid = f'{job}_{branch}_{tier}'
-            color = ((0x53782F if farm else 0x53677C) + (bi+1)*0x080403 + tier*0x080807) & 0xFFFFFF
+            color = SET_COLORS.get(setid, ((0x53782F if farm else 0x53677C) + (bi+1)*0x080403 + tier*0x080807) & 0xFFFFFF)
             req = requirements(job,branch,tier)
             sets[setid] = dict(name=name,job=job,branch=branch,tier=tier,level=level,fortune=fortune,xp=xp,rare=rare,event=event,event_tier=event_tier,reduction=reduction,health=hp,defense=defense,requirements=req)
             template = tier if main else [[3,5],[3,5],[4,5],[4,6],[4,6]][bi][tier-1]

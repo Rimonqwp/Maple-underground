@@ -20,10 +20,11 @@
         <button id="btn-sound" class="pill-btn active" title="开关升级与领奖音效">🔊 音效: 开</button>
         <button id="btn-open-main" class="pill-btn">📋 主信息菜单 (/info-new)</button>
         <button id="btn-open-hub" class="pill-btn primary">📚 收集中心 (/collect)</button>
+        <button id="btn-open-armory" class="pill-btn">⚔️ 武器与装备整合 (/itemmenu)</button>
       </div>
     </header>
 
-    <main class="workspace">
+    <main class="workspace" id="collect-workspace">
       <!-- 左侧/中央：模拟游戏窗口 -->
       <section class="game-stage">
         <div class="breadcrumb-bar" id="breadcrumb-bar"></div>
@@ -107,12 +108,39 @@
         </div>
       </aside>
     </main>
+
+    <!-- 武器与装备整合图鉴页面 -->
+    <section class="armory-workspace" id="armory-workspace" hidden>
+      <div class="armory-toolbar">
+        <div class="armory-tabs" id="armory-tabs"></div>
+        <div class="armory-filters">
+          <div class="armory-search-wrap">
+            <span class="armory-search-icon">🔍</span>
+            <input
+              type="text"
+              id="armory-search"
+              placeholder="搜索武器、套装、头盔、属性或技能关键词..."
+              autocomplete="off"
+            />
+            <button type="button" id="armory-search-clear" class="armory-clear-btn" hidden>✕</button>
+          </div>
+          <div class="armory-rarity-bar" id="armory-rarity-bar"></div>
+        </div>
+      </div>
+
+      <div class="armory-layout">
+        <div class="armory-catalog" id="armory-catalog"></div>
+        <aside class="armory-inspector" id="armory-inspector"></aside>
+      </div>
+    </section>
   </div>
 
   <!-- Minecraft 风格跟随悬浮提示框 -->
   <div class="mc-tooltip" id="mc-tooltip" hidden></div>
 
   <script src="data.js"></script>
+  <script src="equipment-data.js"></script>
   <script src="app.js"></script>
+  <script src="armory.js"></script>
 </body>
 </html>

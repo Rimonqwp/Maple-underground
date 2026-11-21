@@ -23,8 +23,12 @@ element to request a change:
      `CollectionRewardService.java`, `CollectionMath.java`, `CollectCommand.java`
    - Compressed materials and profession 3x3 crafting recipes:
      `tools/generate_professions.py` -> regenerate `underground_item/src/main/resources/professions.yml`
+   - Weapons, dungeon armor sets, special helmets, and cave echoes:
+     `underground_item/src/main/resources/weapons/*.yml`, `underground_item/src/main/resources/gear/*.yml`
+     (and matching managers in `underground_item/src/main/java/maple/underground_caves/{weapons,gear}/`),
+     then re-run `ruby tools/generate_equipment_data.rb` -> regenerates `equipment-data.js`
 2. Only edit this directory alone when the change is purely web simulator tooling or styling
    (such as the right-side debug panel, CSS layout, or texture loader) and does not affect in-game
    behavior or data. When in doubt, update the real plugin code as well.
-3. Always keep `data.js` / `app.js` synchronized with the plugin changes, reply to the user in
+3. Always keep `data.js` / `equipment-data.js` / `app.js` / `armory.js` synchronized with the plugin changes, reply to the user in
    Chinese, and commit locally in Chinese without running `git push`.

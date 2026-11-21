@@ -758,7 +758,7 @@ body {
   position: fixed;
   z-index: 9999;
   pointer-events: none;
-  max-width: 340px;
+  max-width: 420px;
   background: var(--mc-tooltip-bg);
   border: 2px solid #240066;
   box-shadow:
@@ -818,3 +818,620 @@ body {
 .c-blue { color: var(--c-blue); }
 .c-mint { color: var(--c-mint); }
 .bold { font-weight: 700; }
+
+.mc-italic { font-style: italic; }
+.mc-underline { text-decoration: underline; }
+.mc-strike { text-decoration: line-through; }
+.mc-underline.mc-strike { text-decoration: underline line-through; }
+
+/* ================================================================
+   武器与装备整合图鉴 (Armory Compendium)
+   ================================================================ */
+.armory-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.armory-workspace[hidden],
+.workspace[hidden] {
+  display: none;
+}
+
+.armory-toolbar {
+  background: rgba(23, 28, 40, 0.92);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.armory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.armory-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-card-2);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.08s;
+}
+
+.armory-tab:hover {
+  border-color: var(--accent);
+  background: #273147;
+}
+
+.armory-tab.active {
+  background: rgba(245, 185, 66, 0.18);
+  border-color: var(--accent);
+  color: #ffd875;
+  font-weight: 700;
+}
+
+.armory-tab-count {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.armory-tab.active .armory-tab-count {
+  background: rgba(245, 185, 66, 0.25);
+  color: #ffe399;
+}
+
+.armory-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.armory-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+}
+
+.armory-search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.armory-search-wrap input {
+  width: 100%;
+  background: #101521;
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  padding: 7px 30px 7px 32px;
+  font-size: 13px;
+  outline: none;
+}
+
+.armory-search-wrap input:focus {
+  border-color: var(--accent);
+}
+
+.armory-clear-btn {
+  position: absolute;
+  right: 7px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+
+.armory-clear-btn:hover {
+  color: #fff;
+}
+
+.armory-rarity-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rarity-pill {
+  background: #131927;
+  color: var(--text-muted);
+  border: 1px solid #2a344a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+
+.rarity-pill:hover {
+  border-color: var(--accent);
+  color: var(--text-main);
+}
+
+.rarity-pill.active {
+  background: rgba(88, 213, 201, 0.16);
+  border-color: var(--accent-2);
+  color: #8df2e7;
+  font-weight: 700;
+}
+
+.armory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1120px) {
+  .armory-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.armory-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.armory-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+}
+
+.armory-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.armory-section-title {
+  margin: 0;
+  font-size: 15.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.armory-section-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* MC Chest-styled grid for standalone items (weapons, helmets, echoes, tools) */
+.armory-subgroup-label {
+  font-size: 12px;
+  color: #a9b8d4;
+  font-weight: 700;
+  margin: 12px 0 7px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.armory-subgroup-label:first-of-type {
+  margin-top: 2px;
+}
+
+.armory-item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.armory-item-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  background: #121723;
+  border: 1px solid #273147;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, transform 0.08s;
+  text-align: left;
+}
+
+.armory-item-card:hover {
+  border-color: var(--accent);
+  background: #1b2336;
+}
+
+.armory-item-card.selected {
+  border-color: var(--accent);
+  background: rgba(245, 185, 66, 0.13);
+  box-shadow: 0 0 0 1px rgba(245, 185, 66, 0.45);
+}
+
+.armory-slot-box {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+}
+
+.armory-slot-box.selected-slot {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(245, 185, 66, 0.45);
+}
+
+.armory-item-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.armory-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+.armory-item-sub {
+  margin-top: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Rarity badges */
+.rarity-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+.rarity-稀有 { color: #7fafff; background: rgba(127, 175, 255, 0.13); border-color: rgba(127, 175, 255, 0.35); }
+.rarity-史詩 { color: #d6a5ea; background: rgba(192, 155, 255, 0.14); border-color: rgba(192, 155, 255, 0.38); }
+.rarity-傳說 { color: #ffdfb8; background: rgba(255, 212, 140, 0.15); border-color: rgba(255, 200, 110, 0.42); }
+.rarity-神話 { color: #ffb6f0; background: rgba(255, 150, 230, 0.15); border-color: rgba(255, 150, 230, 0.42); }
+.rarity-永恆 { color: #ffdae0; background: rgba(255, 195, 210, 0.16); border-color: rgba(255, 195, 210, 0.45); }
+.rarity-普通 { color: #c5f3e6; background: rgba(180, 240, 225, 0.12); border-color: rgba(180, 240, 225, 0.32); }
+.rarity-特殊 { color: #90e0ef; background: rgba(144, 224, 239, 0.12); border-color: rgba(144, 224, 239, 0.32); }
+.rarity-职业 { color: #ffd166; background: rgba(255, 209, 102, 0.13); border-color: rgba(255, 209, 102, 0.35); }
+
+/* 4-piece Armor Set Cards */
+.armory-set-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 10px;
+}
+
+.armory-set-card {
+  background: #121723;
+  border: 1px solid #273147;
+  border-radius: 12px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: border-color 0.14s, background 0.14s;
+}
+
+.armory-set-card:hover {
+  border-color: #3f5074;
+}
+
+.armory-set-card.has-selected {
+  border-color: var(--accent);
+  background: rgba(245, 185, 66, 0.06);
+}
+
+.armory-set-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.armory-set-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.color-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  flex: 0 0 12px;
+}
+
+.armory-set-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f3f6fc;
+}
+
+.armory-set-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.armory-floor-pills {
+  display: inline-flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.floor-pill {
+  background: #1c2436;
+  color: var(--text-muted);
+  border: 1px solid #303d59;
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.floor-pill:hover {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.floor-pill.active {
+  background: rgba(245, 185, 66, 0.22);
+  border-color: var(--accent);
+  color: #ffd875;
+}
+
+.armory-set-slots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: var(--mc-bg);
+  border: 3px solid #2b2b2b;
+  box-shadow:
+    inset 2px 2px 0 var(--mc-border-light),
+    inset -2px -2px 0 var(--mc-border-dark);
+  border-radius: 4px;
+  padding: 6px;
+}
+
+.armory-set-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 11px;
+}
+
+.mini-stat {
+  background: #1a2132;
+  border: 1px solid #29344c;
+  border-radius: 5px;
+  padding: 2px 6px;
+  color: #cdd8ee;
+}
+
+/* Sticky Right Inspector with 1:1 MC Tooltip Preview */
+.armory-inspector {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inspector-mc-stage {
+  background:
+    radial-gradient(ellipse at center, rgba(30, 38, 60, 0.65), rgba(9, 11, 18, 0.94));
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inspector-item-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inspector-item-banner .armory-slot-box {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+}
+
+.inspector-banner-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.inspector-banner-title {
+  font-size: 16px;
+  font-weight: 800;
+  text-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, 0.9);
+}
+
+.inspector-banner-sub {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* 1:1 Static Minecraft Tooltip Window */
+.mc-tooltip-card {
+  background: rgba(16, 0, 16, 0.96);
+  border: 2px solid #26006b;
+  box-shadow:
+    0 0 0 2px #100010,
+    inset 0 0 0 1px rgba(128, 56, 255, 0.78),
+    0 10px 28px rgba(0, 0, 0, 0.65);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.52;
+  text-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, 0.92);
+  word-break: break-word;
+}
+
+.mc-tooltip-card .tt-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.mc-tooltip-card .tt-spacer {
+  height: 9px;
+}
+
+.inspector-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.inspector-ctrl-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.inspector-piece-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.piece-switch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: #171e2f;
+  color: #cdd8ee;
+  border: 1px solid #2c3852;
+  border-radius: 8px;
+  padding: 6px 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.piece-switch-btn:hover {
+  border-color: var(--accent);
+}
+
+.piece-switch-btn.active {
+  background: rgba(245, 185, 66, 0.18);
+  border-color: var(--accent);
+  color: #ffd875;
+  font-weight: 700;
+}
+
+.inspector-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 8px;
+  background: #111622;
+  border: 1px solid #242f44;
+  border-radius: 7px;
+}
+
+.meta-row .mk {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.meta-row .mv {
+  color: #e6eefc;
+  text-align: right;
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+}
+
+.cmd-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #0d121c;
+  border: 1px solid #28344b;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.cmd-copy-code {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #7df0e3;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.armory-notice-banner {
+  background: rgba(88, 213, 201, 0.12);
+  border: 1px solid rgba(88, 213, 201, 0.35);
+  color: #a6f5ec;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.armory-empty {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 14px;
+  font-size: 13.5px;
+}

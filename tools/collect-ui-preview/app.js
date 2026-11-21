@@ -1963,12 +1963,17 @@
     const root = parts[0].toLowerCase();
 
     if (root === "info-new") {
-      state.view.type = "main";
-      render();
+      showCollectWorkspace("main");
+      return;
+    }
+    if (root === "itemmenu" || root === "armory" || root === "weapon" || root === "gear") {
+      if (window.MAPLE_ARMORY && typeof window.MAPLE_ARMORY.open === "function") {
+        window.MAPLE_ARMORY.open();
+      }
       return;
     }
     if (root !== "collect") {
-      pushChat(`<span class="c-red">未知指令，请使用 /collect 或 /info-new。</span>`);
+      pushChat(`<span class="c-red">未知指令，请使用 /collect、/info-new 或 /itemmenu。</span>`);
       return;
     }
 
@@ -2080,6 +2085,69 @@
     renderPlayerStats();
   }
 
+  const elCollectWorkspace = document.getElementById("collect-workspace");
+  const elArmoryWorkspace = document.getElementById("armory-workspace");
+  const btnOpenMain = document.getElementById("btn-open-main");
+  const btnOpenHub = document.getElementById("btn-open-hub");
+  const btnOpenArmory = document.getElementById("btn-open-armory");
+
+  function setTopbarMode(mode) {
+    if (btnOpenMain) btnOpenMain.classList.toggle("primary", mode === "main");
+    if (btnOpenHub) btnOpenHub.classList.toggle("primary", mode === "hub");
+    if (btnOpenArmory) btnOpenArmory.classList.toggle("primary", mode === "armory");
+    if (elCollectWorkspace) elCollectWorkspace.hidden = (mode === "armory");
+    if (elArmoryWorkspace) elArmoryWorkspace.hidden = (mode !== "armory");
+    hideTooltip();
+  }
+
+  function showCollectWorkspace(viewType) {
+    if (viewType) state.view.type = viewType;
+    setTopbarMode(state.view.type === "main" ? "main" : "hub");
+    render();
+  }
+
+  function findRecipeLocation(profItemId) {
+    for (const [mat, tierMap] of Object.entries(MATERIAL_RECIPES)) {
+      const tiers = Object.keys(tierMap).map(Number).sort((a, b) => a - b);
+      for (const tier of tiers) {
+        const list = tierMap[String(tier)] || [];
+        const rIdx = list.findIndex(r => r.itemId === profItemId);
+        if (rIdx >= 0) {
+          const found = findCollectionByMaterial(mat);
+          if (found) return { cat: found.cat, itemIndex: found.itemIndex, tier, recipeIdx: rIdx, mat };
+        }
+      }
+    }
+    return null;
+  }
+
+  function openProfessionRecipe(profItemId) {
+    const loc = findRecipeLocation(profItemId);
+    if (!loc) return false;
+    state.view.type = "tierRecipe";
+    state.view.categoryId = loc.cat.id;
+    state.view.itemIndex = loc.itemIndex;
+    state.view.tier = loc.tier;
+    state.view.recipeIdx = loc.recipeIdx;
+    state.view.recipeStack = [];
+    syncInspectorSelection(loc.cat.id, loc.mat);
+    setTopbarMode("hub");
+    playTone("click");
+    render();
+    return true;
+  }
+
+  window.MAPLE_SIM = {
+    playTone,
+    setTopbarMode,
+    showCollectWorkspace,
+    openProfessionRecipe,
+    findRecipeLocation,
+    showTooltip,
+    moveTooltip,
+    hideTooltip
+  };
+
   // ---------- 事件绑定 ----------
   document.getElementById("btn-sound").addEventListener("click", (ev) => {
     state.soundEnabled = !state.soundEnabled;
@@ -2087,17 +2155,26 @@
     ev.currentTarget.classList.toggle("active", state.soundEnabled);
   });
 
-  document.getElementById("btn-open-main").addEventListener("click", () => {
-    state.view.type = "main";
+  btnOpenMain.addEventListener("click", () => {
     playTone("click");
-    render();
+    showCollectWorkspace("main");
   });
 
-  document.getElementById("btn-open-hub").addEventListener("click", () => {
-    state.view.type = "hub";
+  btnOpenHub.addEventListener("click", () => {
     playTone("click");
-    render();
+    showCollectWorkspace("hub");
   });
+
+  if (btnOpenArmory) {
+    btnOpenArmory.addEventListener("click", () => {
+      playTone("click");
+      if (window.MAPLE_ARMORY && typeof window.MAPLE_ARMORY.open === "function") {
+        window.MAPLE_ARMORY.open();
+      } else {
+        setTopbarMode("armory");
+      }
+    });
+  }
 
   document.querySelectorAll("[data-preset]").forEach(btn => {
     btn.addEventListener("click", () => applyPreset(btn.dataset.preset));

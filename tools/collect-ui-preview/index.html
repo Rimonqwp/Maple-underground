@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maple Underground · 收集中心 UI 模拟器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-badge">MC 26.3</span>
+        <div>
+          <h1>Maple Underground · 收集中心交互模拟器</h1>
+          <p class="subtitle">免开游戏 1:1 模拟箱子 GUI 点击流：主页 → 收集中心 → 分类 → 物品 → 等级 → 3×3 合成配方</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-sound" class="pill-btn active" title="开关升级与领奖音效">🔊 音效: 开</button>
+        <button id="btn-open-main" class="pill-btn">📋 主信息菜单 (/info-new)</button>
+        <button id="btn-open-hub" class="pill-btn primary">📚 收集中心 (/collect)</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <!-- 左侧/中央：模拟游戏窗口 -->
+      <section class="game-stage">
+        <div class="breadcrumb-bar" id="breadcrumb-bar"></div>
+
+        <div class="mc-viewport">
+          <!-- 箱子 GUI 容器 -->
+          <div class="mc-chest-window" id="chest-window">
+            <div class="mc-chest-header">
+              <span class="mc-chest-title" id="gui-title">收集中心</span>
+              <span class="mc-chest-hint" id="gui-hint">左键点击格子交互 · 悬停查看 Lore</span>
+            </div>
+            <div class="mc-grid" id="mc-grid" role="grid" aria-label="Minecraft 54-slot chest GUI"></div>
+          </div>
+
+          <!-- 游戏内 ActionBar -->
+          <div class="mc-actionbar" id="mc-actionbar"></div>
+
+          <!-- 游戏内聊天栏 & 指令行 -->
+          <div class="mc-chat-panel">
+            <div class="mc-chat-log" id="mc-chat-log"></div>
+            <form class="mc-command-form" id="mc-command-form">
+              <span class="cmd-prefix">&gt;</span>
+              <input
+                type="text"
+                id="mc-command-input"
+                placeholder="输入指令模拟，如 /collect、/collect claim、/collect open farming、/collect admin add Player farming wheat 5000"
+                autocomplete="off"
+              />
+              <button type="submit">执行</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧：实时调试与模拟采集面板 -->
+      <aside class="inspector-panel">
+        <div class="panel-card">
+          <h2>🎮 测试存档预设</h2>
+          <div class="preset-grid">
+            <button class="ctrl-btn" data-preset="newbie">新手开荒</button>
+            <button class="ctrl-btn accent" data-preset="midgame">中期体验（推荐）</button>
+            <button class="ctrl-btn" data-preset="endgame">满级大佬</button>
+            <button class="ctrl-btn danger" data-preset="reset">全部清空</button>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2>⛏️ 模拟采集 / 调整进度</h2>
+          <label class="field-label" for="sim-category">分类</label>
+          <select id="sim-category" class="field-select"></select>
+
+          <label class="field-label" for="sim-item">物品（浏览详情页时会自动同步）</label>
+          <select id="sim-item" class="field-select"></select>
+
+          <div class="sim-current-box" id="sim-current-box"></div>
+
+          <div class="delta-grid">
+            <button class="ctrl-btn" data-delta="50">+50</button>
+            <button class="ctrl-btn" data-delta="250">+250</button>
+            <button class="ctrl-btn" data-delta="1000">+1k</button>
+            <button class="ctrl-btn" data-delta="5000">+5k</button>
+            <button class="ctrl-btn" data-delta="50000">+50k</button>
+            <button class="ctrl-btn accent" id="btn-sim-max">一键满级</button>
+          </div>
+          <div class="custom-set-row">
+            <input type="number" id="sim-custom-amount" min="0" step="1" placeholder="直接设置数量..." />
+            <button class="ctrl-btn" id="btn-sim-set">设置</button>
+            <button class="ctrl-btn danger" id="btn-sim-zero">清零</button>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2>📊 模拟玩家收益面板</h2>
+          <div class="stats-list" id="player-stats-box"></div>
+        </div>
+
+        <div class="panel-card">
+          <h2>✨ 含真实配方的推荐物品</h2>
+          <p class="small-tip">以下物品在 <code>professions.yml</code> 中绑定了真实 3×3 装备/压缩配方，点击可直达查看：</p>
+          <div class="recipe-shortcut-list" id="recipe-shortcuts"></div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Minecraft 风格跟随悬浮提示框 -->
+  <div class="mc-tooltip" id="mc-tooltip" hidden></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
